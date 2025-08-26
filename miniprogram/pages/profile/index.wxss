@@ -204,3 +204,16 @@
 .logout-btn:active {
   background: #FFF2F0;
 }
+
+/* 版本信息（隐藏管理员入口） */
+.version-info {
+  text-align: center;
+  padding: 40rpx 20rpx 60rpx;
+  margin-top: 40rpx;
+}
+
+.version-text {
+  font-size: 22rpx;
+  color: #CCC;
+  opacity: 0.6;
+}

@@ -1,0 +1,160 @@
+<!--用户管理页面-->
+<view class="container">
+  <!-- 管理员头部 -->
+  <view class="admin-header">
+    <view class="header-info">
+      <text class="admin-title">👑 管理员控制台</text>
+      <text class="admin-desc">用户信息管理系统</text>
+    </view>
+    <button class="exit-btn" bind:tap="exitAdmin">
+      <text class="exit-icon">🚪</text>
+      <text>退出</text>
+    </button>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-section">
+    <view class="stat-card">
+      <text class="stat-number">{{totalUsers}}</text>
+      <text class="stat-label">总用户</text>
+      <text class="stat-icon">👥</text>
+    </view>
+    <view class="stat-card active">
+      <text class="stat-number">{{activeUsers}}</text>
+      <text class="stat-label">活跃用户</text>
+      <text class="stat-icon">🟢</text>
+    </view>
+    <view class="stat-card inactive">
+      <text class="stat-number">{{inactiveUsers}}</text>
+      <text class="stat-label">非活跃</text>
+      <text class="stat-icon">🔴</text>
+    </view>
+  </view>
+
+  <!-- 搜索和筛选 -->
+  <view class="search-section">
+    <view class="search-box">
+      <input class="search-input" 
+             placeholder="搜索用户名、手机号或地址..." 
+             value="{{searchKeyword}}" 
+             bind:input="onSearchInput" />
+      <view wx:if="{{searchKeyword}}" class="clear-search" bind:tap="clearSearch">
+        <text class="clear-icon">✕</text>
+      </view>
+      <view wx:else class="search-icon">
+        <text>🔍</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 筛选标签 -->
+  <view class="filter-section">
+    <scroll-view class="filter-scroll" scroll-x>
+      <view class="filter-list">
+        <view wx:for="{{filters}}" wx:key="id" 
+              class="filter-item {{currentFilter === item.id ? 'active' : ''}}"
+              bind:tap="selectFilter" 
+              data-filter="{{item.id}}">
+          <text class="filter-icon">{{item.icon}}</text>
+          <text class="filter-name">{{item.name}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 排序和操作 -->
+  <view class="toolbar">
+    <view class="sort-controls">
+      <button class="sort-btn" bind:tap="selectSort">
+        <text class="sort-icon">📊</text>
+        <text>排序</text>
+      </button>
+      <button class="order-btn" bind:tap="toggleSortOrder">
+        <text class="order-icon">{{sortOrder === 'asc' ? '⬆️' : '⬇️'}}</text>
+      </button>
+    </view>
+    <view class="action-controls">
+      <button class="action-btn" bind:tap="refreshData">
+        <text class="action-icon">🔄</text>
+        <text>刷新</text>
+      </button>
+      <button class="action-btn" bind:tap="exportUserData">
+        <text class="action-icon">📤</text>
+        <text>导出</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 用户列表 -->
+  <view class="users-section">
+    <view wx:if="{{loading}}" class="loading-state">
+      <text class="loading-icon">⏳</text>
+      <text class="loading-text">加载用户数据中...</text>
+    </view>
+
+    <view wx:elif="{{filteredUsers.length > 0}}" class="user-list">
+      <view wx:for="{{filteredUsers}}" wx:key="id" 
+            class="user-card" 
+            bind:tap="viewUserDetail" 
+            data-user="{{item}}">
+        <view class="user-header">
+          <view class="user-basic">
+            <view class="user-avatar">
+              <text>{{item.avatar}}</text>
+            </view>
+            <view class="user-info">
+              <view class="user-name-line">
+                <text class="user-name">{{item.nickname}}</text>
+                <view class="user-status status-{{item.status}}">
+                  <text wx:if="{{item.status === 'active'}}">活跃</text>
+                  <text wx:elif="{{item.status === 'inactive'}}">非活跃</text>
+                </view>
+              </view>
+              <text class="user-phone">{{item.phone}}</text>
+              <view class="user-tags">
+                <text class="member-tag {{item.memberLevel === 'vip' ? 'vip' : 'regular'}}">
+                  {{item.memberLevel === 'vip' ? '👑 VIP' : '🎫 普通'}}
+                </text>
+                <text class="service-tag">{{item.serviceCount}}次服务</text>
+              </view>
+            </view>
+          </view>
+          <view class="user-arrow">
+            <text>></text>
+          </view>
+        </view>
+
+        <view class="user-details">
+          <view class="detail-row">
+            <text class="detail-label">📍 地址：</text>
+            <text class="detail-value">{{item.address}}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">⏰ 最后访问：</text>
+            <text class="detail-value">{{item.lastVisit}}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">🏥 健康状况：</text>
+            <text class="detail-value">{{item.healthCondition}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 无数据状态 -->
+    <view wx:else class="empty-state">
+      <text class="empty-icon">🔍</text>
+      <text class="empty-text">未找到匹配的用户</text>
+      <text class="empty-desc">试试调整搜索条件或筛选器</text>
+      <button class="clear-filter-btn" bind:tap="clearSearch">
+        清空筛选
+      </button>
+    </view>
+  </view>
+
+  <!-- 底部安全提示 -->
+  <view class="security-footer">
+    <text class="security-text">🔒 您正在使用管理员权限访问用户敏感信息</text>
+    <text class="security-text">请严格遵守相关法律法规和隐私保护政策</text>
+  </view>
+</view>

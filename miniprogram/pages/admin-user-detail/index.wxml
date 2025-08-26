@@ -1,0 +1,258 @@
+<!--用户详情页面-->
+<view class="container">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <text class="loading-icon">⏳</text>
+    <text class="loading-text">加载用户详情中...</text>
+  </view>
+
+  <!-- 用户详情 -->
+  <view wx:else class="user-detail">
+    <!-- 用户头部信息 -->
+    <view class="user-header">
+      <view class="user-basic">
+        <view class="user-avatar">
+          <text>{{user.avatar}}</text>
+        </view>
+        <view class="user-info">
+          <text class="user-name">{{user.nickname}}</text>
+          <text class="real-name">真实姓名：{{user.realName}}</text>
+          <view class="user-status-line">
+            <view class="status-badge status-{{user.status}}">
+              <text wx:if="{{user.status === 'active'}}">🟢 活跃</text>
+              <text wx:elif="{{user.status === 'inactive'}}">🔴 非活跃</text>
+            </view>
+            <view class="member-badge {{user.memberLevel === 'vip' ? 'vip' : 'regular'}}">
+              <text wx:if="{{user.memberLevel === 'vip'}}">👑 VIP会员</text>
+              <text wx:else>🎫 普通会员</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 操作按钮 -->
+      <view class="action-buttons">
+        <button class="action-btn primary" bind:tap="callUser">
+          <text class="btn-icon">📞</text>
+          <text>拨打电话</text>
+        </button>
+        <button class="action-btn secondary" bind:tap="sendSMS">
+          <text class="btn-icon">💬</text>
+          <text>发送短信</text>
+        </button>
+      </view>
+    </view>
+
+    <!-- 统计数据 -->
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-number">{{user.serviceCount}}</text>
+        <text class="stat-label">服务次数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">¥{{user.totalSpent}}</text>
+        <text class="stat-label">总消费</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{addressHistory.length}}</text>
+        <text class="stat-label">地址数量</text>
+      </view>
+    </view>
+
+    <!-- 标签页 -->
+    <view class="tab-section">
+      <scroll-view class="tab-scroll" scroll-x>
+        <view class="tab-list">
+          <view wx:for="{{tabs}}" wx:key="id" 
+                class="tab-item {{currentTab === item.id ? 'active' : ''}}"
+                bind:tap="switchTab" 
+                data-tab="{{item.id}}">
+            <text class="tab-icon">{{item.icon}}</text>
+            <text class="tab-name">{{item.name}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 标签页内容 -->
+    <!-- 基本信息 -->
+    <view wx:if="{{currentTab === 'basic'}}" class="tab-content">
+      <view class="info-section">
+        <view class="section-title">📝 基本资料</view>
+        <view class="info-list">
+          <view class="info-item">
+            <text class="info-label">手机号码</text>
+            <view class="info-value-row">
+              <text class="info-value">{{user.phone}}</text>
+              <button class="view-btn" bind:tap="viewFullPhone">完整</button>
+            </view>
+          </view>
+          <view class="info-item">
+            <text class="info-label">身份证号</text>
+            <view class="info-value-row">
+              <text class="info-value">{{user.idCard}}</text>
+              <button class="view-btn" bind:tap="viewFullIdCard">完整</button>
+            </view>
+          </view>
+          <view class="info-item">
+            <text class="info-label">邮箱地址</text>
+            <view class="info-value-row">
+              <text class="info-value">{{user.email}}</text>
+              <button class="view-btn" bind:tap="viewFullEmail">完整</button>
+            </view>
+          </view>
+          <view class="info-item">
+            <text class="info-label">年龄</text>
+            <text class="info-value">{{user.age}}岁</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">性别</text>
+            <text class="info-value">{{user.gender}}</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">生日</text>
+            <text class="info-value">{{user.birthday}}</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">注册时间</text>
+            <text class="info-value">{{user.registerTime}}</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">最后访问</text>
+            <text class="info-value">{{user.lastVisit}}</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">最后登录IP</text>
+            <text class="info-value">{{user.lastLoginIP}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="info-section">
+        <view class="section-title">🆘 紧急联系人</view>
+        <view class="info-list">
+          <view class="info-item">
+            <text class="info-label">联系人</text>
+            <text class="info-value">{{user.emergencyContact}}</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">关系</text>
+            <text class="info-value">{{user.emergencyRelation}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="info-section">
+        <view class="section-title">📱 设备信息</view>
+        <view class="info-list">
+          <view class="info-item">
+            <text class="info-label">设备平台</text>
+            <text class="info-value">{{user.deviceInfo.platform}}</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">设备型号</text>
+            <text class="info-value">{{user.deviceInfo.model}}</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">系统版本</text>
+            <text class="info-value">{{user.deviceInfo.version}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 地址信息 -->
+    <view wx:elif="{{currentTab === 'address'}}" class="tab-content">
+      <view class="address-list">
+        <view wx:for="{{addressHistory}}" wx:key="id" class="address-card">
+          <view class="address-header">
+            <view class="address-info">
+              <text class="address-text">{{item.address}}</text>
+              <view class="address-meta">
+                <text class="contact-info">{{item.contactName}} {{item.contactPhone}}</text>
+                <view class="address-tags">
+                  <text wx:if="{{item.isDefault}}" class="default-tag">默认地址</text>
+                  <text class="visit-tag">{{item.visitCount}}次服务</text>
+                </view>
+              </view>
+            </view>
+            <button class="nav-btn" bind:tap="navigateToAddress" data-address="{{item}}">
+              <text class="nav-icon">🗺️</text>
+              <text>导航</text>
+            </button>
+          </view>
+          <view class="address-footer">
+            <text class="time-info">最后服务：{{item.lastVisit}}</text>
+            <text class="time-info">添加时间：{{item.addTime}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 服务记录 -->
+    <view wx:elif="{{currentTab === 'service'}}" class="tab-content">
+      <view class="service-list">
+        <view wx:for="{{serviceHistory}}" wx:key="id" class="service-card">
+          <view class="service-header">
+            <view class="service-info">
+              <text class="service-name">{{item.serviceName}}</text>
+              <text class="service-time">{{item.serviceTime}}</text>
+            </view>
+            <view class="service-cost">¥{{item.cost}}</view>
+          </view>
+          <view class="service-details">
+            <text class="service-nurse">服务人员：{{item.nurse}}</text>
+            <text class="service-duration">服务时长：{{item.duration}}分钟</text>
+            <view class="service-rating">
+              <text class="rating-label">用户评价：</text>
+              <text class="rating-stars">{'★'.repeat(item.rating)}{'☆'.repeat(5-item.rating)}</text>
+            </view>
+            <text class="service-feedback">用户反馈：{{item.feedback}}</text>
+          </view>
+          <button class="detail-btn" bind:tap="viewServiceDetail" data-service="{{item}}">
+            查看详情
+          </button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 健康档案 -->
+    <view wx:elif="{{currentTab === 'health'}}" class="tab-content">
+      <view class="health-section">
+        <view class="section-title">❤️ 健康状况</view>
+        <view class="health-info">
+          <view class="health-item">
+            <text class="health-label">总体状况</text>
+            <text class="health-value good">{{user.healthCondition}}</text>
+          </view>
+          <view class="health-item">
+            <text class="health-label">过敏史</text>
+            <text class="health-value warning">{{user.allergies}}</text>
+          </view>
+          <view class="health-item">
+            <text class="health-label">病史</text>
+            <text class="health-value">{{user.medicalHistory}}</text>
+          </view>
+          <view class="health-item">
+            <text class="health-label">偏好服务</text>
+            <view class="preferred-services">
+              <text wx:for="{{user.preferredServices}}" wx:key="*this" class="service-tag">{{item}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 管理操作 -->
+    <view class="admin-actions">
+      <button class="admin-btn danger" bind:tap="freezeUser">
+        <text class="btn-icon">🚫</text>
+        <text>冻结用户</text>
+      </button>
+      <button class="admin-btn primary" bind:tap="exportUserData">
+        <text class="btn-icon">📤</text>
+        <text>导出数据</text>
+      </button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,838 @@
+
+> health-guard-server@1.0.0 test
+> jest
+
+  console.log
+    🔧 设置测试环境...
+
+      at Object.log (test/setup.js:14:11)
+
+  console.log
+    ✅ 测试数据库创建成功
+
+      at Object.log (test/setup.js:19:13)
+
+  console.log
+    ✅ 测试数据库初始化完成
+
+      at Object.log (test/setup.js:26:13)
+
+  console.log
+    🛠️ 初始化测试数据库...
+
+      at TestHelper.log [as setupTestDatabase] (test/helpers/TestHelper.js:19:13)
+
+  console.log
+    ✅ 测试数据库连接成功
+
+      at TestHelper.log [as setupTestDatabase] (test/helpers/TestHelper.js:25:17)
+
+  console.log
+    🔄 重置数据库表...
+
+      at log (reset-tables.js:5:11)
+
+  console.log
+    ✅ 数据库连接成功
+
+      at log (config/database.js:27:13)
+
+  console.log
+    🗑️ 删除现有表...
+
+      at log (reset-tables.js:15:13)
+
+  console.log
+    ✅ 删除表 bookings
+
+      at log (reset-tables.js:26:17)
+
+  console.log
+    ✅ 删除表 addresses
+
+      at log (reset-tables.js:26:17)
+
+  console.log
+    ✅ 删除表 admin_sessions
+
+      at log (reset-tables.js:26:17)
+
+  console.log
+    ✅ 删除表 users
+
+      at log (reset-tables.js:26:17)
+
+  console.log
+    📋 创建新表...
+
+      at log (reset-tables.js:33:13)
+
+  console.log
+    ✅ 创建用户表
+
+      at log (reset-tables.js:56:13)
+
+  console.log
+    ✅ 创建地址表
+
+      at log (reset-tables.js:76:13)
+
+  console.log
+    ✅ 创建预约表
+
+      at log (reset-tables.js:98:13)
+
+  console.log
+    ✅ 创建管理员会话表
+
+      at log (reset-tables.js:110:13)
+
+  console.log
+    🎉 数据库表重置完成!
+
+      at log (reset-tables.js:112:13)
+
+  console.error
+    数据库查询错误: Error: Duplicate entry 'constraint_test' for key 'users.open_id'
+        at PromisePool.execute (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\mysql2\lib\promise\pool.js:54:22)
+        at execute (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\config\database.js:39:31)
+        at Function.query [as create] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\models\User.js:92:28)
+        at Object.create (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\test\models\User.test.js:383:25)
+        at processTicksAndRejections (node:internal/process/task_queues:105:5) {
+      code: 'ER_DUP_ENTRY',
+      errno: 1062,
+      sql: '\n' +
+        '      INSERT INTO users (\n' +
+        '        open_id, nickname, avatar, phone, email, real_name,\n' +
+        '        gender, birthday, status, member_level, service_count, total_spent,\n' +
+        '        created_at, updated_at\n' +
+        '      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n' +
+        '    ',
+      sqlState: '23000',
+      sqlMessage: "Duplicate entry 'constraint_test' for key 'users.open_id'"
+    }
+
+    [0m [90m 40 |[39m     [36mreturn[39m rows[33m;[39m
+     [90m 41 |[39m   } [36mcatch[39m (error) {
+    [31m[1m>[22m[39m[90m 42 |[39m     console[33m.[39merror([32m'数据库查询错误:'[39m[33m,[39m error)[33m;[39m
+     [90m    |[39m             [31m[1m^[22m[39m
+     [90m 43 |[39m     [36mthrow[39m error[33m;[39m
+     [90m 44 |[39m   }
+     [90m 45 |[39m }[0m
+
+      at error (config/database.js:42:13)
+      at Function.create (models/User.js:92:22)
+      at Object.<anonymous> (test/models/User.test.js:383:7)
+
+  console.error
+    创建用户失败: Error: Duplicate entry 'constraint_test' for key 'users.open_id'
+        at PromisePool.execute (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\mysql2\lib\promise\pool.js:54:22)
+        at execute (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\config\database.js:39:31)
+        at Function.query [as create] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\models\User.js:92:28)
+        at Object.create (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\test\models\User.test.js:383:25)
+        at processTicksAndRejections (node:internal/process/task_queues:105:5) {
+      code: 'ER_DUP_ENTRY',
+      errno: 1062,
+      sql: '\n' +
+        '      INSERT INTO users (\n' +
+        '        open_id, nickname, avatar, phone, email, real_name,\n' +
+        '        gender, birthday, status, member_level, service_count, total_spent,\n' +
+        '        created_at, updated_at\n' +
+        '      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n' +
+        '    ',
+      sqlState: '23000',
+      sqlMessage: "Duplicate entry 'constraint_test' for key 'users.open_id'"
+    }
+
+    [0m [90m 132 |[39m       }[33m;[39m
+     [90m 133 |[39m     } [36mcatch[39m (error) {
+    [31m[1m>[22m[39m[90m 134 |[39m       console[33m.[39merror([32m'创建用户失败:'[39m[33m,[39m error)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 135 |[39m       [36mthrow[39m error[33m;[39m
+     [90m 136 |[39m     }
+     [90m 137 |[39m   }[0m
+
+      at Function.error [as create] (models/User.js:134:15)
+      at Object.<anonymous> (test/models/User.test.js:383:7)
+
+  console.log
+    🧹 清理测试数据...
+
+      at TestHelper.log [as cleanup] (test/helpers/TestHelper.js:211:13)
+
+  console.log
+    ✅ 测试数据清理完成
+
+      at TestHelper.log [as cleanup] (test/helpers/TestHelper.js:220:13)
+
+  console.log
+    🧹 清理测试环境...
+
+      at Object.log (test/setup.js:33:11)
+
+FAIL test/models/User.test.js
+  用户模型数据库测试
+    User.create - 创建用户
+      √ 应该成功创建新用户 (122 ms)
+      √ 应该设置默认值 (121 ms)
+      √ 应该验证必填字段 (125 ms)
+      √ 应该正确处理特殊字符 (110 ms)
+    User.findByOpenId - 根据OpenId查找用户
+      √ 应该成功找到存在的用户 (122 ms)
+      √ 应该返回null对于不存在的openId (122 ms)
+      √ 应该正确处理数据脱敏 (114 ms)
+    User.findById - 根据ID查找用户
+      √ 应该成功找到存在的用户 (116 ms)
+      √ 应该返回null对于不存在的ID (118 ms)
+      √ 应该验证ID参数类型 (115 ms)
+    User.update - 更新用户信息
+      × 应该成功更新用户信息 (126 ms)
+      √ 应该忽略不允许更新的字段 (123 ms)
+      √ 应该返回null对于不存在的用户 (115 ms)
+      √ 应该验证手机号格式 (114 ms)
+      √ 应该验证邮箱格式 (112 ms)
+    User.updateStatus - 更新用户状态
+      √ 应该成功更新用户状态为禁用 (123 ms)
+      √ 应该成功更新用户状态为激活 (130 ms)
+      √ 应该拒绝无效的状态值 (115 ms)
+      √ 应该返回false对于不存在的用户 (115 ms)
+    数据完整性验证
+      √ 创建用户时应正确设置所有时间戳 (112 ms)
+      × 更新用户时应正确更新时间戳 (220 ms)
+      √ 数据库约束应该正确工作 (123 ms)
+      √ 应该正确处理NULL值 (115 ms)
+
+  ● 用户模型数据库测试 › User.update - 更新用户信息 › 应该成功更新用户信息
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1756217639000
+    Received:   1756217639000
+
+    [0m [90m 249 |[39m       [90m// 验证updated_at字段已更新[39m
+     [90m 250 |[39m       expect([36mnew[39m [33mDate[39m(dbUser[33m.[39mupdated_at))[33m.[39mtoBeInstanceOf([33mDate[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 251 |[39m       expect([36mnew[39m [33mDate[39m(dbUser[33m.[39mupdated_at)[33m.[39mgetTime())[33m.[39mtoBeGreaterThan(
+     [90m     |[39m                                                     [31m[1m^[22m[39m
+     [90m 252 |[39m         [36mnew[39m [33mDate[39m(dbUser[33m.[39mcreated_at)[33m.[39mgetTime()
+     [90m 253 |[39m       )[33m;[39m
+     [90m 254 |[39m     })[33m;[39m[0m
+
+      at Object.toBeGreaterThan (test/models/User.test.js:251:53)
+
+  ● 用户模型数据库测试 › 数据完整性验证 › 更新用户时应正确更新时间戳
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 1756217640302
+    Received:   1756217640000
+
+    [0m [90m 368 |[39m       [36mconst[39m updatedUser [33m=[39m [36mawait[39m [33mUser[39m[33m.[39mupdate(user[33m.[39mid[33m,[39m { nickname[33m:[39m [32m'新昵称'[39m })[33m;[39m
+     [90m 369 |[39m
+    [31m[1m>[22m[39m[90m 370 |[39m       expect(updatedUser[33m.[39mupdatedAt[33m.[39mgetTime())[33m.[39mtoBeGreaterThan(user[33m.[39mcreatedAt[33m.[39mgetTime())[33m;[39m
+     [90m     |[39m                                               [31m[1m^[22m[39m
+     [90m 371 |[39m     })[33m;[39m
+     [90m 372 |[39m
+     [90m 373 |[39m     test([32m'数据库约束应该正确工作'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.toBeGreaterThan (test/models/User.test.js:370:47)
+
+  console.log
+    🔧 设置测试环境...
+
+      at Object.log (test/setup.js:14:11)
+
+  console.log
+    ✅ 测试数据库创建成功
+
+      at Object.log (test/setup.js:19:13)
+
+  console.log
+    ✅ 测试数据库初始化完成
+
+      at Object.log (test/setup.js:26:13)
+
+  console.log
+    🛠️ 初始化测试数据库...
+
+      at TestHelper.log [as setupTestDatabase] (test/helpers/TestHelper.js:19:13)
+
+  console.log
+    ✅ 测试数据库连接成功
+
+      at TestHelper.log [as setupTestDatabase] (test/helpers/TestHelper.js:25:17)
+
+  console.log
+    🧹 清理测试数据...
+
+      at TestHelper.log [as cleanup] (test/helpers/TestHelper.js:211:13)
+
+  console.log
+    ✅ 测试数据清理完成
+
+      at TestHelper.log [as cleanup] (test/helpers/TestHelper.js:220:13)
+
+  console.log
+    🧹 清理测试环境...
+
+      at Object.log (test/setup.js:33:11)
+
+PASS test/routes/booking.test.js
+  服务预约接口测试
+    POST /api/bookings - 创建预约
+      √ 应该成功创建服务预约 (72 ms)
+      √ 应该验证必填字段 (52 ms)
+      √ 应该验证服务类型 (41 ms)
+      √ 应该验证预约日期不能是过去时间 (37 ms)
+      √ 应该验证地址存在且属于当前用户 (35 ms)
+    GET /api/bookings - 获取用户预约列表
+      √ 应该返回用户的预约列表 (43 ms)
+      √ 应该支持分页功能 (55 ms)
+      √ 应该支持状态筛选 (49 ms)
+      √ 应该按创建时间降序排列 (59 ms)
+    GET /api/bookings/:id - 获取预约详情
+      √ 应该返回预约详情 (52 ms)
+      √ 应该拒绝访问其他用户的预约 (57 ms)
+      √ 应该处理不存在的预约 (52 ms)
+    PUT /api/bookings/:id - 更新预约
+      √ 应该成功更新预约信息 (63 ms)
+      √ 应该拒绝更新已完成的预约 (50 ms)
+      √ 应该拒绝访问其他用户的预约 (58 ms)
+    PUT /api/bookings/:id/cancel - 取消预约
+      √ 应该成功取消预约 (54 ms)
+      √ 应该拒绝取消已完成的预约 (56 ms)
+      √ 应该拒绝取消已取消的预约 (55 ms)
+    GET /api/services - 获取服务类型列表
+      √ 应该返回可用的服务类型 (45 ms)
+      √ 服务信息应该包含价格和时长 (40 ms)
+    数据库数据验证
+      √ 预约创建时应正确计算费用 (39 ms)
+      √ 预约状态变更应正确记录时间 (155 ms)
+      √ 预约和地址的关联应该正确 (49 ms)
+      √ 预约统计数据应该准确 (49 ms)
+
+  console.log
+    🔧 设置测试环境...
+
+      at Object.log (test/setup.js:14:11)
+
+  console.log
+    ✅ 测试数据库创建成功
+
+      at Object.log (test/setup.js:19:13)
+
+  console.log
+    ✅ 测试数据库初始化完成
+
+      at Object.log (test/setup.js:26:13)
+
+  console.log
+    🛠️ 初始化测试数据库...
+
+      at TestHelper.log [as setupTestDatabase] (test/helpers/TestHelper.js:19:13)
+
+  console.log
+    ✅ 测试数据库连接成功
+
+      at TestHelper.log [as setupTestDatabase] (test/helpers/TestHelper.js:25:17)
+
+  console.log
+    分页参数: { pageNum: 1, pageSizeNum: 20, limitNum: 20, offsetNum: 0 }
+
+      at Function.log [as getList] (models/User.js:260:15)
+
+  console.log
+    执行查询 SQL: 
+            SELECT 
+              id, nickname, real_name, phone, email, avatar, status, member_level,
+              service_count, total_spent, created_at, updated_at
+            FROM users 
+             
+            ORDER BY created_at DESC 
+            LIMIT 20 OFFSET 0
+
+      at Function.log [as getList] (models/User.js:278:15)
+
+  console.log
+    查询参数: []
+
+      at Function.log [as getList] (models/User.js:279:15)
+
+  console.error
+    管理员认证失败: Error: 管理员登录已过期
+        at Function.verifyAdminToken (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\utils\jwt.js:47:15)
+        at verifyAdminToken (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\middlewares\auth.js:44:30)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\route.js:149:13)
+        at Route.dispatch (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\route.js:119:3)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:284:15
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at Function.handle (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:175:3)
+        at router (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:47:12)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at urlencodedParser (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\body-parser\lib\types\urlencoded.js:94:7)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at jsonParser (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\body-parser\lib\types\json.js:113:7)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at cors (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:188:7)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:224:17
+        at originCallback (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:214:15)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:219:13
+        at optionsCallback (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:199:9)
+        at corsMiddleware (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:204:7)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at expressInit (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\middleware\init.js:40:5)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at query (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\middleware\query.js:45:5)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at Function.handle (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:175:3)
+        at Function.handle (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\application.js:181:10)
+        at Server.app (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\express.js:39:9)
+        at Server.emit (node:events:518:28)
+        at parserOnIncoming (node:_http_server:1153:12)
+        at HTTPParser.parserOnHeadersComplete (node:_http_common:117:17)
+
+    [0m [90m 58 |[39m     next()[33m;[39m
+     [90m 59 |[39m   } [36mcatch[39m (error) {
+    [31m[1m>[22m[39m[90m 60 |[39m     console[33m.[39merror([32m'管理员认证失败:'[39m[33m,[39m error)[33m;[39m
+     [90m    |[39m             [31m[1m^[22m[39m
+     [90m 61 |[39m     [33mUtils[39m[33m.[39merror(res[33m,[39m error[33m.[39mmessage[33m,[39m [35m401[39m)[33m;[39m
+     [90m 62 |[39m   }
+     [90m 63 |[39m }[33m;[39m[0m
+
+      at error (middlewares/auth.js:60:13)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at next (node_modules/express/lib/router/route.js:149:13)
+      at Route.dispatch (node_modules/express/lib/router/route.js:119:3)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at node_modules/express/lib/router/index.js:284:15
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at router (node_modules/express/lib/router/index.js:47:12)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at urlencodedParser (node_modules/body-parser/lib/types/urlencoded.js:94:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at jsonParser (node_modules/body-parser/lib/types/json.js:113:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at cors (node_modules/cors/lib/index.js:188:7)
+      at node_modules/cors/lib/index.js:224:17
+      at originCallback (node_modules/cors/lib/index.js:214:15)
+      at node_modules/cors/lib/index.js:219:13
+      at optionsCallback (node_modules/cors/lib/index.js:199:9)
+      at corsMiddleware (node_modules/cors/lib/index.js:204:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at expressInit (node_modules/express/lib/middleware/init.js:40:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at query (node_modules/express/lib/middleware/query.js:45:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at Function.handle (node_modules/express/lib/application.js:181:10)
+      at Server.app (node_modules/express/lib/express.js:39:9)
+
+  console.error
+    管理员认证失败: Error: invalid token
+        at Function.verifyAdminToken (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\utils\jwt.js:49:13)
+        at verifyAdminToken (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\middlewares\auth.js:44:30)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\route.js:149:13)
+        at Route.dispatch (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\route.js:119:3)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:284:15
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at Function.handle (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:175:3)
+        at router (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:47:12)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at urlencodedParser (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\body-parser\lib\types\urlencoded.js:94:7)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at jsonParser (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\body-parser\lib\types\json.js:113:7)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at cors (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:188:7)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:224:17
+        at originCallback (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:214:15)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:219:13
+        at optionsCallback (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:199:9)
+        at corsMiddleware (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:204:7)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at expressInit (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\middleware\init.js:40:5)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at query (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\middleware\query.js:45:5)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at Function.handle (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:175:3)
+        at Function.handle (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\application.js:181:10)
+        at Server.app (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\express.js:39:9)
+        at Server.emit (node:events:518:28)
+        at parserOnIncoming (node:_http_server:1153:12)
+        at HTTPParser.parserOnHeadersComplete (node:_http_common:117:17)
+
+    [0m [90m 58 |[39m     next()[33m;[39m
+     [90m 59 |[39m   } [36mcatch[39m (error) {
+    [31m[1m>[22m[39m[90m 60 |[39m     console[33m.[39merror([32m'管理员认证失败:'[39m[33m,[39m error)[33m;[39m
+     [90m    |[39m             [31m[1m^[22m[39m
+     [90m 61 |[39m     [33mUtils[39m[33m.[39merror(res[33m,[39m error[33m.[39mmessage[33m,[39m [35m401[39m)[33m;[39m
+     [90m 62 |[39m   }
+     [90m 63 |[39m }[33m;[39m[0m
+
+      at error (middlewares/auth.js:60:13)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at next (node_modules/express/lib/router/route.js:149:13)
+      at Route.dispatch (node_modules/express/lib/router/route.js:119:3)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at node_modules/express/lib/router/index.js:284:15
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at router (node_modules/express/lib/router/index.js:47:12)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at urlencodedParser (node_modules/body-parser/lib/types/urlencoded.js:94:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at jsonParser (node_modules/body-parser/lib/types/json.js:113:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at cors (node_modules/cors/lib/index.js:188:7)
+      at node_modules/cors/lib/index.js:224:17
+      at originCallback (node_modules/cors/lib/index.js:214:15)
+      at node_modules/cors/lib/index.js:219:13
+      at optionsCallback (node_modules/cors/lib/index.js:199:9)
+      at corsMiddleware (node_modules/cors/lib/index.js:204:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at expressInit (node_modules/express/lib/middleware/init.js:40:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at query (node_modules/express/lib/middleware/query.js:45:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at Function.handle (node_modules/express/lib/application.js:181:10)
+      at Server.app (node_modules/express/lib/express.js:39:9)
+
+  console.log
+    🧹 清理测试数据...
+
+      at TestHelper.log [as cleanup] (test/helpers/TestHelper.js:211:13)
+
+  console.log
+    ✅ 测试数据清理完成
+
+      at TestHelper.log [as cleanup] (test/helpers/TestHelper.js:220:13)
+
+  console.log
+    🧹 清理测试环境...
+
+      at Object.log (test/setup.js:33:11)
+
+PASS test/routes/admin.test.js
+  管理员功能接口测试
+    POST /api/admin/login - 管理员登录
+      √ 应该使用正确密码成功登录 (56 ms)
+      √ 应该拒绝错误的密码 (35 ms)
+      √ 应该验证必填字段 (37 ms)
+      √ 应该设置正确的过期时间 (40 ms)
+    GET /api/admin/users - 获取用户列表
+      √ 应该返回所有用户列表 (45 ms)
+    GET /api/admin/users/:id - 获取用户详情
+      √ 应该返回用户详细信息 (38 ms)
+      √ 应该返回用户统计信息 (49 ms)
+      √ 应该处理不存在的用户 (43 ms)
+    PUT /api/admin/users/:id/status - 更新用户状态
+      √ 应该成功禁用用户 (59 ms)
+      √ 应该成功启用用户 (61 ms)
+      √ 应该验证状态值 (39 ms)
+    GET /api/admin/statistics - 获取管理统计信息
+      √ 应该返回系统统计信息 (52 ms)
+    POST /api/admin/logout - 管理员登出
+      √ 应该成功登出管理员 (48 ms)
+    管理员权限验证
+      √ 过期的token应该被拒绝 (54 ms)
+      √ 无效格式的token应该被拒绝 (43 ms)
+    数据库数据验证
+      √ 管理员登录应该创建session记录 (41 ms)
+      √ 用户状态更新应该正确保存到数据库 (160 ms)
+      √ 管理员登出应该删除session记录 (55 ms)
+
+  console.log
+    🔧 设置测试环境...
+
+      at Object.log (test/setup.js:14:11)
+
+  console.log
+    ✅ 测试数据库创建成功
+
+      at Object.log (test/setup.js:19:13)
+
+  console.log
+    ✅ 测试数据库初始化完成
+
+      at Object.log (test/setup.js:26:13)
+
+  console.log
+    🛠️ 初始化测试数据库...
+
+      at TestHelper.log [as setupTestDatabase] (test/helpers/TestHelper.js:19:13)
+
+  console.log
+    ✅ 测试数据库连接成功
+
+      at TestHelper.log [as setupTestDatabase] (test/helpers/TestHelper.js:25:17)
+
+  console.error
+    用户认证失败: Error: Token无效
+        at Function.verifyUserToken (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\utils\jwt.js:34:13)
+        at verifyUserToken (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\middlewares\auth.js:15:30)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\route.js:149:13)
+        at Route.dispatch (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\route.js:119:3)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:284:15
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at Function.handle (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:175:3)
+        at router (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:47:12)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at urlencodedParser (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\body-parser\lib\types\urlencoded.js:94:7)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at jsonParser (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\body-parser\lib\types\json.js:113:7)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at cors (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:188:7)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:224:17
+        at originCallback (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:214:15)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:219:13
+        at optionsCallback (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:199:9)
+        at corsMiddleware (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\cors\lib\index.js:204:7)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at expressInit (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\middleware\init.js:40:5)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at query (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\middleware\query.js:45:5)
+        at Layer.handle [as handle_request] (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:328:13)
+        at D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:346:12)
+        at next (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:280:10)
+        at Function.handle (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\router\index.js:175:3)
+        at Function.handle (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\application.js:181:10)
+        at Server.app (D:\ProjectPackage\claude_code_project\RedCellProject\wx_mini_program\server\node_modules\express\lib\express.js:39:9)
+        at Server.emit (node:events:518:28)
+        at parserOnIncoming (node:_http_server:1153:12)
+        at HTTPParser.parserOnHeadersComplete (node:_http_common:117:17)
+
+    [0m [90m 27 |[39m     next()[33m;[39m
+     [90m 28 |[39m   } [36mcatch[39m (error) {
+    [31m[1m>[22m[39m[90m 29 |[39m     console[33m.[39merror([32m'用户认证失败:'[39m[33m,[39m error)[33m;[39m
+     [90m    |[39m             [31m[1m^[22m[39m
+     [90m 30 |[39m     [33mUtils[39m[33m.[39merror(res[33m,[39m [32m'token无效'[39m[33m,[39m [35m401[39m)[33m;[39m
+     [90m 31 |[39m   }
+     [90m 32 |[39m }[33m;[39m[0m
+
+      at error (middlewares/auth.js:29:13)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at next (node_modules/express/lib/router/route.js:149:13)
+      at Route.dispatch (node_modules/express/lib/router/route.js:119:3)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at node_modules/express/lib/router/index.js:284:15
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at router (node_modules/express/lib/router/index.js:47:12)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at urlencodedParser (node_modules/body-parser/lib/types/urlencoded.js:94:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at jsonParser (node_modules/body-parser/lib/types/json.js:113:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at cors (node_modules/cors/lib/index.js:188:7)
+      at node_modules/cors/lib/index.js:224:17
+      at originCallback (node_modules/cors/lib/index.js:214:15)
+      at node_modules/cors/lib/index.js:219:13
+      at optionsCallback (node_modules/cors/lib/index.js:199:9)
+      at corsMiddleware (node_modules/cors/lib/index.js:204:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at expressInit (node_modules/express/lib/middleware/init.js:40:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at query (node_modules/express/lib/middleware/query.js:45:5)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at Function.handle (node_modules/express/lib/application.js:181:10)
+      at Server.app (node_modules/express/lib/express.js:39:9)
+
+  console.log
+    🧹 清理测试数据...
+
+      at TestHelper.log [as cleanup] (test/helpers/TestHelper.js:211:13)
+
+  console.log
+    ✅ 测试数据清理完成
+
+      at TestHelper.log [as cleanup] (test/helpers/TestHelper.js:220:13)
+
+  console.log
+    🧹 清理测试环境...
+
+      at Object.log (test/setup.js:33:11)
+
+PASS test/routes/auth.test.js
+  用户认证接口测试
+    POST /api/auth/register - 用户注册
+      √ 应该成功注册新用户 (28 ms)
+      √ 应该拒绝重复的openId注册 (27 ms)
+      √ 应该验证必填字段 (16 ms)
+    POST /api/auth/login - 用户登录
+      √ 应该成功登录现有用户 (25 ms)
+      √ 应该为新用户创建账户 (26 ms)
+    GET /api/auth/profile - 获取用户信息
+      √ 应该返回用户基本信息 (21 ms)
+      √ 应该拒绝无效token的请求 (29 ms)
+      √ 应该拒绝无token的请求 (19 ms)
+    PUT /api/auth/profile - 更新用户信息
+      √ 应该成功更新用户信息 (31 ms)
+      √ 应该验证手机号格式 (25 ms)
+      √ 应该验证邮箱格式 (25 ms)
+    POST /api/auth/logout - 用户登出
+      √ 应该成功登出用户 (24 ms)
+      √ 应该拒绝无token的登出请求 (20 ms)
+    数据库数据验证
+      √ 用户注册时应正确保存所有字段 (24 ms)
+      √ 用户更新时应正确修改数据库记录 (141 ms)
+
+Test Suites: 1 failed, 3 passed, 4 total
+Tests:       2 failed, 78 passed, 80 total
+Snapshots:   0 total
+Time:        7.292 s
+Ran all test suites.

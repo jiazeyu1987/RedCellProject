@@ -113,4 +113,9 @@
   <view class="logout-section" wx:if="{{userInfo}}">
     <button class="logout-btn" bindtap="logout">退出登录</button>
   </view>
+
+  <!-- 版本信息（隐藏管理员入口） -->
+  <view class="version-info" bind:tap="onVersionTap">
+    <text class="version-text">版本 v1.0.0</text>
+  </view>
 </view>

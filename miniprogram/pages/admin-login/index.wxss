@@ -1,0 +1,234 @@
+/* 管理员登录页面样式 */
+.container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 60rpx 20rpx 40rpx;
+}
+
+/* 头部 */
+.header {
+  text-align: center;
+  color: white;
+  margin-bottom: 60rpx;
+}
+
+.admin-icon {
+  width: 120rpx;
+  height: 120rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 30rpx;
+  backdrop-filter: blur(10rpx);
+}
+
+.icon-emoji {
+  font-size: 60rpx;
+}
+
+.title {
+  display: block;
+  font-size: 42rpx;
+  font-weight: bold;
+  margin-bottom: 15rpx;
+}
+
+.subtitle {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+/* 登录表单 */
+.login-form {
+  background: white;
+  border-radius: 20rpx;
+  padding: 40rpx 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 30rpx rgba(0, 0, 0, 0.1);
+}
+
+.form-item {
+  margin-bottom: 40rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input {
+  flex: 1;
+  height: 80rpx;
+  border: 2rpx solid #E5E5E5;
+  border-radius: 15rpx;
+  padding: 0 60rpx 0 20rpx;
+  font-size: 26rpx;
+  background: #F8F9FA;
+}
+
+.password-input:focus {
+  border-color: #1890FF;
+  background: white;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 20rpx;
+  width: 40rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-icon {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.login-btn {
+  width: 100%;
+  height: 100rpx;
+  background: linear-gradient(135deg, #1890FF, #52C41A);
+  color: white;
+  border-radius: 50rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  border: none;
+  margin-bottom: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 20rpx rgba(24, 144, 255, 0.3);
+}
+
+.login-btn.loading {
+  background: #CCC;
+  box-shadow: none;
+}
+
+.help-links {
+  text-align: center;
+}
+
+.help-link {
+  font-size: 24rpx;
+  color: #1890FF;
+  text-decoration: underline;
+}
+
+.separator {
+  font-size: 24rpx;
+  color: #CCC;
+  margin: 0 20rpx;
+}
+
+/* 功能说明 */
+.feature-info {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 30rpx rgba(0, 0, 0, 0.1);
+}
+
+.info-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 25rpx;
+  text-align: center;
+}
+
+.feature-list {
+  gap: 20rpx;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.feature-item:last-child {
+  border-bottom: none;
+}
+
+.feature-icon {
+  font-size: 32rpx;
+  margin-right: 20rpx;
+  width: 50rpx;
+  text-align: center;
+}
+
+.feature-text {
+  font-size: 26rpx;
+  color: #666;
+}
+
+/* 安全警告 */
+.security-warning {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2rpx solid #FAAD14;
+  border-radius: 15rpx;
+  padding: 25rpx;
+  margin-bottom: 30rpx;
+}
+
+.warning-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.warning-icon {
+  font-size: 28rpx;
+  margin-right: 10rpx;
+}
+
+.warning-title {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #FAAD14;
+}
+
+.warning-text {
+  font-size: 22rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 返回按钮 */
+.back-section {
+  text-align: center;
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2rpx solid rgba(255, 255, 255, 0.3);
+  border-radius: 40rpx;
+  padding: 20rpx 40rpx;
+  font-size: 26rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10rpx);
+}
+
+.back-icon {
+  font-size: 24rpx;
+  margin-right: 10rpx;
+}

@@ -16,7 +16,10 @@
     "pages/feedback/index",
     "pages/help/index",
     "pages/settings/index",
-    "pages/about/index"
+    "pages/about/index",
+    "pages/admin-login/index",
+    "pages/admin-users/index",
+    "pages/admin-user-detail/index"
   ],
   "window": {
     "backgroundColor": "#F8F9FA",

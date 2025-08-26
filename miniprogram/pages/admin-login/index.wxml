@@ -1,0 +1,84 @@
+<!--管理员登录页面-->
+<view class="container">
+  <!-- 头部 -->
+  <view class="header">
+    <view class="admin-icon">
+      <text class="icon-emoji">🔐</text>
+    </view>
+    <text class="title">管理员登录</text>
+    <text class="subtitle">请输入管理员口令以继续</text>
+  </view>
+
+  <!-- 登录表单 -->
+  <view class="login-form">
+    <view class="form-item">
+      <text class="form-label">管理员口令</text>
+      <view class="password-input-wrapper">
+        <input class="password-input"
+               type="{{showPassword ? 'text' : 'password'}}"
+               placeholder="请输入管理员口令"
+               value="{{password}}"
+               bind:input="onPasswordInput"
+               maxlength="20" />
+        <view class="password-toggle" bind:tap="togglePasswordVisibility">
+          <text class="toggle-icon">{{showPassword ? '🙈' : '👁️'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 登录按钮 -->
+    <button class="login-btn {{loading ? 'loading' : ''}}" 
+            bind:tap="verifyAdminPassword" 
+            disabled="{{loading}}">
+      <text wx:if="{{loading}}">验证中...</text>
+      <text wx:else>🚀 进入管理模式</text>
+    </button>
+
+    <!-- 帮助链接 -->
+    <view class="help-links">
+      <text class="help-link" bind:tap="forgotPassword">忘记口令？</text>
+      <text class="separator">|</text>
+      <text class="help-link" bind:tap="viewSecurityTips">安全提示</text>
+    </view>
+  </view>
+
+  <!-- 功能说明 -->
+  <view class="feature-info">
+    <view class="info-title">📊 管理员功能</view>
+    <view class="feature-list">
+      <view class="feature-item">
+        <text class="feature-icon">👥</text>
+        <text class="feature-text">查看所有用户信息</text>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">🏠</text>
+        <text class="feature-text">查看用户住址信息</text>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">📈</text>
+        <text class="feature-text">查看服务统计数据</text>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">📋</text>
+        <text class="feature-text">查看用户服务记录</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 安全警告 -->
+  <view class="security-warning">
+    <view class="warning-header">
+      <text class="warning-icon">⚠️</text>
+      <text class="warning-title">安全警告</text>
+    </view>
+    <text class="warning-text">管理员权限涉及用户隐私数据，请确保您有权限访问这些信息，并严格遵守相关法律法规和公司政策。</text>
+  </view>
+
+  <!-- 返回按钮 -->
+  <view class="back-section">
+    <button class="back-btn" bind:tap="goBack">
+      <text class="back-icon">🔙</text>
+      <text>返回</text>
+    </button>
+  </view>
+</view>

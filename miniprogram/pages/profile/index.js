@@ -7,7 +7,8 @@ Page({
     memberLevel: '普通会员',
     serviceCount: 0,
     recordCount: 0,
-    postCount: 0
+    postCount: 0,
+    adminClickCount: 0 // 管理员入口点击计数
   },
 
   onLoad: function() {
@@ -150,6 +151,39 @@ Page({
       return false;
     }
     return true;
+  },
+
+  // 管理员入口（隐藏）- 连续点击版本号区域5次
+  onVersionTap() {
+    this.setData({
+      adminClickCount: this.data.adminClickCount + 1
+    });
+    
+    if (this.data.adminClickCount >= 5) {
+      wx.showModal({
+        title: '管理员入口',
+        content: '您即将进入管理员模式，是否继续？',
+        success: (res) => {
+          if (res.confirm) {
+            this.goToAdminLogin();
+          }
+          // 重置计数器
+          this.setData({ adminClickCount: 0 });
+        }
+      });
+    }
+    
+    // 3秒后重置计数器
+    setTimeout(() => {
+      this.setData({ adminClickCount: 0 });
+    }, 3000);
+  },
+
+  // 跳转到管理员登录页面
+  goToAdminLogin() {
+    wx.navigateTo({
+      url: '/pages/admin-login/index'
+    });
   },
 
   // 下拉刷新
