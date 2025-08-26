@@ -131,7 +131,13 @@ class UserModel {
         updatedAt: new Date(user.updatedAt)
       };
     } catch (error) {
-      console.error('创建用户失败:', error);
+      // 在测试环境中对预期的重复条目错误不输出详细日忕
+      const isDuplicateEntry = error.code === 'ER_DUP_ENTRY';
+      const isTestEnv = process.env.NODE_ENV === 'test';
+      
+      if (!isTestEnv || !isDuplicateEntry) {
+        console.error('创建用户失败:', error);
+      }
       throw error;
     }
   }

@@ -34,12 +34,19 @@ class JWTUtils {
       }
       return jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
-      console.error('JWT用户token验证失败:', {
-        error: error.message,
-        tokenLength: token ? token.length : 0,
-        tokenPrefix: token ? token.substring(0, 20) + '...' : 'null',
-        jwtSecretExists: !!process.env.JWT_SECRET
-      });
+      // 在非测试环境或非预期错误时输出详细日忕
+      const isExpectedError = error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError';
+      const isTestEnv = process.env.NODE_ENV === 'test';
+      
+      if (!isTestEnv || !isExpectedError) {
+        console.error('JWT用户token验证失败:', {
+          error: error.message,
+          errorName: error.name,
+          tokenLength: token ? token.length : 0,
+          tokenPrefix: token ? token.substring(0, 20) + '...' : 'null',
+          jwtSecretExists: !!process.env.JWT_SECRET
+        });
+      }
       
       if (error.name === 'TokenExpiredError') {
         throw new Error('用户登录已过期');
@@ -55,13 +62,39 @@ class JWTUtils {
   // 验证管理员Token
   static verifyAdminToken(token) {
     try {
+      if (!process.env.ADMIN_JWT_SECRET) {
+        throw new Error('ADMIN_JWT_SECRET未配置');
+      }
+      
+      if (!token) {
+        throw new Error('token为空');
+      }
+      
       const decoded = jwt.verify(token, process.env.ADMIN_JWT_SECRET);
       
       // JWT本身已经处理了过期检查，不需要额外的loginTime检查
       return decoded;
     } catch (error) {
+      // 在非测试环境或非预期错误时输出详细日志
+      const isExpectedError = error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError';
+      const isTestEnv = process.env.NODE_ENV === 'test';
+      
+      if (!isTestEnv || !isExpectedError) {
+        console.error('JWT管理员token验证失败:', {
+          error: error.message,
+          errorName: error.name,
+          tokenLength: token ? token.length : 0,
+          tokenPrefix: token ? token.substring(0, 20) + '...' : 'null',
+          adminJwtSecretExists: !!process.env.ADMIN_JWT_SECRET
+        });
+      }
+      
       if (error.name === 'TokenExpiredError') {
         throw new Error('管理员登录已过期');
+      } else if (error.name === 'JsonWebTokenError') {
+        throw new Error('Token格式错误');
+      } else if (error.name === 'NotBeforeError') {
+        throw new Error('Token尚未生效');
       }
       throw new Error(error.message || '管理员Token无效');
     }

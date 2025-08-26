@@ -25,16 +25,36 @@ describe('用户模型数据库测试', () => {
   beforeEach(async () => {
     // 清理测试数据 - 清理所有测试相关的数据
     try {
+      // 更全面的清理策略，包括新的短前缀
       await Database.query(`
         DELETE FROM users WHERE 
           email LIKE "%test%" OR 
           open_id LIKE "%test%" OR 
           open_id LIKE "%duplicate%" OR 
           open_id LIKE "%special%" OR
+          open_id LIKE "%constraint%" OR
+          open_id LIKE "%minimal%" OR
+          open_id LIKE "%char%" OR
+          open_id LIKE "%find%" OR
+          open_id LIKE "%update%" OR
+          open_id LIKE "%status%" OR
+          open_id LIKE "%timestamp%" OR
+          open_id LIKE "%null%" OR
+          open_id LIKE "constraint_%" OR
+          open_id LIKE "timestamp_%" OR
+          open_id LIKE "null_%" OR
+          open_id LIKE "cst_%" OR
           nickname LIKE "%测试%" OR
           nickname LIKE "%创建%" OR
           nickname LIKE "%重复%" OR
-          nickname LIKE "%特殊%"
+          nickname LIKE "%特殊%" OR
+          nickname LIKE "%最小%" OR
+          nickname LIKE "%查找%" OR
+          nickname LIKE "%更新%" OR
+          nickname LIKE "%状态%" OR
+          nickname LIKE "%时间戳%" OR
+          nickname LIKE "%NULL%" OR
+          nickname LIKE "%约束%"
       `);
       // 等待片刻以确保数据库操作完成
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -344,8 +364,9 @@ describe('用户模型数据库测试', () => {
 
   describe('数据完整性验证', () => {
     test('创建用户时应正确设置所有时间戳', async () => {
+      const uniqueId = Date.now() + '_' + Math.random().toString(36).substr(2, 6);
       const userData = {
-        openId: 'timestamp_test',
+        openId: `timestamp_${uniqueId}`,
         nickname: '时间戳测试用户'
       };
 
@@ -374,21 +395,55 @@ describe('用户模型数据库测试', () => {
     });
 
     test('数据库约束应该正确工作', async () => {
-      // 测试唯一约束
+      // 使用更简单的随机策略，并加入高精度时间戳
+      const uniqueId = `${Date.now()}_${performance.now().toString().replace('.', '')}_${Math.floor(Math.random() * 999999)}`;
+      
       const userData = {
-        openId: 'constraint_test',
+        openId: `cst_${uniqueId}`, // 使用更短的前缀
         nickname: '约束测试用户'
       };
 
-      await User.create(userData);
+      // 更强的清理逼辑 - 先清理所有可能的残留数据
+      try {
+        await Database.query('DELETE FROM users WHERE open_id LIKE "cst_%"');
+        await Database.query('DELETE FROM users WHERE open_id = ?', [userData.openId]);
+        // 等待更长时间确保数据库操作完成
+        await new Promise(resolve => setTimeout(resolve, 200));
+      } catch (cleanupError) {
+        console.log('清理数据警告:', cleanupError.message);
+      }
+
+      // 再次检查是否存在
+      try {
+        const existing = await Database.query('SELECT id FROM users WHERE open_id = ?', [userData.openId]);
+        if (existing.length > 0) {
+          await Database.query('DELETE FROM users WHERE open_id = ?', [userData.openId]);
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      } catch (checkError) {
+        console.log('检查数据警告:', checkError.message);
+      }
+
+      // 第一次创建应该成功
+      const firstUser = await User.create(userData);
+      expect(firstUser).toBeTruthy();
+      expect(firstUser.openId).toBe(userData.openId);
       
       // 尝试创建相同openId的用户应该失败
       await expect(User.create(userData)).rejects.toThrow();
+      
+      // 清理测试数据
+      try {
+        await Database.query('DELETE FROM users WHERE open_id = ?', [userData.openId]);
+      } catch (cleanupError) {
+        console.log('清理测试数据警告:', cleanupError.message);
+      }
     });
 
     test('应该正确处理NULL值', async () => {
+      const uniqueId = Date.now() + '_' + Math.random().toString(36).substr(2, 6);
       const userData = {
-        openId: 'null_test',
+        openId: `null_${uniqueId}`,
         nickname: 'NULL测试用户',
         phone: null,
         email: null,

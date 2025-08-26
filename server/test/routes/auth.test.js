@@ -23,7 +23,28 @@ describe('用户认证接口测试', () => {
       await Database.query('DELETE FROM bookings');
       await Database.query('DELETE FROM addresses');
       await Database.query('DELETE FROM admin_sessions');
-      await Database.query('DELETE FROM users');
+      // 更全面的用户数据清理
+      await Database.query(`DELETE FROM users WHERE 
+        open_id LIKE "%test%" OR 
+        open_id LIKE "%duplicate%" OR 
+        open_id LIKE "%new_user%" OR
+        open_id LIKE "%login%" OR
+        open_id LIKE "%profile%" OR
+        open_id LIKE "%update%" OR
+        open_id LIKE "%logout%" OR
+        open_id LIKE "%db_%" OR
+        email LIKE "%test%" OR
+        email LIKE "%example%" OR
+        nickname LIKE "%测试%" OR
+        nickname LIKE "%登录%" OR
+        nickname LIKE "%个人信息%" OR
+        nickname LIKE "%更新%" OR
+        nickname LIKE "%登出%" OR
+        nickname LIKE "%数据库%" OR
+        nickname LIKE "%用户%"
+      `);
+      // 等待片刻确保数据库操作完成
+      await new Promise(resolve => setTimeout(resolve, 50));
     } catch (error) {
       console.log('清理数据时的错误（可忽略）:', error.message);
     }

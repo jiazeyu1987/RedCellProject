@@ -39,7 +39,13 @@ async function query(sql, params = []) {
     const [rows] = await pool.execute(sql, params);
     return rows;
   } catch (error) {
-    console.error('数据库查询错误:', error);
+    // 在测试环境中对预期的重复条目错误不输出详细日志
+    const isDuplicateEntry = error.code === 'ER_DUP_ENTRY';
+    const isTestEnv = process.env.NODE_ENV === 'test';
+    
+    if (!isTestEnv || !isDuplicateEntry) {
+      console.error('数据库查询错误:', error);
+    }
     throw error;
   }
 }

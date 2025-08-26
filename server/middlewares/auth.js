@@ -26,7 +26,13 @@ const authMiddleware = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.error('用户认证失败:', error);
+    // 在非测试环境或非预期错误时输出日忕
+    const isExpectedError = error.message.includes('过期') || error.message.includes('格式错误');
+    const isTestEnv = process.env.NODE_ENV === 'test';
+    
+    if (!isTestEnv || !isExpectedError) {
+      console.error('用户认证失败:', error);
+    }
     Utils.error(res, 'token无效', 401);
   }
 };
@@ -57,7 +63,13 @@ const adminAuthMiddleware = async (req, res, next) => {
     
     next();
   } catch (error) {
-    console.error('管理员认证失败:', error);
+    // 在非测试环境或非预期错误时输出日忕
+    const isExpectedError = error.message.includes('过期') || error.message.includes('格式错误');
+    const isTestEnv = process.env.NODE_ENV === 'test';
+    
+    if (!isTestEnv || !isExpectedError) {
+      console.error('管理员认证失败:', error);
+    }
     Utils.error(res, error.message, 401);
   }
 };
