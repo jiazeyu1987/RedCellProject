@@ -1,0 +1,178 @@
+<!--关于我们页面-->
+<view class="container">
+  <!-- 应用信息 -->
+  <view class="app-header">
+    <view class="app-logo">
+      <text class="logo-emoji">{{appInfo.logo}}</text>
+    </view>
+    <text class="app-name">{{appInfo.name}}</text>
+    <text class="app-version">{{appInfo.version}}</text>
+    <text class="app-description">{{appInfo.description}}</text>
+  </view>
+
+  <!-- 数据成就 -->
+  <view class="achievements-section">
+    <view class="section-title">📊 数据成就</view>
+    <view class="achievements-grid">
+      <view wx:for="{{achievements}}" wx:key="label" class="achievement-item">
+        <text class="achievement-icon">{{item.icon}}</text>
+        <text class="achievement-number">{{item.number}}</text>
+        <text class="achievement-label">{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 核心特色 -->
+  <view class="features-section">
+    <view class="section-title">✨ 核心特色</view>
+    <view class="features-list">
+      <view wx:for="{{features}}" wx:key="title" class="feature-item">
+        <view class="feature-icon">
+          <text>{{item.icon}}</text>
+        </view>
+        <view class="feature-content">
+          <text class="feature-title">{{item.title}}</text>
+          <text class="feature-description">{{item.description}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 发展历程 -->
+  <view class="milestones-section">
+    <view class="section-title">🚀 发展历程</view>
+    <view class="timeline">
+      <view wx:for="{{milestones}}" wx:key="year" class="milestone-item">
+        <view class="milestone-year">{{item.year}}</view>
+        <view class="milestone-content">
+          <text class="milestone-title">{{item.title}}</text>
+          <text class="milestone-description">{{item.description}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 核心团队 -->
+  <view class="team-section">
+    <view class="section-title">👥 核心团队</view>
+    <view class="team-grid">
+      <view wx:for="{{teamMembers}}" wx:key="name" 
+            class="team-member" 
+            bind:tap="viewTeamMember" 
+            data-member="{{item}}">
+        <view class="member-avatar">
+          <text>{{item.avatar}}</text>
+        </view>
+        <text class="member-name">{{item.name}}</text>
+        <text class="member-position">{{item.position}}</text>
+        <text class="member-experience">{{item.experience}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 公司信息 -->
+  <view class="company-section">
+    <view class="section-title">🏢 公司信息</view>
+    <view class="company-info">
+      <view class="info-item">
+        <text class="info-label">公司名称</text>
+        <text class="info-value">{{companyInfo.name}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">成立时间</text>
+        <text class="info-value">{{companyInfo.established}}</text>
+      </view>
+      <view class="info-item" bind:tap="contactUs" data-type="address" data-contact="{{companyInfo.address}}">
+        <text class="info-label">公司地址</text>
+        <text class="info-value">{{companyInfo.address}}</text>
+        <text class="copy-hint">点击复制</text>
+      </view>
+      <view class="info-item" bind:tap="contactUs" data-type="phone" data-contact="{{companyInfo.phone}}">
+        <text class="info-label">联系电话</text>
+        <text class="info-value">{{companyInfo.phone}}</text>
+        <text class="copy-hint">点击拨打</text>
+      </view>
+      <view class="info-item" bind:tap="contactUs" data-type="email" data-contact="{{companyInfo.email}}">
+        <text class="info-label">邮箱地址</text>
+        <text class="info-value">{{companyInfo.email}}</text>
+        <text class="copy-hint">点击复制</text>
+      </view>
+      <view class="info-item" bind:tap="contactUs" data-type="website" data-contact="{{companyInfo.website}}">
+        <text class="info-label">官方网站</text>
+        <text class="info-value">{{companyInfo.website}}</text>
+        <text class="copy-hint">点击复制</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关注我们 -->
+  <view class="social-section">
+    <view class="section-title">📱 关注我们</view>
+    <view class="social-list">
+      <view wx:for="{{socialLinks}}" wx:key="platform" class="social-item">
+        <view class="social-info">
+          <text class="social-icon">{{item.icon}}</text>
+          <view class="social-content">
+            <text class="social-platform">{{item.platform}}</text>
+            <text class="social-account">{{item.account}}</text>
+          </view>
+        </view>
+        <view wx:if="{{item.qrcode}}" class="social-action" bind:tap="viewQRCode" data-platform="{{item.platform}}">
+          <text class="qr-icon">{{item.qrcode}}</text>
+          <text class="qr-text">扫码关注</text>
+        </view>
+        <view wx:else class="social-action" bind:tap="contactUs" data-type="phone" data-contact="{{item.account}}">
+          <text class="action-text">拨打电话</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 法律信息 -->
+  <view class="legal-section">
+    <view class="section-title">📋 法律信息</view>
+    <view class="legal-links">
+      <button class="legal-btn" bind:tap="viewUserAgreement">
+        <text class="legal-icon">📄</text>
+        <text>用户协议</text>
+      </button>
+      <button class="legal-btn" bind:tap="viewPrivacyPolicy">
+        <text class="legal-icon">🔒</text>
+        <text>隐私政策</text>
+      </button>
+      <button class="legal-btn" bind:tap="viewChangeLog">
+        <text class="legal-icon">📝</text>
+        <text>更新日志</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 更多服务 -->
+  <view class="more-section">
+    <view class="section-title">🛠️ 更多服务</view>
+    <view class="service-links">
+      <button class="service-btn" bind:tap="help">
+        <text class="service-icon">❓</text>
+        <text>帮助中心</text>
+      </button>
+      <button class="service-btn" bind:tap="feedback">
+        <text class="service-icon">💭</text>
+        <text>意见反馈</text>
+      </button>
+      <button class="service-btn" bind:tap="checkUpdate">
+        <text class="service-icon">🔄</text>
+        <text>检查更新</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 版权信息 -->
+  <view class="copyright-section">
+    <text class="copyright-text">© 2024 {{companyInfo.name}}</text>
+    <text class="copyright-text">版权所有，保留一切权利</text>
+    <text class="copyright-text">用心守护您的健康</text>
+  </view>
+
+  <!-- 底部间距 -->
+  <view class="bottom-space"></view>
+</view>

@@ -1,0 +1,176 @@
+/* 服务记录页面样式 */
+.container {
+  background-color: #F8F9FA;
+  min-height: 100vh;
+}
+
+/* 筛选器 */
+.filter-bar {
+  display: flex;
+  background: white;
+  padding: 20rpx;
+  border-bottom: 1rpx solid #E5E5E5;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.filter-item {
+  flex: 1;
+  text-align: center;
+  padding: 15rpx 0;
+  font-size: 26rpx;
+  color: #666;
+  border-radius: 25rpx;
+  margin: 0 10rpx;
+}
+
+.filter-item.active {
+  background: #1890FF;
+  color: white;
+}
+
+/* 记录列表 */
+.record-list {
+  padding: 20rpx;
+}
+
+.record-item {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.service-type {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.status-badge {
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  font-weight: bold;
+}
+
+.status-badge.completed {
+  background: #F6FFED;
+  color: #52C41A;
+}
+
+.status-badge.scheduled {
+  background: #E6F7FF;
+  color: #1890FF;
+}
+
+.status-badge.cancelled {
+  background: #FFF2F0;
+  color: #FF4D4F;
+}
+
+.record-info {
+  margin-bottom: 25rpx;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 15rpx;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  min-width: 160rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.info-value {
+  flex: 1;
+  font-size: 24rpx;
+  color: #333;
+}
+
+.info-value.price {
+  color: #FF4444;
+  font-weight: bold;
+}
+
+.record-actions {
+  display: flex;
+  gap: 15rpx;
+}
+
+.action-btn {
+  flex: 1;
+  height: 64rpx;
+  border-radius: 32rpx;
+  font-size: 24rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn.primary {
+  background: #1890FF;
+  color: white;
+}
+
+.action-btn.secondary {
+  background: #F8F9FA;
+  color: #666;
+  border: 1rpx solid #E5E5E5;
+}
+
+.action-btn.danger {
+  background: #FF4D4F;
+  color: white;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 100rpx 40rpx;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+  display: block;
+  color: #CCC;
+}
+
+.empty-text {
+  display: block;
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+}
+
+.empty-action {
+  width: 300rpx;
+  height: 80rpx;
+  background: #1890FF;
+  color: white;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

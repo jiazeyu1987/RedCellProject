@@ -1,0 +1,48 @@
+/* 空状态组件样式 */
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400rpx;
+  padding: 60rpx 40rpx;
+}
+
+.empty-content {
+  text-align: center;
+  max-width: 500rpx;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+  display: block;
+  color: #CCC;
+}
+
+.empty-title {
+  display: block;
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 15rpx;
+}
+
+.empty-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #CCC;
+  line-height: 1.5;
+  margin-bottom: 40rpx;
+}
+
+.empty-action {
+  width: 300rpx;
+  height: 80rpx;
+  background: #1890FF;
+  color: white;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

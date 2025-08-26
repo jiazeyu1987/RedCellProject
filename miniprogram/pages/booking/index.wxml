@@ -1,0 +1,224 @@
+<!-- 服务预约页面 -->
+<view class="container">
+  <!-- 顶部步骤指示器 -->
+  <view class="step-indicator">
+    <view class="step-item {{currentStep >= 1 ? 'active' : ''}}">
+      <view class="step-number">1</view>
+      <text class="step-text">选择服务</text>
+    </view>
+    <view class="step-line {{currentStep >= 2 ? 'active' : ''}}"></view>
+    <view class="step-item {{currentStep >= 2 ? 'active' : ''}}">
+      <view class="step-number">2</view>
+      <text class="step-text">选择时间</text>
+    </view>
+    <view class="step-line {{currentStep >= 3 ? 'active' : ''}}"></view>
+    <view class="step-item {{currentStep >= 3 ? 'active' : ''}}">
+      <view class="step-number">3</view>
+      <text class="step-text">确认信息</text>
+    </view>
+  </view>
+
+  <!-- 第一步：选择服务类型 -->
+  <view class="step-content" wx:if="{{currentStep === 1}}">
+    <view class="section-title">选择服务类型</view>
+    <view class="service-list">
+      <view class="service-card {{selectedService.id === item.id ? 'selected' : ''}}" 
+            wx:for="{{serviceTypes}}" wx:key="id" 
+            bindtap="selectService" data-service="{{item}}">
+        <view class="service-header">
+          <text class="service-name">{{item.name}}</text>
+          <text class="service-price">¥{{item.price}}</text>
+        </view>
+        <text class="service-description">{{item.description}}</text>
+        <view class="service-features">
+          <text class="feature-tag" wx:for="{{item.features}}" wx:key="index" wx:for-item="feature">{{feature}}</text>
+        </view>
+        <view class="check-icon" wx:if="{{selectedService.id === item.id}}">✓</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 第二步：选择时间和地址 -->
+  <view class="step-content" wx:if="{{currentStep === 2}}">
+    <!-- 选择日期 -->
+    <view class="date-section">
+      <view class="section-title">选择日期</view>
+      <view class="date-picker">
+        <view class="date-item {{selectedDate === item.date ? 'selected' : ''}}" 
+              wx:for="{{availableDates}}" wx:key="date"
+              bindtap="selectDate" data-date="{{item.date}}">
+          <text class="date-text">{{item.dayText}}</text>
+          <text class="date-day">{{item.dateText}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 选择时间段 -->
+    <view class="time-section">
+      <view class="section-title">选择时间段</view>
+      <view class="time-slots">
+        <view class="time-slot {{selectedTime === item.time ? 'selected' : ''}} {{item.available ? '' : 'disabled'}}" 
+              wx:for="{{timeSlots}}" wx:key="time"
+              bindtap="selectTime" data-time="{{item.time}}">
+          <text class="time-text">{{item.time}}</text>
+          <text class="time-status" wx:if="{{!item.available}}">已约满</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 服务地址 -->
+    <view class="address-section">
+      <view class="section-title">
+        <text>服务地址</text>
+        <text class="add-address" bindtap="addAddress">+ 新增地址</text>
+      </view>
+      <view class="address-list">
+        <view class="address-item {{selectedAddress.id === item.id ? 'selected' : ''}}" 
+              wx:for="{{addressList}}" wx:key="id"
+              bindtap="selectAddress" data-address="{{item}}">
+          <view class="address-content">
+            <view class="address-header">
+              <text class="contact-name">{{item.contactName}}</text>
+              <text class="contact-phone">{{item.contactPhone}}</text>
+            </view>
+            <text class="address-detail">{{item.province}}{{item.city}}{{item.district}}{{item.detail}}</text>
+          </view>
+          <view class="address-actions">
+            <text class="edit-btn" bindtap="editAddress" data-address="{{item}}">编辑</text>
+            <view class="check-icon" wx:if="{{selectedAddress.id === item.id}}">✓</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 特殊需求 -->
+    <view class="special-needs">
+      <view class="section-title">特殊需求（可选）</view>
+      <textarea class="needs-input" 
+                placeholder="请输入特殊需求，如需要特别关注的健康问题等"
+                value="{{specialNeeds}}"
+                bindinput="onSpecialNeedsInput"
+                maxlength="200"></textarea>
+      <text class="char-count">{{specialNeeds.length}}/200</text>
+    </view>
+  </view>
+
+  <!-- 第三步：确认预约信息 -->
+  <view class="step-content" wx:if="{{currentStep === 3}}">
+    <view class="section-title">确认预约信息</view>
+    
+    <view class="confirm-card">
+      <view class="confirm-section">
+        <text class="confirm-label">服务类型：</text>
+        <text class="confirm-value">{{selectedService.name}}</text>
+      </view>
+      
+      <view class="confirm-section">
+        <text class="confirm-label">服务价格：</text>
+        <text class="confirm-value price">¥{{selectedService.price}}</text>
+      </view>
+      
+      <view class="confirm-section">
+        <text class="confirm-label">预约时间：</text>
+        <text class="confirm-value">{{selectedDate}} {{selectedTime}}</text>
+      </view>
+      
+      <view class="confirm-section">
+        <text class="confirm-label">服务地址：</text>
+        <view class="confirm-address">
+          <text class="address-name">{{selectedAddress.contactName}} {{selectedAddress.contactPhone}}</text>
+          <text class="address-detail">{{selectedAddress.province}}{{selectedAddress.city}}{{selectedAddress.district}}{{selectedAddress.detail}}</text>
+        </view>
+      </view>
+      
+      <view class="confirm-section" wx:if="{{specialNeeds}}">
+        <text class="confirm-label">特殊需求：</text>
+        <text class="confirm-value">{{specialNeeds}}</text>
+      </view>
+    </view>
+
+    <!-- 支付方式 -->
+    <view class="payment-section">
+      <view class="section-title">支付方式</view>
+      <view class="payment-methods">
+        <view class="payment-item {{selectedPayment === 'wechat' ? 'selected' : ''}}"
+              bindtap="selectPayment" data-method="wechat">
+          <image class="payment-icon" src="/images/icons/wechat-pay.png"></image>
+          <text class="payment-name">微信支付</text>
+          <view class="check-icon" wx:if="{{selectedPayment === 'wechat'}}">✓</view>
+        </view>
+        <view class="payment-item {{selectedPayment === 'offline' ? 'selected' : ''}}"
+              bindtap="selectPayment" data-method="offline">
+          <image class="payment-icon" src="/images/icons/cash.png"></image>
+          <text class="payment-name">到场支付</text>
+          <view class="check-icon" wx:if="{{selectedPayment === 'offline'}}">✓</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 服务协议 -->
+    <view class="agreement-section">
+      <view class="agreement-item" bindtap="toggleAgreement">
+        <view class="checkbox {{agreedToTerms ? 'checked' : ''}}">
+          <text wx:if="{{agreedToTerms}}">✓</text>
+        </view>
+        <text class="agreement-text">
+          我已阅读并同意 <text class="link" bindtap="viewServiceAgreement">《服务协议》</text> 和 <text class="link" bindtap="viewPrivacyPolicy">《隐私政策》</text>
+        </text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作按钮 -->
+  <view class="bottom-actions">
+    <button class="action-btn secondary" wx:if="{{currentStep > 1}}" bindtap="prevStep">上一步</button>
+    <button class="action-btn primary" wx:if="{{currentStep < 3}}" bindtap="nextStep">下一步</button>
+    <button class="action-btn primary submit" wx:if="{{currentStep === 3}}" 
+            bindtap="submitBooking" disabled="{{!canSubmit}}">
+      {{selectedPayment === 'wechat' ? '立即支付' : '确认预约'}}
+    </button>
+  </view>
+</view>
+
+<!-- 地址编辑弹窗 -->
+<view class="modal-overlay" wx:if="{{showAddressModal}}" bindtap="closeAddressModal">
+  <view class="address-modal" catchtap="">
+    <view class="modal-header">
+      <text class="modal-title">{{editingAddress.id ? '编辑地址' : '新增地址'}}</text>
+      <text class="modal-close" bindtap="closeAddressModal">×</text>
+    </view>
+    <view class="modal-content">
+      <view class="form-item">
+        <text class="form-label">联系人：</text>
+        <input class="form-input" placeholder="请输入联系人姓名" 
+               value="{{editingAddress.contactName}}" 
+               bindinput="onAddressInput" data-field="contactName"/>
+      </view>
+      <view class="form-item">
+        <text class="form-label">联系电话：</text>
+        <input class="form-input" placeholder="请输入联系电话" 
+               value="{{editingAddress.contactPhone}}" 
+               bindinput="onAddressInput" data-field="contactPhone"/>
+      </view>
+      <view class="form-item">
+        <text class="form-label">所在地区：</text>
+        <picker mode="region" value="{{[editingAddress.province, editingAddress.city, editingAddress.district]}}" 
+                bindchange="onRegionChange">
+          <view class="picker-content">
+            {{editingAddress.province}}{{editingAddress.city}}{{editingAddress.district || '请选择'}}
+          </view>
+        </picker>
+      </view>
+      <view class="form-item">
+        <text class="form-label">详细地址：</text>
+        <textarea class="form-textarea" placeholder="请输入详细地址" 
+                  value="{{editingAddress.detail}}" 
+                  bindinput="onAddressInput" data-field="detail"/>
+      </view>
+    </view>
+    <view class="modal-actions">
+      <button class="modal-btn secondary" bindtap="closeAddressModal">取消</button>
+      <button class="modal-btn primary" bindtap="saveAddress">保存</button>
+    </view>
+  </view>
+</view>

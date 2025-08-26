@@ -1,0 +1,19 @@
+<!-- 用户认证组件 -->
+<view class="auth-guard" wx:if="{{!isLoggedIn && showAuthGuard}}">
+  <view class="auth-modal">
+    <view class="auth-content">
+      <image class="auth-icon" src="/images/icons/lock.png" mode="aspectFit"></image>
+      <text class="auth-title">{{title || '需要登录'}}</text>
+      <text class="auth-desc">{{description || '请先登录后使用此功能'}}</text>
+      <view class="auth-actions">
+        <button class="auth-btn cancel" bindtap="onCancel" wx:if="{{showCancel}}">{{cancelText || '取消'}}</button>
+        <button class="auth-btn confirm" bindtap="onConfirm">{{confirmText || '去登录'}}</button>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 内容区域 -->
+<view class="content" wx:if="{{isLoggedIn || !requireAuth}}">
+  <slot></slot>
+</view>

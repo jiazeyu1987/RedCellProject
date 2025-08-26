@@ -1,0 +1,41 @@
+<!-- 加载组件 -->
+<view class="loading-container" wx:if="{{show}}">
+  <!-- 全屏加载 -->
+  <view class="loading-overlay" wx:if="{{type === 'fullscreen'}}">
+    <view class="loading-content">
+      <view class="loading-spinner">
+        <view class="spinner-dot"></view>
+        <view class="spinner-dot"></view>
+        <view class="spinner-dot"></view>
+      </view>
+      <text class="loading-text">{{text || '加载中...'}}</text>
+    </view>
+  </view>
+
+  <!-- 内联加载 -->
+  <view class="loading-inline" wx:if="{{type === 'inline'}}">
+    <view class="inline-spinner">
+      <view class="spinner-circle"></view>
+    </view>
+    <text class="inline-text">{{text || '加载中...'}}</text>
+  </view>
+
+  <!-- 骨架屏加载 -->
+  <view class="loading-skeleton" wx:if="{{type === 'skeleton'}}">
+    <view class="skeleton-item" wx:for="{{skeletonRows}}" wx:key="index">
+      <view class="skeleton-avatar" wx:if="{{index === 0 && showAvatar}}"></view>
+      <view class="skeleton-content">
+        <view class="skeleton-line" style="width: {{item.width}}%;"></view>
+        <view class="skeleton-line short" wx:if="{{item.showSubLine}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 列表加载 -->
+  <view class="loading-list" wx:if="{{type === 'list'}}">
+    <view class="list-spinner">
+      <view class="spinner-circle small"></view>
+    </view>
+    <text class="list-text">{{text || '加载更多...'}}</text>
+  </view>
+</view>

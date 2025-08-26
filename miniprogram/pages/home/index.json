@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "健康守护",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50,
+  "backgroundTextStyle": "dark"
+}

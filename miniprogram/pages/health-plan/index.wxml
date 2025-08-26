@@ -1,0 +1,180 @@
+<!--健康计划页面-->
+<view class="container">
+  <!-- 顶部统计 -->
+  <view class="stats-section">
+    <view class="stat-item">
+      <text class="stat-number">{{totalPlans}}</text>
+      <text class="stat-label">总计划</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">{{activePlans}}</text>
+      <text class="stat-label">进行中</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">{{completedPlans}}</text>
+      <text class="stat-label">已完成</text>
+    </view>
+  </view>
+
+  <!-- 快速添加 -->
+  <view class="quick-add-section">
+    <button class="add-plan-btn" bind:tap="showAddPlanModal">
+      <text class="add-icon">➕</text>
+      <text>新建健康计划</text>
+    </button>
+  </view>
+
+  <!-- 筛选区域 -->
+  <view class="filter-section">
+    <view class="filter-tabs">
+      <view class="filter-tab {{currentFilter === 'all' ? 'active' : ''}}" 
+            bind:tap="filterPlans" data-filter="all">
+        <text>全部</text>
+      </view>
+      <view class="filter-tab {{currentFilter === 'active' ? 'active' : ''}}" 
+            bind:tap="filterPlans" data-filter="active">
+        <text>进行中</text>
+      </view>
+      <view class="filter-tab {{currentFilter === 'completed' ? 'active' : ''}}" 
+            bind:tap="filterPlans" data-filter="completed">
+        <text>已完成</text>
+      </view>
+      <view class="filter-tab {{currentFilter === 'paused' ? 'active' : ''}}" 
+            bind:tap="filterPlans" data-filter="paused">
+        <text>已暂停</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 计划列表 -->
+  <view class="plans-section">
+    <view wx:for="{{filteredPlans}}" wx:key="id" class="plan-card" bind:tap="viewPlanDetail" data-plan="{{item}}">
+      <view class="plan-header">
+        <view class="plan-title">{{item.title}}</view>
+        <view class="plan-status status-{{item.status}}">
+          <text wx:if="{{item.status === 'active'}}">进行中</text>
+          <text wx:if="{{item.status === 'completed'}}">已完成</text>
+          <text wx:if="{{item.status === 'paused'}}">已暂停</text>
+        </view>
+      </view>
+
+      <view class="plan-description">{{item.description}}</view>
+
+      <view class="plan-progress">
+        <view class="progress-bar">
+          <view class="progress-fill" style="width: {{item.progress}}%"></view>
+        </view>
+        <text class="progress-text">{{item.progress}}%</text>
+      </view>
+
+      <view class="plan-info">
+        <view class="info-item">
+          <text class="info-label">开始时间：</text>
+          <text class="info-value">{{item.startDate}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">目标时间：</text>
+          <text class="info-value">{{item.endDate}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">剩余天数：</text>
+          <text class="info-value">{{item.remainingDays}}天</text>
+        </view>
+      </view>
+
+      <view class="plan-actions">
+        <button class="action-btn secondary" bind:tap="editPlan" data-plan="{{item}}" catch:tap="true">
+          编辑
+        </button>
+        <button wx:if="{{item.status === 'active'}}" class="action-btn warning" 
+                bind:tap="pausePlan" data-id="{{item.id}}" catch:tap="true">
+          暂停
+        </button>
+        <button wx:if="{{item.status === 'paused'}}" class="action-btn primary" 
+                bind:tap="resumePlan" data-id="{{item.id}}" catch:tap="true">
+          继续
+        </button>
+        <button wx:if="{{item.status === 'active'}}" class="action-btn success" 
+                bind:tap="completePlan" data-id="{{item.id}}" catch:tap="true">
+          完成
+        </button>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{filteredPlans.length === 0}}" class="empty-state">
+      <text class="empty-icon">📋</text>
+      <text class="empty-text">暂无健康计划</text>
+      <text class="empty-desc">创建您的第一个健康计划，开始健康管理之旅</text>
+      <button class="empty-action-btn" bind:tap="showAddPlanModal">
+        立即创建
+      </button>
+    </view>
+  </view>
+
+  <!-- 添加计划弹窗 -->
+  <view wx:if="{{showAddModal}}" class="modal-overlay" bind:tap="hideAddPlanModal">
+    <view class="modal-content" catch:tap="true">
+      <view class="modal-header">
+        <text class="modal-title">新建健康计划</text>
+        <button class="close-btn" bind:tap="hideAddPlanModal">✕</button>
+      </view>
+
+      <view class="modal-body">
+        <view class="form-item">
+          <text class="form-label">计划标题</text>
+          <input class="form-input" placeholder="请输入计划标题" 
+                 value="{{newPlan.title}}" bind:input="onPlanInput" data-field="title" />
+        </view>
+
+        <view class="form-item">
+          <text class="form-label">计划描述</text>
+          <textarea class="form-textarea" placeholder="请描述您的健康计划目标和内容" 
+                    value="{{newPlan.description}}" bind:input="onPlanInput" data-field="description"></textarea>
+        </view>
+
+        <view class="form-item">
+          <text class="form-label">计划类型</text>
+          <picker range="{{planTypes}}" range-key="name" value="{{newPlan.typeIndex}}" 
+                  bind:change="onPlanTypeChange">
+            <view class="picker-item">
+              <text>{{planTypes[newPlan.typeIndex].name}}</text>
+              <text class="picker-arrow">></text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <text class="form-label">开始日期</text>
+          <picker mode="date" value="{{newPlan.startDate}}" bind:change="onStartDateChange">
+            <view class="picker-item">
+              <text>{{newPlan.startDate || '请选择开始日期'}}</text>
+              <text class="picker-arrow">></text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <text class="form-label">结束日期</text>
+          <picker mode="date" value="{{newPlan.endDate}}" bind:change="onEndDateChange">
+            <view class="picker-item">
+              <text>{{newPlan.endDate || '请选择结束日期'}}</text>
+              <text class="picker-arrow">></text>
+            </view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <text class="form-label">目标体重 (kg)</text>
+          <input class="form-input" type="digit" placeholder="请输入目标体重" 
+                 value="{{newPlan.targetWeight}}" bind:input="onPlanInput" data-field="targetWeight" />
+        </view>
+      </view>
+
+      <view class="modal-footer">
+        <button class="modal-btn secondary" bind:tap="hideAddPlanModal">取消</button>
+        <button class="modal-btn primary" bind:tap="savePlan">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

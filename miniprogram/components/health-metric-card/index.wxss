@@ -1,0 +1,114 @@
+/* 健康指标卡片组件样式 */
+.health-metric-card {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+  border-left: 6rpx solid transparent;
+  transition: all 0.3s ease;
+}
+
+.health-metric-card.normal {
+  border-left-color: #52C41A;
+}
+
+.health-metric-card.warning {
+  border-left-color: #FAAD14;
+}
+
+.health-metric-card.danger {
+  border-left-color: #FF4D4F;
+}
+
+.metric-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.metric-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 25rpx;
+  font-size: 40rpx;
+  background: #F0F8FF;
+}
+
+.metric-info {
+  flex: 1;
+}
+
+.metric-name {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.metric-value-container {
+  display: flex;
+  align-items: baseline;
+}
+
+.metric-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.metric-unit {
+  font-size: 24rpx;
+  color: #999;
+  margin-left: 8rpx;
+}
+
+.metric-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.status-text {
+  font-size: 24rpx;
+}
+
+.health-metric-card.normal .status-text {
+  color: #52C41A;
+}
+
+.health-metric-card.warning .status-text {
+  color: #FAAD14;
+}
+
+.health-metric-card.danger .status-text {
+  color: #FF4D4F;
+}
+
+.trend-icon {
+  font-size: 20rpx;
+  font-weight: bold;
+}
+
+.metric-range {
+  margin-bottom: 10rpx;
+}
+
+.range-text {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.metric-time {
+  text-align: right;
+}
+
+.time-text {
+  font-size: 20rpx;
+  color: #CCC;
+}

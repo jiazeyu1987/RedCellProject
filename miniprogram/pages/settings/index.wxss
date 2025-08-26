@@ -1,0 +1,202 @@
+/* 设置页面样式 */
+.container {
+  background-color: #F8F9FA;
+  min-height: 100vh;
+}
+
+/* 用户信息区域 */
+.user-section {
+  background: linear-gradient(135deg, #1890FF, #52C41A);
+  padding: 40rpx 20rpx 60rpx;
+  color: white;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  backdrop-filter: blur(10rpx);
+}
+
+.user-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 30rpx;
+  flex-shrink: 0;
+}
+
+.avatar-emoji {
+  font-size: 50rpx;
+}
+
+.user-details {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.user-name {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.user-phone {
+  font-size: 26rpx;
+  opacity: 0.8;
+}
+
+.edit-icon {
+  font-size: 28rpx;
+  opacity: 0.7;
+}
+
+/* 设置分组 */
+.settings-group {
+  margin: 20rpx;
+  background: white;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.group-header {
+  padding: 30rpx;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.group-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.group-content {
+  padding: 0 30rpx;
+}
+
+/* 设置项 */
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.item-info {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.item-title {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.item-desc {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.4;
+}
+
+.item-action {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.action-text {
+  font-size: 26rpx;
+  color: #1890FF;
+  margin-right: 10rpx;
+}
+
+.arrow {
+  font-size: 28rpx;
+  color: #CCC;
+}
+
+.setting-switch {
+  transform: scale(0.8);
+}
+
+/* 存储信息 */
+.storage-info {
+  padding: 30rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.storage-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.storage-title {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.storage-size {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.storage-bar {
+  height: 8rpx;
+  background: #F5F5F5;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.storage-used {
+  height: 100%;
+  background: linear-gradient(90deg, #1890FF, #52C41A);
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+
+/* 退出登录 */
+.logout-section {
+  margin: 40rpx 20rpx 20rpx;
+}
+
+.logout-btn {
+  width: 100%;
+  height: 100rpx;
+  background: #FF4D4F;
+  color: white;
+  border-radius: 50rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 20rpx rgba(255, 77, 79, 0.3);
+}
+
+.logout-btn:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* 底部间距 */
+.bottom-space {
+  height: 100rpx;
+}

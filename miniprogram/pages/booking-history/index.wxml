@@ -1,0 +1,76 @@
+<!-- 预约历史页面 -->
+<view class="container">
+  <!-- 状态筛选 -->
+  <view class="filter-bar">
+    <view class="filter-item {{statusFilter === 'all' ? 'active' : ''}}" bindtap="filterByStatus" data-status="all">
+      全部
+    </view>
+    <view class="filter-item {{statusFilter === 'pending' ? 'active' : ''}}" bindtap="filterByStatus" data-status="pending">
+      待服务
+    </view>
+    <view class="filter-item {{statusFilter === 'completed' ? 'active' : ''}}" bindtap="filterByStatus" data-status="completed">
+      已完成
+    </view>
+    <view class="filter-item {{statusFilter === 'cancelled' ? 'active' : ''}}" bindtap="filterByStatus" data-status="cancelled">
+      已取消
+    </view>
+  </view>
+
+  <!-- 预约列表 -->
+  <view class="booking-list" wx:if="{{!loading}}">
+    <view class="booking-item" wx:for="{{filteredBookings}}" wx:key="id" bindtap="viewDetail" data-booking="{{item}}">
+      <view class="booking-header">
+        <text class="service-type">{{item.serviceType}}</text>
+        <view class="status-badge {{item.status}}">{{item.statusText}}</view>
+      </view>
+      
+      <view class="booking-info">
+        <view class="info-row">
+          <text class="info-label">📅 服务时间：</text>
+          <text class="info-value">{{item.serviceDate}} {{item.serviceTime}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">📍 服务地址：</text>
+          <text class="info-value">{{item.address}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">💰 服务费用：</text>
+          <text class="info-value price">¥{{item.price}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.nurseInfo}}">
+          <text class="info-label">👩‍⚕️ 医护人员：</text>
+          <text class="info-value">{{item.nurseInfo.name}} {{item.nurseInfo.title}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.cancelReason}}">
+          <text class="info-label">❗ 取消原因：</text>
+          <text class="info-value">{{item.cancelReason}}</text>
+        </view>
+      </view>
+
+      <view class="booking-actions" wx:if="{{item.status === 'pending'}}">
+        <button class="action-btn secondary" bindtap="contactNurse" data-nurse="{{item.nurseInfo}}" catchtap="" wx:if="{{item.nurseInfo}}">联系医护</button>
+        <button class="action-btn danger" bindtap="cancelBooking" data-id="{{item.id}}" catchtap="">取消预约</button>
+      </view>
+
+      <view class="booking-actions" wx:if="{{item.status === 'cancelled'}}">
+        <button class="action-btn primary" bindtap="rebookService" data-booking="{{item}}" catchtap="">重新预约</button>
+      </view>
+
+      <view class="booking-time">
+        <text class="create-time">预约时间：{{item.createTime}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && filteredBookings.length === 0}}">
+    <text class="empty-icon">📅</text>
+    <text class="empty-text">暂无预约记录</text>
+    <button class="empty-action" bindtap="goToBooking">立即预约</button>
+  </view>
+</view>

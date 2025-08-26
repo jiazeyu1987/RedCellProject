@@ -1,0 +1,178 @@
+<!-- 健康档案页面 -->
+<view class="container">
+  <!-- 健康概览卡片 -->
+  <view class="health-overview">
+    <view class="overview-header">
+      <text class="overview-title">健康概览</text>
+      <text class="update-time">更新时间：{{lastUpdateTime}}</text>
+    </view>
+    
+    <view class="health-metrics">
+      <view class="metric-item" wx:for="{{healthMetrics}}" wx:key="type" bindtap="viewMetricDetail" data-type="{{item.type}}">
+        <view class="metric-icon" style="background-color: {{item.color}};">
+          <text class="icon-emoji">{{item.icon}}</text>
+        </view>
+        <view class="metric-content">
+          <text class="metric-name">{{item.name}}</text>
+          <text class="metric-value">{{item.value}}</text>
+          <text class="metric-unit">{{item.unit}}</text>
+        </view>
+        <view class="metric-status {{item.status}}">
+          <text class="status-text">{{item.statusText}}</text>
+          <text class="trend-icon">{{item.trend}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快速记录按钮 -->
+  <view class="quick-record">
+    <button class="record-btn" bindtap="quickRecord">
+      <text class="plus-icon">+</text>
+      <text class="record-text">快速记录</text>
+    </button>
+  </view>
+
+  <!-- 数据趋势图 -->
+  <view class="trend-section">
+    <view class="section-header">
+      <text class="section-title">数据趋势</text>
+      <view class="time-filter">
+        <text class="filter-item {{trendFilter === 'week' ? 'active' : ''}}" bindtap="changeTrendFilter" data-filter="week">7天</text>
+        <text class="filter-item {{trendFilter === 'month' ? 'active' : ''}}" bindtap="changeTrendFilter" data-filter="month">30天</text>
+        <text class="filter-item {{trendFilter === 'year' ? 'active' : ''}}" bindtap="changeTrendFilter" data-filter="year">1年</text>
+      </view>
+    </view>
+    
+    <view class="chart-container">
+      <canvas canvas-id="healthChart" class="health-chart" disable-scroll="true" bindtouchstart="chartTouchStart" bindtouchmove="chartTouchMove" bindtouchend="chartTouchEnd"></canvas>
+    </view>
+    
+    <view class="chart-legend">
+      <view class="legend-item" wx:for="{{chartLegend}}" wx:key="type">
+        <view class="legend-color" style="background-color: {{item.color}};"></view>
+        <text class="legend-text">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 历史记录 -->
+  <view class="history-section">
+    <view class="section-header">
+      <text class="section-title">历史记录</text>
+      <text class="view-all" bindtap="viewAllRecords">查看全部</text>
+    </view>
+    
+    <view class="record-list">
+      <view class="record-item" wx:for="{{recentRecords}}" wx:key="id" bindtap="viewRecordDetail" data-record="{{item}}">
+        <view class="record-date">
+          <text class="date-text">{{item.date}}</text>
+          <text class="time-text">{{item.time}}</text>
+        </view>
+        <view class="record-content">
+          <text class="record-type">{{item.type}}</text>
+          <view class="record-values">
+            <text class="value-item" wx:for="{{item.values}}" wx:key="name" wx:for-item="value">
+              {{value.name}}: {{value.value}}{{value.unit}}
+            </text>
+          </view>
+          <text class="record-note" wx:if="{{item.note}}">备注：{{item.note}}</text>
+        </view>
+        <view class="record-status {{item.overallStatus}}">
+          <text class="status-dot"></text>
+          <text class="status-label">{{item.statusLabel}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 健康建议 -->
+  <view class="suggestions-section">
+    <view class="section-title">健康建议</view>
+    <view class="suggestion-list">
+      <view class="suggestion-item" wx:for="{{healthSuggestions}}" wx:key="id">
+        <view class="suggestion-icon">
+          <text class="suggestion-emoji">{{item.icon}}</text>
+        </view>
+        <view class="suggestion-content">
+          <text class="suggestion-title">{{item.title}}</text>
+          <text class="suggestion-desc">{{item.description}}</text>
+        </view>
+        <view class="suggestion-action" wx:if="{{item.actionText}}">
+          <text class="action-text" bindtap="handleSuggestionAction" data-action="{{item.action}}">{{item.actionText}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 快速记录弹窗 -->
+<view class="modal-overlay" wx:if="{{showRecordModal}}" bindtap="closeRecordModal">
+  <view class="record-modal" catchtap="">
+    <view class="modal-header">
+      <text class="modal-title">快速记录健康数据</text>
+      <text class="modal-close" bindtap="closeRecordModal">×</text>
+    </view>
+    
+    <view class="modal-content">
+      <!-- 血压记录 -->
+      <view class="record-group">
+        <text class="group-title">血压 (mmHg)</text>
+        <view class="input-row">
+          <input class="health-input" placeholder="收缩压" value="{{recordData.systolic}}" bindinput="onRecordInput" data-field="systolic" type="number"/>
+          <text class="input-separator">/</text>
+          <input class="health-input" placeholder="舒张压" value="{{recordData.diastolic}}" bindinput="onRecordInput" data-field="diastolic" type="number"/>
+        </view>
+      </view>
+      
+      <!-- 血糖记录 -->
+      <view class="record-group">
+        <text class="group-title">血糖 (mmol/L)</text>
+        <input class="health-input full" placeholder="请输入血糖值" value="{{recordData.bloodSugar}}" bindinput="onRecordInput" data-field="bloodSugar" type="digit"/>
+      </view>
+      
+      <!-- 心率记录 -->
+      <view class="record-group">
+        <text class="group-title">心率 (次/分)</text>
+        <input class="health-input full" placeholder="请输入心率" value="{{recordData.heartRate}}" bindinput="onRecordInput" data-field="heartRate" type="number"/>
+      </view>
+      
+      <!-- 体重记录 -->
+      <view class="record-group">
+        <text class="group-title">体重 (kg)</text>
+        <input class="health-input full" placeholder="请输入体重" value="{{recordData.weight}}" bindinput="onRecordInput" data-field="weight" type="digit"/>
+      </view>
+      
+      <!-- 备注 -->
+      <view class="record-group">
+        <text class="group-title">备注</text>
+        <textarea class="health-textarea" placeholder="记录身体感受或其他备注" value="{{recordData.note}}" bindinput="onRecordInput" data-field="note" maxlength="100"></textarea>
+      </view>
+    </view>
+    
+    <view class="modal-actions">
+      <button class="modal-btn secondary" bindtap="closeRecordModal">取消</button>
+      <button class="modal-btn primary" bindtap="saveRecord">保存记录</button>
+    </view>
+  </view>
+</view>
+
+<!-- 详情查看弹窗 -->
+<view class="modal-overlay" wx:if="{{showDetailModal}}" bindtap="closeDetailModal">
+  <view class="detail-modal" catchtap="">
+    <view class="modal-header">
+      <text class="modal-title">{{detailTitle}}</text>
+      <text class="modal-close" bindtap="closeDetailModal">×</text>
+    </view>
+    
+    <view class="modal-content">
+      <view class="detail-content">
+        <text class="detail-text">{{detailContent}}</text>
+      </view>
+    </view>
+    
+    <view class="modal-actions">
+      <button class="modal-btn primary full" bindtap="closeDetailModal">确定</button>
+    </view>
+  </view>
+</view>

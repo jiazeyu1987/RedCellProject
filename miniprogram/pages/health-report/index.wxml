@@ -1,0 +1,121 @@
+<!-- 健康报告页面 -->
+<view class="container">
+  <!-- 报告列表 -->
+  <view class="report-list" wx:if="{{!loading}}">
+    <view class="report-item" wx:for="{{reportList}}" wx:key="id" bindtap="viewDetail" data-report="{{item}}">
+      <view class="report-header">
+        <view class="report-title">{{item.title}}</view>
+        <view class="status-badge {{item.status}}">{{item.status === 'normal' ? '正常' : item.status === 'warning' ? '注意' : '异常'}}</view>
+      </view>
+      
+      <view class="report-info">
+        <view class="info-row">
+          <text class="info-label">📅 检查日期：</text>
+          <text class="info-value">{{item.date}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">🏥 检查机构：</text>
+          <text class="info-value">{{item.hospital}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">👨‍⚕️ 检查医生：</text>
+          <text class="info-value">{{item.doctor}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">📋 检查类型：</text>
+          <text class="info-value">{{item.type}}</text>
+        </view>
+      </view>
+
+      <view class="report-summary">
+        <text class="summary-text">{{item.summary}}</text>
+      </view>
+
+      <view class="report-actions">
+        <button class="action-btn secondary" bindtap="downloadReport" data-id="{{item.id}}" catchtap="">下载</button>
+        <button class="action-btn secondary" bindtap="shareReport" data-report="{{item}}" catchtap="">分享</button>
+        <button class="action-btn primary" bindtap="viewDetail" data-report="{{item}}" catchtap="">查看详情</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && reportList.length === 0}}">
+    <text class="empty-icon">📈</text>
+    <text class="empty-text">暂无健康报告</text>
+    <button class="empty-action" bindtap="goToHealth">去体检</button>
+  </view>
+</view>
+
+<!-- 报告详情弹窗 -->
+<view class="modal-overlay" wx:if="{{showDetailModal}}" bindtap="closeDetail">
+  <view class="detail-modal" catchtap="">
+    <view class="modal-header">
+      <text class="modal-title">{{selectedReport.title}}</text>
+      <text class="modal-close" bindtap="closeDetail">×</text>
+    </view>
+    
+    <view class="modal-content">
+      <!-- 基本信息 -->
+      <view class="detail-section">
+        <text class="section-title">基本信息</text>
+        <view class="detail-info">
+          <view class="detail-row">
+            <text class="detail-label">检查日期：</text>
+            <text class="detail-value">{{selectedReport.date}}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">检查类型：</text>
+            <text class="detail-value">{{selectedReport.type}}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">检查医生：</text>
+            <text class="detail-value">{{selectedReport.doctor}}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">检查机构：</text>
+            <text class="detail-value">{{selectedReport.hospital}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 检查结果 -->
+      <view class="detail-section" wx:if="{{selectedReport.details}}">
+        <text class="section-title">检查结果</text>
+        <view class="metrics-list">
+          <view class="metric-item" wx:for="{{selectedReport.details}}" wx:key="name" wx:for-item="metric">
+            <view class="metric-header">
+              <text class="metric-name">{{metric.name}}</text>
+              <view class="metric-status {{metric.status}}">{{metric.status === 'normal' ? '正常' : metric.status === 'warning' ? '注意' : '异常'}}</view>
+            </view>
+            <view class="metric-value">
+              <text class="value">{{metric.value}}</text>
+              <text class="unit">{{metric.unit}}</text>
+            </view>
+            <text class="metric-reference">参考范围：{{metric.reference}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 健康建议 -->
+      <view class="detail-section" wx:if="{{selectedReport.recommendations}}">
+        <text class="section-title">健康建议</text>
+        <view class="recommendations">
+          <view class="recommendation-item" wx:for="{{selectedReport.recommendations}}" wx:key="index">
+            <text class="recommendation-text">{{index + 1}}. {{item}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="modal-actions">
+      <button class="modal-btn secondary" bindtap="downloadReport" data-id="{{selectedReport.id}}">下载报告</button>
+      <button class="modal-btn primary" bindtap="shareReport" data-report="{{selectedReport}}">分享报告</button>
+    </view>
+  </view>
+</view>

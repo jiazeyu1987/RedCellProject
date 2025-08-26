@@ -1,0 +1,350 @@
+/* 医院挂号页面样式 */
+.container {
+  background-color: #F8F9FA;
+  min-height: 100vh;
+}
+
+/* 搜索栏 */
+.search-bar {
+  background: white;
+  padding: 20rpx;
+  border-bottom: 1rpx solid #E5E5E5;
+}
+
+.search-input {
+  display: flex;
+  align-items: center;
+  background: #F8F9FA;
+  border-radius: 25rpx;
+  padding: 0 20rpx;
+  height: 70rpx;
+}
+
+.search-icon {
+  font-size: 32rpx;
+  margin-right: 15rpx;
+  color: #999;
+}
+
+.search-input input {
+  flex: 1;
+  font-size: 26rpx;
+}
+
+/* 医院列表 */
+.hospital-list {
+  padding: 20rpx;
+}
+
+.hospital-item {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.hospital-logo {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 15rpx;
+  margin-right: 25rpx;
+  background: #F0F8FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60rpx;
+  color: #1890FF;
+}
+
+.hospital-info {
+  flex: 1;
+}
+
+.hospital-name {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.hospital-level {
+  display: block;
+  font-size: 22rpx;
+  color: #1890FF;
+  margin-bottom: 8rpx;
+}
+
+.hospital-address {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 15rpx;
+}
+
+.hospital-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.tag {
+  background: #F0F8FF;
+  color: #1890FF;
+  padding: 6rpx 12rpx;
+  border-radius: 15rpx;
+  font-size: 20rpx;
+}
+
+.hospital-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 80rpx;
+}
+
+.distance {
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 10rpx;
+}
+
+.arrow {
+  font-size: 28rpx;
+  color: #CCC;
+}
+
+/* 快速入口 */
+.quick-access {
+  margin: 0 20rpx 20rpx;
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 30rpx;
+}
+
+.quick-departments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.dept-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 150rpx;
+  padding: 20rpx 0;
+}
+
+.dept-icon {
+  width: 80rpx;
+  height: 80rpx;
+  background: #F0F8FF;
+  border-radius: 50%;
+  margin-bottom: 15rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: #1890FF;
+}
+
+.dept-name {
+  font-size: 24rpx;
+  color: #333;
+  text-align: center;
+}
+
+/* 服务说明 */
+.service-info {
+  margin: 0 20rpx;
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.info-card {
+  margin-top: 20rpx;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25rpx;
+}
+
+.info-item:last-child {
+  margin-bottom: 0;
+}
+
+.info-icon {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: #F0F8FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  margin-right: 20rpx;
+}
+
+.info-content {
+  flex: 1;
+}
+
+.info-title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5rpx;
+}
+
+.info-desc {
+  font-size: 22rpx;
+  color: #666;
+}
+
+/* 医院详情弹窗 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: flex-end;
+  z-index: 999;
+}
+
+.hospital-modal {
+  background: white;
+  border-radius: 20rpx 20rpx 0 0;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #E5E5E5;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.modal-close {
+  font-size: 40rpx;
+  color: #999;
+}
+
+.modal-content {
+  flex: 1;
+  padding: 30rpx;
+  overflow-y: auto;
+}
+
+.hospital-detail {
+  margin-bottom: 30rpx;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 15rpx;
+}
+
+.detail-label {
+  min-width: 140rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.detail-value {
+  flex: 1;
+  font-size: 24rpx;
+  color: #333;
+}
+
+.detail-value.phone {
+  color: #1890FF;
+}
+
+.section-subtitle {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.departments-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15rpx;
+}
+
+.dept-card {
+  flex: 0 0 calc(50% - 7.5rpx);
+  background: #F8F9FA;
+  border-radius: 15rpx;
+  padding: 25rpx 20rpx;
+  border: 2rpx solid transparent;
+}
+
+.dept-card:active {
+  border-color: #1890FF;
+  background: #F0F8FF;
+}
+
+.dept-card-name {
+  display: block;
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.dept-card-info {
+  display: block;
+  font-size: 22rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.dept-card-status {
+  font-size: 20rpx;
+  padding: 4rpx 8rpx;
+  border-radius: 10rpx;
+  display: inline-block;
+}
+
+.dept-card-status.available {
+  background: #F6FFED;
+  color: #52C41A;
+}
+
+.dept-card-status.unavailable {
+  background: #FFF2F0;
+  color: #FF4D4F;
+}

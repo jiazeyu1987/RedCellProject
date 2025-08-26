@@ -1,0 +1,541 @@
+/* 健康档案页面样式 */
+.container {
+  background-color: #F8F9FA;
+  min-height: 100vh;
+  padding-bottom: 50rpx;
+}
+
+/* 健康概览 */
+.health-overview {
+  background: white;
+  margin: 20rpx;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.overview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.overview-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.update-time {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.health-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.metric-item {
+  display: flex;
+  align-items: center;
+  padding: 25rpx;
+  background: #F8F9FA;
+  border-radius: 15rpx;
+  border-left: 6rpx solid transparent;
+}
+
+.metric-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 25rpx;
+}
+
+.icon-emoji {
+  font-size: 40rpx;
+  color: white;
+}
+
+.metric-content {
+  flex: 1;
+}
+
+.metric-name {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.metric-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.metric-unit {
+  font-size: 24rpx;
+  color: #999;
+  margin-left: 8rpx;
+}
+
+.metric-status {
+  text-align: center;
+  min-width: 120rpx;
+}
+
+.status-text {
+  display: block;
+  font-size: 24rpx;
+  margin-bottom: 5rpx;
+}
+
+.metric-status.normal {
+  color: #52C41A;
+}
+
+.metric-status.high {
+  color: #FF4D4F;
+}
+
+.metric-status.low {
+  color: #FAAD14;
+}
+
+.trend-icon {
+  font-size: 20rpx;
+}
+
+/* 快速记录按钮 */
+.quick-record {
+  margin: 0 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.record-btn {
+  width: 100%;
+  height: 100rpx;
+  background: linear-gradient(135deg, #1890FF, #40A9FF);
+  color: white;
+  border: none;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: bold;
+  box-shadow: 0 4rpx 20rpx rgba(24, 144, 255, 0.3);
+}
+
+.plus-icon {
+  font-size: 36rpx;
+  margin-right: 15rpx;
+}
+
+/* 数据趋势 */
+.trend-section {
+  background: white;
+  margin: 0 20rpx;
+  margin-bottom: 20rpx;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.time-filter {
+  display: flex;
+  gap: 20rpx;
+}
+
+.filter-item {
+  padding: 10rpx 20rpx;
+  font-size: 24rpx;
+  color: #666;
+  background: #F8F9FA;
+  border-radius: 20rpx;
+  border: 1rpx solid #E5E5E5;
+}
+
+.filter-item.active {
+  background: #1890FF;
+  color: white;
+  border-color: #1890FF;
+}
+
+.chart-container {
+  height: 400rpx;
+  margin-bottom: 20rpx;
+}
+
+.health-chart {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 30rpx;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.legend-color {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+}
+
+.legend-text {
+  font-size: 22rpx;
+  color: #666;
+}
+
+.view-all {
+  font-size: 24rpx;
+  color: #1890FF;
+}
+
+/* 历史记录 */
+.history-section {
+  background: white;
+  margin: 0 20rpx;
+  margin-bottom: 20rpx;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.record-list {
+  margin-top: 20rpx;
+}
+
+.record-item {
+  display: flex;
+  padding: 25rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.record-item:last-child {
+  border-bottom: none;
+}
+
+.record-date {
+  min-width: 120rpx;
+  text-align: center;
+  margin-right: 25rpx;
+}
+
+.date-text {
+  display: block;
+  font-size: 24rpx;
+  color: #333;
+  margin-bottom: 5rpx;
+}
+
+.time-text {
+  font-size: 20rpx;
+  color: #999;
+}
+
+.record-content {
+  flex: 1;
+}
+
+.record-type {
+  display: block;
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.record-values {
+  margin-bottom: 10rpx;
+}
+
+.value-item {
+  display: inline-block;
+  font-size: 22rpx;
+  color: #666;
+  margin-right: 20rpx;
+  margin-bottom: 5rpx;
+}
+
+.record-note {
+  font-size: 22rpx;
+  color: #999;
+  line-height: 1.4;
+}
+
+.record-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80rpx;
+}
+
+.status-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  margin-bottom: 8rpx;
+}
+
+.record-status.normal .status-dot {
+  background: #52C41A;
+}
+
+.record-status.warning .status-dot {
+  background: #FAAD14;
+}
+
+.record-status.danger .status-dot {
+  background: #FF4D4F;
+}
+
+.status-label {
+  font-size: 20rpx;
+  color: #999;
+}
+
+/* 健康建议 */
+.suggestions-section {
+  background: white;
+  margin: 0 20rpx;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.suggestion-list {
+  margin-top: 20rpx;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 25rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-icon {
+  width: 60rpx;
+  height: 60rpx;
+  background: #F0F8FF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 25rpx;
+  flex-shrink: 0;
+}
+
+.suggestion-emoji {
+  font-size: 30rpx;
+}
+
+.suggestion-content {
+  flex: 1;
+}
+
+.suggestion-title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.suggestion-desc {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+.suggestion-action {
+  margin-left: 20rpx;
+}
+
+.action-text {
+  font-size: 24rpx;
+  color: #1890FF;
+  padding: 10rpx 20rpx;
+  border: 1rpx solid #1890FF;
+  border-radius: 20rpx;
+}
+
+/* 快速记录弹窗 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.record-modal {
+  background: white;
+  border-radius: 20rpx;
+  width: 650rpx;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-modal {
+  background: white;
+  border-radius: 20rpx;
+  width: 650rpx;
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #E5E5E5;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.modal-close {
+  font-size: 40rpx;
+  color: #999;
+}
+
+.modal-content {
+  flex: 1;
+  padding: 30rpx;
+  overflow-y: auto;
+}
+
+.record-group {
+  margin-bottom: 30rpx;
+}
+
+.group-title {
+  display: block;
+  font-size: 26rpx;
+  color: #333;
+  margin-bottom: 15rpx;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.health-input {
+  height: 80rpx;
+  border: 2rpx solid #E5E5E5;
+  border-radius: 15rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+  background: #F8F9FA;
+}
+
+.health-input.full {
+  width: 100%;
+}
+
+.input-separator {
+  font-size: 28rpx;
+  color: #666;
+  font-weight: bold;
+}
+
+.health-textarea {
+  width: 100%;
+  min-height: 120rpx;
+  border: 2rpx solid #E5E5E5;
+  border-radius: 15rpx;
+  padding: 20rpx;
+  font-size: 26rpx;
+  background: #F8F9FA;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 20rpx;
+  padding: 30rpx;
+  border-top: 1rpx solid #E5E5E5;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-btn.primary {
+  background: #1890FF;
+  color: white;
+}
+
+.modal-btn.secondary {
+  background: #F8F9FA;
+  color: #666;
+  border: 1rpx solid #E5E5E5;
+}
+
+.modal-btn.full {
+  flex: none;
+  width: 100%;
+}
+
+.detail-content {
+  line-height: 1.6;
+}
+
+.detail-text {
+  font-size: 26rpx;
+  color: #333;
+}

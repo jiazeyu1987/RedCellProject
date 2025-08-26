@@ -1,0 +1,28 @@
+<!-- 健康指标卡片组件 -->
+<view class="health-metric-card {{status}}" bindtap="onCardTap">
+  <view class="metric-header">
+    <view class="metric-icon" style="background-color: {{iconColor}};">
+      <text>{{icon}}</text>
+    </view>
+    <view class="metric-info">
+      <text class="metric-name">{{name}}</text>
+      <view class="metric-value-container">
+        <text class="metric-value">{{value}}</text>
+        <text class="metric-unit">{{unit}}</text>
+      </view>
+    </view>
+  </view>
+  
+  <view class="metric-status">
+    <text class="status-text">{{statusText}}</text>
+    <text class="trend-icon">{{trendIcon}}</text>
+  </view>
+  
+  <view class="metric-range" wx:if="{{showRange}}">
+    <text class="range-text">正常范围：{{normalRange}}</text>
+  </view>
+  
+  <view class="metric-time" wx:if="{{lastUpdateTime}}">
+    <text class="time-text">{{lastUpdateTime}}</text>
+  </view>
+</view>

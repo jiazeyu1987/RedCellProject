@@ -1,0 +1,149 @@
+<!--帮助中心页面-->
+<view class="container">
+  <!-- 搜索区域 -->
+  <view class="search-section">
+    <view class="search-box">
+      <input class="search-input" 
+             placeholder="搜索您的问题..." 
+             value="{{searchKeyword}}" 
+             bind:input="onSearchInput" />
+      <view wx:if="{{searchKeyword}}" class="clear-search" bind:tap="clearSearch">
+        <text class="clear-icon">✕</text>
+      </view>
+      <view wx:else class="search-icon">
+        <text>🔍</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 热门问题 -->
+  <view wx:if="{{!searchKeyword && currentCategory === 'all'}}" class="hot-section">
+    <view class="section-header">
+      <text class="section-title">🔥 热门问题</text>
+    </view>
+    <view class="hot-list">
+      <view wx:for="{{hotFaqs}}" wx:key="id" 
+            class="hot-item" 
+            bind:tap="toggleFaq" 
+            data-id="{{item.id}}">
+        <text class="hot-question">{{item.question}}</text>
+        <view class="hot-stats">
+          <text class="view-count">👁 {{item.views}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类筛选 -->
+  <view class="category-section">
+    <scroll-view class="category-scroll" scroll-x>
+      <view class="category-list">
+        <view wx:for="{{categories}}" wx:key="id" 
+              class="category-item {{currentCategory === item.id ? 'active' : ''}}"
+              bind:tap="selectCategory" 
+              data-id="{{item.id}}">
+          <text class="category-icon">{{item.icon}}</text>
+          <text class="category-name">{{item.name}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- FAQ列表 -->
+  <view class="faq-section">
+    <view wx:if="{{filteredFaqs.length > 0}}" class="faq-list">
+      <view wx:for="{{filteredFaqs}}" wx:key="id" class="faq-item">
+        <view class="faq-header" bind:tap="toggleFaq" data-id="{{item.id}}">
+          <view class="question-wrapper">
+            <text class="faq-question">{{item.question}}</text>
+            <view wx:if="{{item.isHot}}" class="hot-badge">
+              <text>🔥 热门</text>
+            </view>
+          </view>
+          <view class="expand-icon {{expandedFaq === item.id ? 'expanded' : ''}}">
+            <text>⌄</text>
+          </view>
+        </view>
+        
+        <view wx:if="{{expandedFaq === item.id}}" class="faq-answer">
+          <text class="answer-content">{{item.answer}}</text>
+          <view class="answer-footer">
+            <view class="answer-stats">
+              <text class="view-count">查看次数: {{item.views}}</text>
+              <text class="category-tag">{{getCategoryName(item.category)}}</text>
+            </view>
+            <view class="answer-actions">
+              <button class="action-btn" bind:tap="copyFaq" data-faq="{{item}}" catch:tap="true">
+                <text class="action-icon">📋</text>
+                <text>复制</text>
+              </button>
+              <button class="action-btn" bind:tap="shareFaq" data-faq="{{item}}" catch:tap="true">
+                <text class="action-icon">📤</text>
+                <text>分享</text>
+              </button>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 搜索无结果 -->
+    <view wx:if="{{filteredFaqs.length === 0 && searchKeyword}}" class="no-results">
+      <text class="no-results-icon">🔍</text>
+      <text class="no-results-text">未找到相关问题</text>
+      <text class="no-results-desc">试试其他关键词或浏览常见问题</text>
+      <button class="clear-search-btn" bind:tap="clearSearch">
+        清空搜索
+      </button>
+    </view>
+
+    <!-- 分类无结果 -->
+    <view wx:if="{{filteredFaqs.length === 0 && !searchKeyword && currentCategory !== 'all'}}" class="no-results">
+      <text class="no-results-icon">📂</text>
+      <text class="no-results-text">该分类暂无问题</text>
+      <text class="no-results-desc">查看其他分类或联系客服</text>
+    </view>
+  </view>
+
+  <!-- 联系我们 -->
+  <view class="contact-section">
+    <view class="section-header">
+      <text class="section-title">📞 联系我们</text>
+      <text class="section-desc">找不到答案？我们随时为您提供帮助</text>
+    </view>
+    
+    <view class="contact-list">
+      <view wx:for="{{contactMethods}}" wx:key="type" 
+            class="contact-item" 
+            bind:tap="contactCustomerService" 
+            data-type="{{item.type}}">
+        <view class="contact-icon">
+          <text>{{item.icon}}</text>
+        </view>
+        <view class="contact-info">
+          <text class="contact-title">{{item.title}}</text>
+          <text class="contact-content">{{item.content}}</text>
+          <text class="contact-desc">{{item.desc}}</text>
+        </view>
+        <view class="contact-arrow">
+          <text>></text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 反馈建议 -->
+  <view class="feedback-section">
+    <button class="feedback-btn" bind:tap="feedbackIssue">
+      <text class="feedback-icon">💡</text>
+      <text>问题反馈</text>
+      <text class="feedback-desc">帮助我们改进服务</text>
+    </button>
+  </view>
+
+  <!-- 底部说明 -->
+  <view class="footer-info">
+    <text class="footer-text">📋 更多问题请查看用户协议和隐私政策</text>
+    <text class="footer-text">🕐 客服工作时间：周一至周日 9:00-21:00</text>
+  </view>
+</view>

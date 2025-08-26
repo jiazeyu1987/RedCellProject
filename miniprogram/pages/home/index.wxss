@@ -1,0 +1,412 @@
+/* 首页样式 */
+.container {
+  background-color: #F8F9FA;
+  min-height: 100vh;
+}
+
+/* 轮播图区域 */
+.banner-section {
+  height: 400rpx;
+  position: relative;
+}
+
+.banner-swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.banner-emoji {
+  font-size: 80rpx;
+  color: white;
+}
+
+.banner-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.6));
+  padding: 40rpx 30rpx 30rpx;
+  color: white;
+}
+
+.banner-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.banner-desc {
+  display: block;
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+/* 快速服务 */
+.quick-services {
+  background: white;
+  margin: 20rpx;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 30rpx;
+}
+
+.service-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.service-item {
+  width: 160rpx;
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+
+.service-icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin: 0 auto 20rpx;
+  background: #F0F8FF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.service-emoji {
+  font-size: 40rpx;
+}
+
+.service-name {
+  font-size: 24rpx;
+  color: #666;
+  display: block;
+}
+
+/* 健康卡片 */
+.health-card {
+  background: white;
+  margin: 20rpx;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.card-date {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.health-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30rpx;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #1890FF;
+  margin-bottom: 10rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.health-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.action-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn.primary {
+  background: #1890FF;
+  color: white;
+}
+
+.action-btn.secondary {
+  background: #F8F9FA;
+  color: #666;
+  border: 1rpx solid #E5E5E5;
+}
+
+/* 登录卡片 */
+.login-card {
+  background: white;
+  margin: 20rpx;
+  border-radius: 20rpx;
+  padding: 60rpx 30rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.login-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+  display: block;
+}
+
+.login-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.login-desc {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 40rpx;
+  line-height: 1.5;
+}
+
+.login-btn {
+  width: 300rpx;
+  height: 80rpx;
+  background: #1890FF;
+  color: white;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 服务特色 */
+.features-section {
+  background: white;
+  margin: 20rpx;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.features-list {
+  margin-top: 30rpx;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.feature-item:last-child {
+  margin-bottom: 0;
+}
+
+.feature-icon {
+  width: 80rpx;
+  height: 80rpx;
+  background: #F0F8FF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 30rpx;
+  flex-shrink: 0;
+}
+
+.feature-emoji {
+  font-size: 40rpx;
+}
+
+.feature-content {
+  flex: 1;
+}
+
+.feature-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.feature-desc {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 社区动态 */
+.community-section {
+  background: white;
+  margin: 20rpx;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.section-more {
+  font-size: 24rpx;
+  color: #1890FF;
+}
+
+.community-item {
+  border-bottom: 1rpx solid #F5F5F5;
+  padding-bottom: 30rpx;
+  margin-bottom: 30rpx;
+}
+
+.community-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.user-avatar {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+  background: #F0F8FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  color: #1890FF;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  display: block;
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5rpx;
+}
+
+.post-time {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.post-content {
+  font-size: 26rpx;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 20rpx;
+}
+
+.post-images {
+  display: flex;
+  gap: 10rpx;
+  margin-bottom: 20rpx;
+}
+
+.post-image {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 10rpx;
+  background: #F0F8FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: #1890FF;
+}
+
+.post-actions {
+  display: flex;
+  gap: 40rpx;
+}
+
+.action-item {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.action-item .iconfont {
+  margin-right: 10rpx;
+}
+
+.action-count {
+  margin-left: 10rpx;
+}
+
+/* 底部间距 */
+.bottom-space {
+  height: 100rpx;
+}
+
+/* 字体图标 */
+.iconfont {
+  font-family: "iconfont";
+}
+
+.icon-like::before {
+  content: "♡";
+}
+
+.icon-comment::before {
+  content: "💬";
+}

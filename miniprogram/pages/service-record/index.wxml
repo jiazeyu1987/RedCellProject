@@ -1,0 +1,65 @@
+<!-- 服务记录页面 -->
+<view class="container">
+  <!-- 筛选器 -->
+  <view class="filter-bar">
+    <view class="filter-item {{statusFilter === 'all' ? 'active' : ''}}" bindtap="filterByStatus" data-status="all">
+      全部
+    </view>
+    <view class="filter-item {{statusFilter === 'completed' ? 'active' : ''}}" bindtap="filterByStatus" data-status="completed">
+      已完成
+    </view>
+    <view class="filter-item {{statusFilter === 'scheduled' ? 'active' : ''}}" bindtap="filterByStatus" data-status="scheduled">
+      已预约
+    </view>
+    <view class="filter-item {{statusFilter === 'cancelled' ? 'active' : ''}}" bindtap="filterByStatus" data-status="cancelled">
+      已取消
+    </view>
+  </view>
+
+  <!-- 服务记录列表 -->
+  <view class="record-list">
+    <view class="record-item" wx:for="{{filteredRecords}}" wx:key="id" bindtap="viewDetail" data-record="{{item}}">
+      <view class="record-header">
+        <text class="service-type">{{item.serviceType}}</text>
+        <view class="status-badge {{item.status}}">{{item.statusText}}</view>
+      </view>
+      
+      <view class="record-info">
+        <view class="info-row">
+          <text class="info-label">服务时间：</text>
+          <text class="info-value">{{item.serviceDate}} {{item.serviceTime}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">服务地址：</text>
+          <text class="info-value">{{item.address}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">服务费用：</text>
+          <text class="info-value price">¥{{item.price}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.nurseInfo}}">
+          <text class="info-label">医护人员：</text>
+          <text class="info-value">{{item.nurseInfo.name}} {{item.nurseInfo.title}}</text>
+        </view>
+      </view>
+
+      <view class="record-actions" wx:if="{{item.status === 'completed'}}">
+        <button class="action-btn secondary" bindtap="viewReport" data-id="{{item.id}}" catchtap="">查看报告</button>
+        <button class="action-btn secondary" bindtap="watchVideo" data-id="{{item.id}}" catchtap="">观看录像</button>
+        <button class="action-btn primary" bindtap="rateService" data-id="{{item.id}}" catchtap="">评价服务</button>
+      </view>
+
+      <view class="record-actions" wx:if="{{item.status === 'scheduled'}}">
+        <button class="action-btn secondary" bindtap="contactNurse" data-nurse="{{item.nurseInfo}}" catchtap="">联系医护</button>
+        <button class="action-btn danger" bindtap="cancelService" data-id="{{item.id}}" catchtap="">取消服务</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{filteredRecords.length === 0}}">
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">暂无服务记录</text>
+    <button class="empty-action" bindtap="goToBooking">立即预约服务</button>
+  </view>
+</view>

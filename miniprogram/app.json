@@ -1,0 +1,59 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/booking/index", 
+    "pages/health/index",
+    "pages/community/index",
+    "pages/profile/index",
+    "pages/service-record/index",
+    "pages/hospital/index",
+    "pages/login/index",
+    "pages/booking-history/index",
+    "pages/address-management/index",
+    "pages/health-report/index",
+    "pages/health-plan/index",
+    "pages/family-members/index",
+    "pages/feedback/index",
+    "pages/help/index",
+    "pages/settings/index",
+    "pages/about/index"
+  ],
+  "window": {
+    "backgroundColor": "#F8F9FA",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "navigationBarTitleText": "健康守护",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#1890FF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/booking/index",
+        "text": "预约"
+      },
+      {
+        "pagePath": "pages/health/index",
+        "text": "健康"
+      },
+      {
+        "pagePath": "pages/community/index",
+        "text": "社区"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

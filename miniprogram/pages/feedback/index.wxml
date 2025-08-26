@@ -1,0 +1,134 @@
+<!--意见反馈页面-->
+<view class="container">
+  <!-- 反馈表单 -->
+  <view class="feedback-form">
+    <view class="form-header">
+      <text class="form-title">📝 意见反馈</text>
+      <text class="form-desc">您的意见是我们前进的动力</text>
+    </view>
+
+    <!-- 反馈类型选择 -->
+    <view class="form-section">
+      <text class="section-title">反馈类型</text>
+      <view class="type-grid">
+        <view wx:for="{{feedbackTypes}}" wx:key="value" 
+              class="type-item {{selectedType === item.value ? 'selected' : ''}}"
+              bind:tap="selectFeedbackType" data-type="{{item.value}}">
+          <text class="type-icon">{{item.icon}}</text>
+          <text class="type-name">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 反馈内容 -->
+    <view class="form-section">
+      <text class="section-title">详细描述</text>
+      <textarea class="feedback-textarea" 
+                placeholder="请详细描述您遇到的问题或建议，至少10个字符..."
+                value="{{feedbackContent}}" 
+                bind:input="onContentInput"
+                maxlength="500"
+                show-confirm-bar="{{false}}"></textarea>
+      <view class="char-count">{{feedbackContent.length}}/500</view>
+    </view>
+
+    <!-- 图片上传 -->
+    <view class="form-section">
+      <text class="section-title">相关图片 (可选)</text>
+      <view class="image-upload">
+        <view wx:for="{{images}}" wx:key="*this" class="image-item">
+          <image class="upload-image" src="{{item}}" mode="aspectFill" 
+                 bind:tap="previewImage" data-src="{{item}}"></image>
+          <view class="image-delete" bind:tap="deleteImage" data-index="{{index}}">
+            <text class="delete-icon">✕</text>
+          </view>
+        </view>
+        <view wx:if="{{images.length < 9}}" class="upload-btn" bind:tap="chooseImage">
+          <text class="upload-icon">📷</text>
+          <text class="upload-text">添加图片</text>
+        </view>
+      </view>
+      <view class="upload-tip">最多可上传9张图片</view>
+    </view>
+
+    <!-- 联系方式 -->
+    <view class="form-section">
+      <text class="section-title">联系方式 (可选)</text>
+      <input class="contact-input" 
+             placeholder="请输入手机号、邮箱或QQ号，方便我们与您联系"
+             value="{{contactInfo}}" 
+             bind:input="onContactInput" />
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-section">
+      <button class="submit-btn {{submitting ? 'submitting' : ''}}" 
+              bind:tap="submitFeedback" 
+              disabled="{{submitting}}">
+        <text wx:if="{{submitting}}">提交中...</text>
+        <text wx:else>提交反馈</text>
+      </button>
+      
+      <button class="contact-service-btn" bind:tap="contactCustomerService">
+        <text class="service-icon">📞</text>
+        <text>联系客服</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 反馈历史 -->
+  <view wx:if="{{feedbackHistory.length > 0}}" class="history-section">
+    <view class="section-header">
+      <text class="section-title">历史反馈</text>
+      <text class="history-count">{{feedbackHistory.length}}条</text>
+    </view>
+
+    <view class="history-list">
+      <view wx:for="{{feedbackHistory}}" wx:key="id" 
+            class="history-item" 
+            bind:tap="viewFeedbackDetail" 
+            data-feedback="{{item}}">
+        <view class="history-header">
+          <view class="history-type">
+            <text class="type-icon">{{getFeedbackTypeIcon(item.type)}}</text>
+            <text class="type-text">{{item.typeName}}</text>
+          </view>
+          <view class="history-actions">
+            <text class="history-time">{{formatDate(item.submitTime)}}</text>
+            <button class="delete-history-btn" 
+                    bind:tap="deleteFeedback" 
+                    data-id="{{item.id}}" 
+                    catch:tap="true">
+              ✕
+            </button>
+          </view>
+        </view>
+        
+        <view class="history-content">{{item.content}}</view>
+        
+        <view class="history-footer">
+          <view class="history-status status-{{item.status}}">
+            <text>{{getStatusText(item.status)}}</text>
+          </view>
+          <view wx:if="{{item.imageCount > 0}}" class="image-count">
+            <text class="image-icon">📷</text>
+            <text>{{item.imageCount}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{feedbackHistory.length === 0}}" class="empty-history">
+    <text class="empty-icon">📭</text>
+    <text class="empty-text">暂无反馈记录</text>
+    <text class="empty-desc">您的第一条反馈将显示在这里</text>
+  </view>
+
+  <!-- 底部说明 -->
+  <view class="footer-note">
+    <text class="note-text">💡 我们承诺在3个工作日内回复您的反馈</text>
+    <text class="note-text">🔒 您的个人信息将受到严格保护</text>
+  </view>
+</view>

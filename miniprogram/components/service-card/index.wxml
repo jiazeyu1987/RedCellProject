@@ -1,0 +1,35 @@
+<!-- 服务卡片组件 -->
+<view class="service-card {{selected ? 'selected' : ''}}" bindtap="onCardTap">
+  <view class="card-header">
+    <view class="service-info">
+      <text class="service-name">{{serviceData.name}}</text>
+      <text class="service-price">¥{{serviceData.price}}</text>
+    </view>
+    <view class="card-icon" wx:if="{{showIcon}}">
+      <text class="icon-emoji">{{serviceData.icon || '📋'}}</text>
+    </view>
+  </view>
+  
+  <text class="service-description">{{serviceData.description}}</text>
+  
+  <view class="service-features" wx:if="{{serviceData.features && serviceData.features.length > 0}}">
+    <text class="feature-tag" wx:for="{{serviceData.features}}" wx:key="index">{{item}}</text>
+  </view>
+  
+  <view class="service-meta" wx:if="{{showMeta}}">
+    <view class="meta-item" wx:if="{{serviceData.duration}}">
+      <text class="meta-label">服务时长：</text>
+      <text class="meta-value">{{serviceData.duration}}</text>
+    </view>
+    <view class="meta-item" wx:if="{{serviceData.rating}}">
+      <text class="meta-label">评分：</text>
+      <text class="meta-value rating">{{serviceData.rating}}分</text>
+    </view>
+  </view>
+
+  <view class="card-badge" wx:if="{{serviceData.badge}}">
+    <text class="badge-text">{{serviceData.badge}}</text>
+  </view>
+
+  <view class="check-icon" wx:if="{{selected}}">✓</view>
+</view>

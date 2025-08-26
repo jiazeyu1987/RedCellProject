@@ -1,0 +1,93 @@
+<!-- 地址管理页面 -->
+<view class="container">
+  <!-- 地址列表 -->
+  <view class="address-list">
+    <view class="address-item" wx:for="{{addressList}}" wx:key="id">
+      <view class="address-content">
+        <view class="address-header">
+          <text class="contact-name">{{item.contactName}}</text>
+          <text class="contact-phone">{{item.contactPhone}}</text>
+          <view class="default-tag" wx:if="{{item.isDefault}}">默认</view>
+        </view>
+        
+        <view class="address-detail">
+          <text class="region">{{item.province}} {{item.city}} {{item.district}}</text>
+          <text class="detail">{{item.detail}}</text>
+        </view>
+      </view>
+
+      <view class="address-actions">
+        <button class="action-btn" wx:if="{{!item.isDefault}}" bindtap="setDefault" data-id="{{item.id}}">设为默认</button>
+        <button class="action-btn" bindtap="editAddress" data-address="{{item}}">编辑</button>
+        <button class="action-btn danger" bindtap="deleteAddress" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新增地址按钮 -->
+  <view class="add-address">
+    <button class="add-btn" bindtap="addAddress">
+      <text class="plus-icon">+</text>
+      <text>新增地址</text>
+    </button>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{addressList.length === 0}}">
+    <text class="empty-icon">📍</text>
+    <text class="empty-text">暂无地址信息</text>
+    <button class="empty-action" bindtap="addAddress">添加地址</button>
+  </view>
+</view>
+
+<!-- 新增/编辑地址弹窗 -->
+<view class="modal-overlay" wx:if="{{showAddModal}}" bindtap="closeModal">
+  <view class="address-modal" catchtap="">
+    <view class="modal-header">
+      <text class="modal-title">{{editingAddress.id ? '编辑地址' : '新增地址'}}</text>
+      <text class="modal-close" bindtap="closeModal">×</text>
+    </view>
+    
+    <view class="modal-content">
+      <view class="form-item">
+        <text class="form-label">联系人</text>
+        <input class="form-input" placeholder="请输入联系人姓名" value="{{editingAddress.contactName}}" bindinput="onInput" data-field="contactName"/>
+      </view>
+      
+      <view class="form-item">
+        <text class="form-label">联系电话</text>
+        <input class="form-input" type="number" placeholder="请输入手机号" value="{{editingAddress.contactPhone}}" bindinput="onInput" data-field="contactPhone"/>
+      </view>
+      
+      <view class="form-item">
+        <text class="form-label">所在地区</text>
+        <picker mode="region" value="{{[editingAddress.province, editingAddress.city, editingAddress.district]}}" bindchange="onRegionChange">
+          <view class="picker-content">
+            {{editingAddress.province && editingAddress.city && editingAddress.district ? 
+              editingAddress.province + ' ' + editingAddress.city + ' ' + editingAddress.district : 
+              '请选择省市区'}}
+          </view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="form-label">详细地址</text>
+        <textarea class="form-textarea" placeholder="请输入详细地址（如道路、门牌号、小区、楼栋号等）" value="{{editingAddress.detail}}" bindinput="onInput" data-field="detail" maxlength="100"></textarea>
+      </view>
+      
+      <view class="form-item">
+        <view class="default-switch" bindtap="toggleDefault">
+          <text class="switch-label">设为默认地址</text>
+          <view class="switch {{editingAddress.isDefault ? 'checked' : ''}}">
+            <view class="switch-thumb"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="modal-actions">
+      <button class="modal-btn secondary" bindtap="closeModal">取消</button>
+      <button class="modal-btn primary" bindtap="saveAddress">保存</button>
+    </view>
+  </view>
+</view>

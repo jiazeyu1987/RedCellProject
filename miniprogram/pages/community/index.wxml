@@ -1,0 +1,89 @@
+<!-- 社区互动页面 -->
+<view class="container">
+  <!-- 顶部导航 -->
+  <view class="top-nav">
+    <view class="nav-item {{activeTab === 'posts' ? 'active' : ''}}" bindtap="switchTab" data-tab="posts">
+      <text>动态</text>
+    </view>
+    <view class="nav-item {{activeTab === 'knowledge' ? 'active' : ''}}" bindtap="switchTab" data-tab="knowledge">
+      <text>健康知识</text>
+    </view>
+    <view class="nav-item {{activeTab === 'qa' ? 'active' : ''}}" bindtap="switchTab" data-tab="qa">
+      <text>问答</text>
+    </view>
+  </view>
+
+  <!-- 发布按钮 -->
+  <view class="publish-btn" bindtap="publish">
+    <text class="plus-icon">+</text>
+  </view>
+
+  <!-- 内容区域 -->
+  <view class="content-area">
+    <!-- 用户动态 -->
+    <view class="posts-content" wx:if="{{activeTab === 'posts'}}">
+      <view class="post-item" wx:for="{{postList}}" wx:key="id" bindtap="viewPost" data-post="{{item}}">
+        <view class="post-header">
+          <text class="user-avatar">{{item.userAvatar}}</text>
+          <view class="user-info">
+            <text class="user-name">{{item.userName}}</text>
+            <text class="post-time">{{item.createTime}}</text>
+          </view>
+        </view>
+        <text class="post-content">{{item.content}}</text>
+        <view class="post-images" wx:if="{{item.images && item.images.length > 0}}">
+          <text class="post-image" wx:for="{{item.images}}" wx:for-item="img" wx:key="index" 
+                 bindtap="previewImage" data-urls="{{item.images}}" data-current="{{img}}">{{img}}</text>
+        </view>
+        <view class="post-actions">
+          <view class="action-item" bindtap="likePost" data-id="{{item.id}}">
+            <text class="action-icon">♡</text>
+            <text class="action-text">{{item.likes}}</text>
+          </view>
+          <view class="action-item" bindtap="commentPost" data-id="{{item.id}}">
+            <text class="action-icon">💬</text>
+            <text class="action-text">{{item.comments}}</text>
+          </view>
+          <view class="action-item">
+            <text class="action-icon">🔗</text>
+            <text class="action-text">分享</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 健康知识 -->
+    <view class="knowledge-content" wx:if="{{activeTab === 'knowledge'}}">
+      <view class="knowledge-item" wx:for="{{knowledgeList}}" wx:key="id" bindtap="viewKnowledge" data-item="{{item}}">
+        <text class="knowledge-cover">{{item.cover}}</text>
+        <view class="knowledge-info">
+          <text class="knowledge-title">{{item.title}}</text>
+          <text class="knowledge-summary">{{item.summary}}</text>
+          <view class="knowledge-meta">
+            <text class="author">{{item.author}}</text>
+            <text class="read-count">{{item.readCount}}人阅读</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 问答区域 -->
+    <view class="qa-content" wx:if="{{activeTab === 'qa'}}">
+      <view class="qa-item" wx:for="{{qaList}}" wx:key="id" bindtap="viewQA" data-item="{{item}}">
+        <view class="question">
+          <text class="q-tag">Q</text>
+          <text class="q-content">{{item.question}}</text>
+        </view>
+        <view class="answer" wx:if="{{item.answer}}">
+          <text class="a-tag">A</text>
+          <text class="a-content">{{item.answer}}</text>
+          <text class="doctor-name">- {{item.doctorName}}</text>
+        </view>
+        <view class="qa-meta">
+          <text class="qa-time">{{item.createTime}}</text>
+          <text class="qa-status {{item.status}}">{{item.statusText}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

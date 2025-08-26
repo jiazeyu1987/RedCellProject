@@ -1,0 +1,62 @@
+<!-- 登录页面 -->
+<view class="container">
+  <view class="login-header">
+    <text class="logo">🏥</text>
+    <text class="app-name">健康守护</text>
+    <text class="app-slogan">专业上门医疗服务</text>
+  </view>
+
+  <view class="login-form">
+    <view class="welcome-text">
+      <text class="welcome-title">欢迎使用健康守护</text>
+      <text class="welcome-desc">为您提供专业、贴心的上门医疗服务</text>
+    </view>
+
+    <!-- 微信授权登录 -->
+    <button class="login-btn wechat" open-type="getUserInfo" bindgetuserinfo="onGetUserInfo">
+      <text class="btn-icon">📱</text>
+      <text class="btn-text">微信授权登录</text>
+    </button>
+
+    <!-- 手机号登录 -->
+    <view class="phone-login">
+      <view class="input-group">
+        <input class="phone-input" type="number" placeholder="请输入手机号码" value="{{phoneNumber}}" bindinput="onPhoneInput" maxlength="11"/>
+      </view>
+      
+      <view class="input-group">
+        <input class="code-input" type="number" placeholder="验证码" value="{{verifyCode}}" bindinput="onCodeInput" maxlength="6"/>
+        <button class="send-code-btn {{canSendCode ? '' : 'disabled'}}" bindtap="sendVerifyCode" disabled="{{!canSendCode}}">
+          {{codeButtonText}}
+        </button>
+      </view>
+      
+      <button class="login-btn phone" bindtap="phoneLogin" disabled="{{!canLogin}}">
+        <text class="btn-text">手机号登录</text>
+      </button>
+    </view>
+
+    <!-- 服务协议 -->
+    <view class="agreement">
+      <view class="agreement-item" bindtap="toggleAgreement">
+        <view class="checkbox {{agreedToTerms ? 'checked' : ''}}">
+          <text wx:if="{{agreedToTerms}}">✓</text>
+        </view>
+        <text class="agreement-text">
+          我已阅读并同意 <text class="link" bindtap="viewUserAgreement">《用户协议》</text> 和 <text class="link" bindtap="viewPrivacyPolicy">《隐私政策》</text>
+        </text>
+      </view>
+    </view>
+
+    <!-- 快速体验 -->
+    <view class="quick-experience">
+      <text class="experience-text" bindtap="quickExperience">跳过登录，快速体验</text>
+    </view>
+  </view>
+
+  <!-- 底部信息 -->
+  <view class="footer">
+    <text class="footer-text">客服热线：400-123-4567</text>
+    <text class="footer-text">服务时间：9:00-18:00</text>
+  </view>
+</view>

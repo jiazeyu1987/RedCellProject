@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "服务预约",
+  "enablePullDownRefresh": false,
+  "onReachBottomDistance": 50,
+  "usingComponents": {
+    "service-card": "/components/service-card/index",
+    "loading": "/components/loading/index"
+  }
+}

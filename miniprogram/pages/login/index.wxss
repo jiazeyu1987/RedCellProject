@@ -1,0 +1,203 @@
+/* 登录页面样式 */
+.container {
+  background: linear-gradient(135deg, #1890FF, #40A9FF);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: white;
+}
+
+/* 登录头部 */
+.login-header {
+  text-align: center;
+  padding: 100rpx 0 60rpx;
+}
+
+.logo {
+  font-size: 160rpx;
+  margin-bottom: 30rpx;
+  display: block;
+}
+
+.app-name {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-bottom: 15rpx;
+}
+
+.app-slogan {
+  font-size: 26rpx;
+  opacity: 0.8;
+}
+
+/* 登录表单 */
+.login-form {
+  flex: 1;
+  background: white;
+  border-radius: 40rpx 40rpx 0 0;
+  padding: 60rpx 40rpx 40rpx;
+  color: #333;
+}
+
+.welcome-text {
+  text-align: center;
+  margin-bottom: 60rpx;
+}
+
+.welcome-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15rpx;
+}
+
+.welcome-desc {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 登录按钮 */
+.login-btn {
+  width: 100%;
+  height: 88rpx;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: bold;
+  margin-bottom: 30rpx;
+  border: none;
+}
+
+.login-btn.wechat {
+  background: #07C160;
+  color: white;
+}
+
+.login-btn.phone {
+  background: #1890FF;
+  color: white;
+}
+
+.login-btn[disabled] {
+  background: #E5E5E5;
+  color: #999;
+}
+
+.btn-icon {
+  font-size: 40rpx;
+  margin-right: 15rpx;
+}
+
+/* 手机号登录 */
+.phone-login {
+  margin-top: 40rpx;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+  position: relative;
+}
+
+.phone-input,
+.code-input {
+  flex: 1;
+  height: 88rpx;
+  border: 2rpx solid #E5E5E5;
+  border-radius: 44rpx;
+  padding: 0 30rpx;
+  font-size: 28rpx;
+  background: #F8F9FA;
+}
+
+.send-code-btn {
+  position: absolute;
+  right: 10rpx;
+  height: 68rpx;
+  padding: 0 30rpx;
+  background: #1890FF;
+  color: white;
+  border-radius: 34rpx;
+  font-size: 24rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-code-btn.disabled {
+  background: #E5E5E5;
+  color: #999;
+}
+
+/* 服务协议 */
+.agreement {
+  margin: 40rpx 0;
+}
+
+.agreement-item {
+  display: flex;
+  align-items: flex-start;
+}
+
+.checkbox {
+  width: 32rpx;
+  height: 32rpx;
+  border: 2rpx solid #E5E5E5;
+  border-radius: 6rpx;
+  margin-right: 15rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18rpx;
+  color: white;
+  flex-shrink: 0;
+  margin-top: 2rpx;
+}
+
+.checkbox.checked {
+  background: #1890FF;
+  border-color: #1890FF;
+}
+
+.agreement-text {
+  flex: 1;
+  font-size: 22rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.link {
+  color: #1890FF;
+}
+
+/* 快速体验 */
+.quick-experience {
+  text-align: center;
+  margin: 40rpx 0;
+}
+
+.experience-text {
+  font-size: 24rpx;
+  color: #999;
+  text-decoration: underline;
+}
+
+/* 底部信息 */
+.footer {
+  text-align: center;
+  padding: 40rpx;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.footer-text {
+  display: block;
+  font-size: 22rpx;
+  opacity: 0.8;
+  margin-bottom: 8rpx;
+}

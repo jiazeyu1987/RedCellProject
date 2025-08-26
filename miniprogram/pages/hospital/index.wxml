@@ -1,0 +1,114 @@
+<!-- 医院挂号页面 -->
+<view class="container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input">
+      <text class="search-icon">🔍</text>
+      <input placeholder="搜索医院、科室或医生" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="performSearch"/>
+    </view>
+  </view>
+
+  <!-- 医院列表 -->
+  <view class="hospital-list">
+    <view class="hospital-item" wx:for="{{hospitalList}}" wx:key="id" bindtap="selectHospital" data-hospital="{{item}}">
+      <text class="hospital-logo">{{item.logo}}</text>
+      <view class="hospital-info">
+        <text class="hospital-name">{{item.name}}</text>
+        <text class="hospital-level">{{item.level}} | {{item.type}}</text>
+        <text class="hospital-address">{{item.address}}</text>
+        <view class="hospital-tags">
+          <text class="tag" wx:for="{{item.specialties}}" wx:key="index" wx:for-item="specialty">{{specialty}}</text>
+        </view>
+      </view>
+      <view class="hospital-actions">
+        <text class="distance" wx:if="{{item.distance}}">{{item.distance}}km</text>
+        <text class="arrow">></text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快速入口 -->
+  <view class="quick-access" wx:if="{{!searchKeyword}}">
+    <view class="section-title">快速预约</view>
+    <view class="quick-departments">
+      <view class="dept-item" wx:for="{{quickDepartments}}" wx:key="name" bindtap="quickBookDepartment" data-dept="{{item}}">
+        <text class="dept-icon">{{item.icon}}</text>
+        <text class="dept-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 服务说明 -->
+  <view class="service-info" wx:if="{{!searchKeyword}}">
+    <view class="section-title">绿色通道服务</view>
+    <view class="info-card">
+      <view class="info-item">
+        <view class="info-icon">🏥</view>
+        <view class="info-content">
+          <text class="info-title">合作医院</text>
+          <text class="info-desc">与多家三甲医院建立合作关系</text>
+        </view>
+      </view>
+      <view class="info-item">
+        <view class="info-icon">⚡</view>
+        <view class="info-content">
+          <text class="info-title">快速挂号</text>
+          <text class="info-desc">享受优先挂号服务，省时省力</text>
+        </view>
+      </view>
+      <view class="info-item">
+        <view class="info-icon">🚗</view>
+        <view class="info-content">
+          <text class="info-title">专车接送</text>
+          <text class="info-desc">提供专车接送陪诊服务</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 医院详情弹窗 -->
+<view class="modal-overlay" wx:if="{{showHospitalModal}}" bindtap="closeHospitalModal">
+  <view class="hospital-modal" catchtap="">
+    <view class="modal-header">
+      <text class="modal-title">{{selectedHospital.name}}</text>
+      <text class="modal-close" bindtap="closeHospitalModal">×</text>
+    </view>
+    
+    <view class="modal-content">
+      <view class="hospital-detail">
+        <view class="detail-row">
+          <text class="detail-label">医院等级：</text>
+          <text class="detail-value">{{selectedHospital.level}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">医院类型：</text>
+          <text class="detail-value">{{selectedHospital.type}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">医院地址：</text>
+          <text class="detail-value">{{selectedHospital.address}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">联系电话：</text>
+          <text class="detail-value phone" bindtap="callHospital">{{selectedHospital.phone}}</text>
+        </view>
+      </view>
+
+      <!-- 科室列表 -->
+      <view class="departments-section">
+        <text class="section-subtitle">选择科室</text>
+        <view class="departments-grid">
+          <view class="dept-card" wx:for="{{selectedHospital.departments}}" wx:key="id" 
+                bindtap="selectDepartment" data-dept="{{item}}">
+            <text class="dept-card-name">{{item.name}}</text>
+            <text class="dept-card-info">专家{{item.expertCount}}人</text>
+            <text class="dept-card-status {{item.available ? 'available' : 'unavailable'}}">
+              {{item.available ? '可预约' : '暂满'}}
+            </text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

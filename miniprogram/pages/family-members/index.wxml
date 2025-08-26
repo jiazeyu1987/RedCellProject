@@ -1,0 +1,149 @@
+<!--家庭成员管理页面-->
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="header-section">
+    <view class="header-info">
+      <text class="member-count">共{{members.length}}位家庭成员</text>
+      <text class="header-desc">管理您的家庭成员信息，为他们预约医疗服务</text>
+    </view>
+    <button class="add-member-btn" bind:tap="showAddMemberModal">
+      <text class="add-icon">👨‍👩‍👧‍👦</text>
+      <text>添加成员</text>
+    </button>
+  </view>
+
+  <!-- 成员列表 -->
+  <view class="members-section">
+    <view wx:for="{{members}}" wx:key="id" class="member-card" bind:tap="viewMemberDetail" data-member="{{item}}">
+      <view class="member-avatar">
+        <text class="avatar-emoji">{{item.avatar}}</text>
+      </view>
+
+      <view class="member-info">
+        <view class="member-name">{{item.name}}</view>
+        <view class="member-details">
+          <text class="member-relation">{{getRelationName(item.relation)}}</text>
+          <text class="member-age">{{item.age}}岁</text>
+          <text class="member-gender">{{getGenderName(item.gender)}}</text>
+        </view>
+        <view wx:if="{{item.medicalHistory}}" class="member-medical">
+          <text class="medical-icon">🏥</text>
+          <text class="medical-text">{{item.medicalHistory}}</text>
+        </view>
+        <view wx:if="{{item.allergies}}" class="member-allergies">
+          <text class="allergy-icon">⚠️</text>
+          <text class="allergy-text">过敏：{{item.allergies}}</text>
+        </view>
+      </view>
+
+      <view class="member-actions">
+        <button class="action-btn primary" bind:tap="bookForMember" data-member="{{item}}" catch:tap="true">
+          预约
+        </button>
+        <button class="action-btn secondary" bind:tap="editMember" data-member="{{item}}" catch:tap="true">
+          编辑
+        </button>
+        <button class="action-btn danger" bind:tap="deleteMember" data-id="{{item.id}}" catch:tap="true">
+          删除
+        </button>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{members.length === 0}}" class="empty-state">
+      <text class="empty-icon">👨‍👩‍👧‍👦</text>
+      <text class="empty-text">暂无家庭成员</text>
+      <text class="empty-desc">添加家庭成员信息，方便为他们预约医疗服务</text>
+      <button class="empty-action-btn" bind:tap="showAddMemberModal">
+        添加第一位成员
+      </button>
+    </view>
+  </view>
+
+  <!-- 添加/编辑成员弹窗 -->
+  <view wx:if="{{showAddModal}}" class="modal-overlay" bind:tap="hideAddMemberModal">
+    <view class="modal-content" catch:tap="true">
+      <view class="modal-header">
+        <text class="modal-title">{{editingMember.id ? '编辑成员' : '添加成员'}}</text>
+        <button class="close-btn" bind:tap="hideAddMemberModal">✕</button>
+      </view>
+
+      <scroll-view class="modal-body" scroll-y>
+        <view class="form-section">
+          <text class="section-title">基本信息</text>
+          
+          <view class="form-item">
+            <text class="form-label">姓名 *</text>
+            <input class="form-input" placeholder="请输入姓名" 
+                   value="{{editingMember.name}}" bind:input="onMemberInput" data-field="name" />
+          </view>
+
+          <view class="form-item">
+            <text class="form-label">关系 *</text>
+            <picker range="{{relations}}" range-key="name" value="{{editingMember.relationIndex}}" 
+                    bind:change="onRelationChange">
+              <view class="picker-item">
+                <text>{{editingMember.relation ? getRelationName(editingMember.relation) : '请选择关系'}}</text>
+                <text class="picker-arrow">></text>
+              </view>
+            </picker>
+          </view>
+
+          <view class="form-item">
+            <text class="form-label">性别 *</text>
+            <picker range="{{genders}}" range-key="name" value="{{editingMember.genderIndex}}" 
+                    bind:change="onGenderChange">
+              <view class="picker-item">
+                <text>{{editingMember.gender ? getGenderName(editingMember.gender) : '请选择性别'}}</text>
+                <text class="picker-arrow">></text>
+              </view>
+            </picker>
+          </view>
+
+          <view class="form-item">
+            <text class="form-label">年龄 *</text>
+            <input class="form-input" type="number" placeholder="请输入年龄" 
+                   value="{{editingMember.age}}" bind:input="onMemberInput" data-field="age" />
+          </view>
+        </view>
+
+        <view class="form-section">
+          <text class="section-title">联系信息</text>
+          
+          <view class="form-item">
+            <text class="form-label">手机号</text>
+            <input class="form-input" type="number" placeholder="请输入手机号" 
+                   value="{{editingMember.phone}}" bind:input="onMemberInput" data-field="phone" />
+          </view>
+
+          <view class="form-item">
+            <text class="form-label">身份证号</text>
+            <input class="form-input" placeholder="请输入身份证号" 
+                   value="{{editingMember.idCard}}" bind:input="onMemberInput" data-field="idCard" />
+          </view>
+        </view>
+
+        <view class="form-section">
+          <text class="section-title">健康信息</text>
+          
+          <view class="form-item">
+            <text class="form-label">既往病史</text>
+            <textarea class="form-textarea" placeholder="请输入既往病史，如高血压、糖尿病等" 
+                      value="{{editingMember.medicalHistory}}" bind:input="onMemberInput" data-field="medicalHistory"></textarea>
+          </view>
+
+          <view class="form-item">
+            <text class="form-label">过敏史</text>
+            <textarea class="form-textarea" placeholder="请输入过敏史，如药物过敏、食物过敏等" 
+                      value="{{editingMember.allergies}}" bind:input="onMemberInput" data-field="allergies"></textarea>
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="modal-footer">
+        <button class="modal-btn secondary" bind:tap="hideAddMemberModal">取消</button>
+        <button class="modal-btn primary" bind:tap="saveMember">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

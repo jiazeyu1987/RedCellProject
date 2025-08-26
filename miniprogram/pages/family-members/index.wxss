@@ -1,0 +1,374 @@
+/* 家庭成员管理页面样式 */
+.container {
+  background-color: #F8F9FA;
+  min-height: 100vh;
+  padding-bottom: 100rpx;
+}
+
+/* 页面头部 */
+.header-section {
+  background: linear-gradient(135deg, #1890FF, #52C41A);
+  color: white;
+  padding: 40rpx 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.header-info {
+  margin-bottom: 30rpx;
+}
+
+.member-count {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.header-desc {
+  font-size: 26rpx;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.add-member-btn {
+  width: 100%;
+  height: 80rpx;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2rpx solid rgba(255, 255, 255, 0.3);
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-icon {
+  font-size: 32rpx;
+  margin-right: 15rpx;
+}
+
+/* 成员列表 */
+.members-section {
+  margin: 0 20rpx;
+}
+
+.member-card {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0,0,0,0.05);
+  display: flex;
+  align-items: flex-start;
+}
+
+.member-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: #F0F8FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 30rpx;
+  flex-shrink: 0;
+}
+
+.avatar-emoji {
+  font-size: 50rpx;
+}
+
+.member-info {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.member-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15rpx;
+}
+
+.member-details {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 15rpx;
+  flex-wrap: wrap;
+}
+
+.member-relation {
+  background: #F0F8FF;
+  color: #1890FF;
+  padding: 6rpx 12rpx;
+  border-radius: 15rpx;
+  font-size: 22rpx;
+}
+
+.member-age,
+.member-gender {
+  background: #F6FFED;
+  color: #52C41A;
+  padding: 6rpx 12rpx;
+  border-radius: 15rpx;
+  font-size: 22rpx;
+}
+
+.member-medical,
+.member-allergies {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.medical-icon,
+.allergy-icon {
+  font-size: 24rpx;
+  margin-right: 10rpx;
+}
+
+.medical-text,
+.allergy-text {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.4;
+}
+
+.allergy-text {
+  color: #FAAD14;
+}
+
+/* 操作按钮 */
+.member-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  width: 120rpx;
+  height: 60rpx;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn.primary {
+  background: #1890FF;
+  color: white;
+}
+
+.action-btn.secondary {
+  background: #F8F9FA;
+  color: #666;
+  border: 1rpx solid #E5E5E5;
+}
+
+.action-btn.danger {
+  background: #FFF2F0;
+  color: #FF4D4F;
+  border: 1rpx solid #FFCCC7;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 100rpx 40rpx;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  display: block;
+  margin-bottom: 30rpx;
+  color: #CCC;
+}
+
+.empty-text {
+  display: block;
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 15rpx;
+}
+
+.empty-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #CCC;
+  line-height: 1.5;
+  margin-bottom: 40rpx;
+}
+
+.empty-action-btn {
+  width: 300rpx;
+  height: 80rpx;
+  background: #1890FF;
+  color: white;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20rpx;
+  width: 90%;
+  max-width: 600rpx;
+  max-height: 80%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #E5E5E5;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.close-btn {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: #F5F5F5;
+  border: none;
+  color: #999;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-body {
+  flex: 1;
+  padding: 30rpx;
+  max-height: 60vh;
+}
+
+.form-section {
+  margin-bottom: 40rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 30rpx;
+  padding-bottom: 15rpx;
+  border-bottom: 2rpx solid #E5E5E5;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 26rpx;
+  color: #333;
+  margin-bottom: 15rpx;
+  font-weight: bold;
+}
+
+.form-input {
+  width: 100%;
+  height: 80rpx;
+  border: 2rpx solid #E5E5E5;
+  border-radius: 15rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+  background: #F8F9FA;
+}
+
+.form-input:focus {
+  border-color: #1890FF;
+  background: white;
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 120rpx;
+  border: 2rpx solid #E5E5E5;
+  border-radius: 15rpx;
+  padding: 20rpx;
+  font-size: 26rpx;
+  background: #F8F9FA;
+}
+
+.picker-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80rpx;
+  border: 2rpx solid #E5E5E5;
+  border-radius: 15rpx;
+  padding: 0 20rpx;
+  background: #F8F9FA;
+  font-size: 26rpx;
+  color: #333;
+}
+
+.picker-arrow {
+  color: #999;
+  font-size: 24rpx;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 20rpx;
+  padding: 30rpx;
+  border-top: 1rpx solid #E5E5E5;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-btn.primary {
+  background: #1890FF;
+  color: white;
+}
+
+.modal-btn.secondary {
+  background: #F8F9FA;
+  color: #666;
+  border: 1rpx solid #E5E5E5;
+}

@@ -1,0 +1,72 @@
+/* 用户认证组件样式 */
+.auth-guard {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.auth-modal {
+  background: white;
+  border-radius: 20rpx;
+  width: 600rpx;
+  max-width: 90vw;
+}
+
+.auth-content {
+  padding: 60rpx 40rpx 40rpx;
+  text-align: center;
+}
+
+.auth-icon {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 30rpx;
+}
+
+.auth-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.auth-desc {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 40rpx;
+}
+
+.auth-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.auth-btn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
+.auth-btn.cancel {
+  background: #F8F9FA;
+  color: #666;
+  border: 1rpx solid #E5E5E5;
+}
+
+.auth-btn.confirm {
+  background: #1890FF;
+  color: white;
+}
