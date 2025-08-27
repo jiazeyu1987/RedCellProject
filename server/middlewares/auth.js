@@ -87,7 +87,8 @@ const checkAdminPermission = (permission) => {
     }
     
     // 检查权限
-    if (!req.admin.permissions.includes(permission)) {
+    const permissions = req.admin.permissions || [];
+    if (!permissions.includes(permission)) {
       return Utils.error(res, '权限不足', 403);
     }
     

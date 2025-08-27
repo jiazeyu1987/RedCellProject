@@ -7,6 +7,15 @@ const memoryStore = new Map();
 
 // 创建session
 async function createSession(token, sessionData) {
+  // 验证输入参数
+  if (!sessionData || typeof sessionData !== 'object') {
+    throw new Error('无效的sessionData');
+  }
+  
+  if (!sessionData.expires_at || !(sessionData.expires_at instanceof Date)) {
+    throw new Error('sessionData必须包含有效的expires_at字段');
+  }
+  
   if (isTestEnv) {
     // 测试环境使用内存存储
     memoryStore.set(token, sessionData);
@@ -37,12 +46,21 @@ async function getSession(token) {
   if (isTestEnv) {
     // 测试环境从内存获取
     const session = memoryStore.get(token);
-    if (session && new Date() <= session.expires_at) {
+    
+    // 检查session是否为null或undefined
+    if (!session || !session.expires_at) {
+      if (session) {
+        memoryStore.delete(token); // 删除无效session
+      }
+      return null;
+    }
+    
+    if (new Date() <= session.expires_at) {
       return session;
     }
-    if (session) {
-      memoryStore.delete(token); // 删除过期session
-    }
+    
+    // 删除过期session
+    memoryStore.delete(token);
     return null;
   }
   
@@ -91,6 +109,13 @@ async function cleanupExpiredSessions() {
     const now = new Date();
     let cleaned = 0;
     for (const [token, session] of memoryStore.entries()) {
+      // 检查session是否为null或undefined，以及是否有expires_at属性
+      if (!session || !session.expires_at) {
+        memoryStore.delete(token);
+        cleaned++;
+        continue;
+      }
+      
       if (now > session.expires_at) {
         memoryStore.delete(token);
         cleaned++;

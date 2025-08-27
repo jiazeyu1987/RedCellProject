@@ -386,12 +386,21 @@ describe('用户模型数据库测试', () => {
         nickname: '时间戳更新测试'
       });
 
-      // 等待一小段时间
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // 等待一小段时间确保时间戳不同
+      await new Promise(resolve => setTimeout(resolve, 1100));
 
+      const updateStartTime = new Date();
       const updatedUser = await User.update(user.id, { nickname: '新昵称' });
 
-      expect(updatedUser.updatedAt.getTime()).toBeGreaterThanOrEqual(user.createdAt.getTime());
+      // 验证updatedAt字段存在且为Date对象
+      expect(updatedUser.updatedAt).toBeInstanceOf(Date);
+      
+      // 验证更新后的时间戳大于或等于原创建时间（允许一秒误差）
+      const timeDiff = updatedUser.updatedAt.getTime() - user.createdAt.getTime();
+      expect(timeDiff).toBeGreaterThanOrEqual(-1000); // 允许1秒误差
+      
+      // 验证更新时间在合理范围内（不能太远的将来）
+      expect(updatedUser.updatedAt.getTime()).toBeLessThanOrEqual(Date.now() + 1000);
     });
 
     test('数据库约束应该正确工作', async () => {

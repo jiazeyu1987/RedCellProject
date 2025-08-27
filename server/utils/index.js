@@ -22,13 +22,43 @@ class Utils {
   // 手机号脱敏
   static maskPhone(phone) {
     if (!phone) return '';
-    return phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+    if (phone.length === 11) {
+      // 11位手机号：138****5678
+      return phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+    } else if (phone.length === 10) {
+      // 10位手机号：123***7890（保持原有长度）
+      return phone.replace(/(\d{3})\d{3}(\d{4})/, '$1***$2');
+    } else {
+      // 其他长度，保留前3位和后3位（如果长度够）
+      if (phone.length <= 6) {
+        return phone.replace(/./g, '*');
+      }
+      const start = phone.substring(0, 3);
+      const end = phone.substring(phone.length - 3);
+      const middle = '*'.repeat(Math.max(0, phone.length - 6));
+      return start + middle + end;
+    }
   }
   
   // 身份证脱敏
   static maskIdCard(idCard) {
     if (!idCard) return '';
-    return idCard.replace(/(\d{6})\d{8}(\d{4})/, '$1********$2');
+    if (idCard.length === 18) {
+      // 18位身份证：123456********5678
+      return idCard.replace(/(\d{6})\d{8}(\d{4})/, '$1********$2');
+    } else if (idCard.length === 15) {
+      // 15位身份证：123456*****2345（保持原有长度）
+      return idCard.replace(/(\d{6})\d{5}(\d{4})/, '$1*****$2');
+    } else {
+      // 其他长度，保留前6位和后4位（如果长度够）
+      if (idCard.length <= 10) {
+        return idCard.replace(/./g, '*');
+      }
+      const start = idCard.substring(0, 6);
+      const end = idCard.substring(idCard.length - 4);
+      const middle = '*'.repeat(Math.max(0, idCard.length - 10));
+      return start + middle + end;
+    }
   }
   
   // 邮箱脱敏
