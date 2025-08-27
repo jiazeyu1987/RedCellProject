@@ -9,6 +9,7 @@
     "pages/hospital/index",
     "pages/login/index",
     "pages/booking-history/index",
+    "pages/health-records/index",
     "pages/address-management/index",
     "pages/health-report/index",
     "pages/health-plan/index",
@@ -19,7 +20,10 @@
     "pages/about/index",
     "pages/admin-login/index",
     "pages/admin-users/index",
-    "pages/admin-user-detail/index"
+    "pages/admin-user-detail/index",
+    "pages/api-test/index",
+    "pages/test-nav/index",
+    "pages/modal-demo/index"
   ],
   "window": {
     "backgroundColor": "#F8F9FA",

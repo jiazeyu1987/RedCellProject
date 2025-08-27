@@ -2,6 +2,7 @@
 Page({
   data: {
     members: [],
+    loading: false,
     showAddModal: false,
     editingMember: {
       name: '',
@@ -38,44 +39,40 @@ Page({
   },
 
   // 加载家庭成员列表
-  loadMembers() {
-    // 模拟从本地存储或服务器加载数据
-    const savedMembers = wx.getStorageSync('familyMembers') || [];
+  async loadMembers() {
+    this.setData({ loading: true });
     
-    // 添加一些示例数据（如果没有数据）
-    if (savedMembers.length === 0) {
-      const sampleMembers = [
-        {
-          id: 1,
-          name: '张小明',
-          relation: 'child',
-          age: 8,
-          gender: 'male',
-          phone: '',
-          idCard: '',
-          medicalHistory: '过敏性鼻炎',
-          allergies: '花粉',
-          createTime: '2024-01-15',
-          avatar: '👦'
-        },
-        {
-          id: 2,
-          name: '李美丽',
-          relation: 'spouse',
-          age: 35,
-          gender: 'female',
-          phone: '13888888888',
-          idCard: '310101********1234',
-          medicalHistory: '高血压',
-          allergies: '海鲜',
-          createTime: '2024-01-10',
-          avatar: '👩'
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'quickstartFunctions',
+        data: {
+          type: 'getFamilyMembers'
         }
-      ];
-      wx.setStorageSync('familyMembers', sampleMembers);
-      this.setData({ members: sampleMembers });
-    } else {
-      this.setData({ members: savedMembers });
+      });
+      
+      if (result.result.success) {
+        const members = result.result.data.map(member => ({
+          ...member,
+          avatar: this.getAvatarByGender(member.gender),
+          createTime: new Date(member.createTime).toLocaleDateString()
+        }));
+        
+        this.setData({ members });
+      } else {
+        console.error('获取家庭成员失败:', result.result.errMsg);
+        wx.showToast({
+          title: '获取数据失败',
+          icon: 'none'
+        });
+      }
+    } catch (error) {
+      console.error('获取家庭成员失败:', error);
+      wx.showToast({
+        title: '获取数据失败',
+        icon: 'none'
+      });
+    } finally {
+      this.setData({ loading: false });
     }
   },
 
@@ -142,7 +139,7 @@ Page({
   },
 
   // 保存成员
-  saveMember() {
+  async saveMember() {
     const member = this.data.editingMember;
     
     // 验证必填字段
@@ -172,40 +169,77 @@ Page({
       return;
     }
 
-    let members = [...this.data.members];
+    wx.showLoading({ title: '保存中...' });
     
-    if (member.id) {
-      // 编辑现有成员
-      const index = members.findIndex(item => item.id === member.id);
-      if (index !== -1) {
-        members[index] = {
-          ...member,
-          avatar: this.getAvatarByGender(member.gender)
-        };
+    try {
+      if (member._id) {
+        // 更新成员
+        const result = await wx.cloud.callFunction({
+          name: 'quickstartFunctions',
+          data: {
+            type: 'updateFamilyMember',
+            data: {
+              _id: member._id,
+              name: member.name,
+              relation: member.relation,
+              age: parseInt(member.age),
+              gender: member.gender,
+              phone: member.phone || '',
+              idCard: member.idCard || '',
+              medicalHistory: member.medicalHistory || '',
+              allergies: member.allergies || ''
+            }
+          }
+        });
+        
+        if (!result.result.success) {
+          throw new Error(result.result.errMsg || '更新失败');
+        }
+      } else {
+        // 新增成员
+        const result = await wx.cloud.callFunction({
+          name: 'quickstartFunctions',
+          data: {
+            type: 'saveFamilyMember',
+            data: {
+              name: member.name,
+              relation: member.relation,
+              age: parseInt(member.age),
+              gender: member.gender,
+              phone: member.phone || '',
+              idCard: member.idCard || '',
+              medicalHistory: member.medicalHistory || '',
+              allergies: member.allergies || ''
+            }
+          }
+        });
+        
+        if (!result.result.success) {
+          throw new Error(result.result.errMsg || '添加失败');
+        }
       }
-    } else {
-      // 新增成员
-      const newMember = {
-        ...member,
-        id: Date.now(),
-        createTime: new Date().toISOString().split('T')[0],
-        avatar: this.getAvatarByGender(member.gender)
-      };
-      members.push(newMember);
+      
+      wx.showToast({
+        title: '保存成功',
+        icon: 'success'
+      });
+      
+      this.setData({
+        showAddModal: false
+      });
+      
+      // 刷新列表
+      this.loadMembers();
+      
+    } catch (error) {
+      console.error('保存家庭成员失败:', error);
+      wx.showToast({
+        title: '保存失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
     }
-
-    // 保存到本地存储
-    wx.setStorageSync('familyMembers', members);
-    
-    this.setData({
-      members: members,
-      showAddModal: false
-    });
-
-    wx.showToast({
-      title: '保存成功',
-      icon: 'success'
-    });
   },
 
   // 根据性别获取头像
@@ -214,26 +248,51 @@ Page({
   },
 
   // 删除成员
-  deleteMember(e) {
+  async deleteMember(e) {
     const memberId = e.currentTarget.dataset.id;
-    const member = this.data.members.find(item => item.id === memberId);
+    const member = this.data.members.find(item => item._id === memberId || item.id === memberId);
     
-    wx.showModal({
+    const res = await wx.showModal({
       title: '确认删除',
-      content: `确定要删除成员"${member.name}"吗？`,
-      success: (res) => {
-        if (res.confirm) {
-          const members = this.data.members.filter(item => item.id !== memberId);
-          wx.setStorageSync('familyMembers', members);
-          this.setData({ members });
-          
-          wx.showToast({
-            title: '删除成功',
-            icon: 'success'
-          });
-        }
-      }
+      content: `确定要删除成员"${member.name}"吗？`
     });
+    
+    if (!res.confirm) return;
+    
+    wx.showLoading({ title: '删除中...' });
+    
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'quickstartFunctions',
+        data: {
+          type: 'deleteFamilyMember',
+          data: {
+            _id: member._id || member.id
+          }
+        }
+      });
+      
+      if (!result.result.success) {
+        throw new Error(result.result.errMsg || '删除失败');
+      }
+      
+      wx.showToast({
+        title: '删除成功',
+        icon: 'success'
+      });
+      
+      // 刷新列表
+      this.loadMembers();
+      
+    } catch (error) {
+      console.error('删除家庭成员失败:', error);
+      wx.showToast({
+        title: '删除失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   // 查看成员详情
@@ -259,7 +318,9 @@ Page({
 
   // 为成员预约服务
   bookForMember(e) {
-    e.stopPropagation();
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     const member = e.currentTarget.dataset.member;
     
     // 将选中的成员信息保存到全局数据中

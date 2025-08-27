@@ -1,0 +1,96 @@
+<!--pages/health-records/index.wxml-->
+<view class="container">
+  <!-- 头部导航 -->
+  <view class="header">
+    <view class="nav-bar">
+      <view class="nav-left" bindtap="goBack">
+        <text class="back-icon">‹</text>
+        <text class="back-text">返回</text>
+      </view>
+      <view class="nav-title">健康记录</view>
+      <view class="nav-right"></view>
+    </view>
+  </view>
+
+  <!-- 筛选选项 -->
+  <view class="filter-section">
+    <scroll-view class="filter-scroll" scroll-x="true">
+      <view class="filter-item {{typeFilter === 'all' ? 'active' : ''}}" 
+            bindtap="filterByType" data-type="all">
+        全部
+      </view>
+      <view class="filter-item {{typeFilter === 'bloodPressure' ? 'active' : ''}}" 
+            bindtap="filterByType" data-type="bloodPressure">
+        血压
+      </view>
+      <view class="filter-item {{typeFilter === 'bloodSugar' ? 'active' : ''}}" 
+            bindtap="filterByType" data-type="bloodSugar">
+        血糖
+      </view>
+      <view class="filter-item {{typeFilter === 'heartRate' ? 'active' : ''}}" 
+            bindtap="filterByType" data-type="heartRate">
+        心率
+      </view>
+      <view class="filter-item {{typeFilter === 'weight' ? 'active' : ''}}" 
+            bindtap="filterByType" data-type="weight">
+        体重
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 记录列表 -->
+  <view class="records-section">
+    <view wx:if="{{loading && filteredRecords.length === 0}}" class="loading-state">
+      <text class="loading-text">加载中...</text>
+    </view>
+    
+    <view wx:elif="{{filteredRecords.length === 0}}" class="empty-state">
+      <text class="empty-icon">📊</text>
+      <text class="empty-text">暂无健康记录</text>
+      <text class="empty-tip">点击首页的快速记录添加数据</text>
+    </view>
+
+    <view wx:else class="record-list">
+      <view class="record-item" 
+            wx:for="{{filteredRecords}}" 
+            wx:key="id"
+            bindtap="viewRecordDetail"
+            data-record="{{item}}">
+        <view class="record-main">
+          <view class="record-left">
+            <view class="record-type">
+              <text class="type-name">{{item.typeName}}</text>
+              <text class="type-status" style="color: {{item.statusColor}}">{{item.statusText}}</text>
+            </view>
+            <view class="record-value">
+              <text class="value-text">{{item.value}}</text>
+              <text class="unit-text">{{item.unit}}</text>
+            </view>
+            <view class="record-time">
+              <text class="date-text">{{item.date}}</text>
+              <text class="time-text">{{item.time}}</text>
+            </view>
+          </view>
+          <view class="record-right">
+            <text class="delete-btn" 
+                  bindtap="deleteRecord" 
+                  data-id="{{item.id}}"
+                  catchtap="true">删除</text>
+          </view>
+        </view>
+        <view wx:if="{{item.notes}}" class="record-notes">
+          <text class="notes-text">备注：{{item.notes}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 加载更多 -->
+    <view wx:if="{{loading && filteredRecords.length > 0}}" class="load-more">
+      <text class="load-text">加载中...</text>
+    </view>
+    
+    <view wx:if="{{!hasMore && filteredRecords.length > 0}}" class="load-end">
+      <text class="end-text">已显示全部记录</text>
+    </view>
+  </view>
+</view>

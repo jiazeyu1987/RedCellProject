@@ -41,7 +41,7 @@
 </view>
 
 <!-- 新增/编辑地址弹窗 -->
-<view class="modal-overlay" wx:if="{{showAddModal}}" bindtap="closeModal">
+<view class="modal-overlay" wx:if="{{showAddModal}}">
   <view class="address-modal" catchtap="">
     <view class="modal-header">
       <text class="modal-title">{{editingAddress.id ? '编辑地址' : '新增地址'}}</text>

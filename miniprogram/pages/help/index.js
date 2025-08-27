@@ -267,7 +267,9 @@ Page({
 
   // 分享FAQ
   shareFaq(e) {
-    e.stopPropagation();
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     const faq = e.currentTarget.dataset.faq;
     
     wx.showShareMenu({
@@ -291,7 +293,9 @@ Page({
 
   // 复制FAQ内容
   copyFaq(e) {
-    e.stopPropagation();
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     const faq = e.currentTarget.dataset.faq;
     const content = `${faq.question}\n\n${faq.answer}`;
     

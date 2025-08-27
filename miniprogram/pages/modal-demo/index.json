@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "弹框组件演示",
+  "usingComponents": {
+    "custom-modal": "/components/modal/index"
+  }
+}

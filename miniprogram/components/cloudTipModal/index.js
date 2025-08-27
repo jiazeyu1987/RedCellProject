@@ -8,8 +8,13 @@ Component({
   },
   properties: {
     showTipProps: Boolean,
-    title:String,
-    content:String
+    title: String,
+    content: String,
+    // 是否可以点击遮罩层关闭
+    maskClosable: {
+      type: Boolean,
+      value: true
+    }
   },
   observers: {
     showTipProps: function(showTipProps) {
@@ -19,10 +24,20 @@ Component({
     }
   },
   methods: {
+    // 点击关闭按钮
     onClose(){
       this.setData({
-        showTip: !this.data.showTip
+        showTip: false
       });
+      // 触发父组件事件
+      this.triggerEvent('close');
     },
+    
+    // 点击遮罩层
+    onMaskTap() {
+      if (this.data.maskClosable) {
+        this.onClose();
+      }
+    }
   }
 });

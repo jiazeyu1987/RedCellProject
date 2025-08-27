@@ -156,17 +156,20 @@ const createTableSQL = {
       id varchar(50) NOT NULL COMMENT '记录ID',
       user_id varchar(50) NOT NULL COMMENT '用户ID',
       type varchar(50) NOT NULL COMMENT '记录类型',
-      value json NOT NULL COMMENT '记录值',
+      value varchar(100) NOT NULL COMMENT '记录值',
       unit varchar(20) DEFAULT NULL COMMENT '单位',
+      status enum('normal','warning','danger') DEFAULT 'normal' COMMENT '状态',
       record_time timestamp NOT NULL COMMENT '记录时间',
       source enum('self','nurse','device','doctor') DEFAULT 'self' COMMENT '数据来源',
       notes text DEFAULT NULL COMMENT '备注',
       images json DEFAULT NULL COMMENT '相关图片',
-      create_time timestamp DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+      created_at timestamp DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+      updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
       PRIMARY KEY (id),
       KEY idx_user_id (user_id),
       KEY idx_type (type),
       KEY idx_record_time (record_time),
+      KEY idx_status (status),
       KEY idx_source (source)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='健康记录表'
   `,
@@ -216,6 +219,55 @@ const createTableSQL = {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='社区动态表'
   `,
   
+  // 健康知识表
+  health_knowledge: `
+    CREATE TABLE IF NOT EXISTS health_knowledge (
+      id varchar(50) NOT NULL COMMENT '知识ID',
+      title varchar(200) NOT NULL COMMENT '标题',
+      summary text DEFAULT NULL COMMENT '摘要',
+      content text NOT NULL COMMENT '正文内容',
+      cover varchar(500) DEFAULT NULL COMMENT '封面图片',
+      author varchar(100) DEFAULT NULL COMMENT '作者',
+      category varchar(50) DEFAULT 'general' COMMENT '分类',
+      read_count int DEFAULT 0 COMMENT '阅读次数',
+      like_count int DEFAULT 0 COMMENT '点赞次数',
+      status enum('draft','published','archived') DEFAULT 'published' COMMENT '状态',
+      is_featured tinyint(1) DEFAULT 0 COMMENT '是否推荐',
+      tags json DEFAULT NULL COMMENT '标签',
+      created_at timestamp DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+      updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+      PRIMARY KEY (id),
+      KEY idx_category (category),
+      KEY idx_status (status),
+      KEY idx_created_at (created_at),
+      KEY idx_is_featured (is_featured)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='健康知识表'
+  `,
+  
+  // 问答表
+  qa_questions: `
+    CREATE TABLE IF NOT EXISTS qa_questions (
+      id int NOT NULL AUTO_INCREMENT COMMENT '问题ID',
+      user_id varchar(50) NOT NULL COMMENT '用户ID',
+      question text NOT NULL COMMENT '问题内容',
+      answer text DEFAULT NULL COMMENT '回答内容',
+      doctor_name varchar(100) DEFAULT NULL COMMENT '医生姓名',
+      category varchar(50) DEFAULT 'general' COMMENT '问题分类',
+      status enum('pending','answered','closed') DEFAULT 'pending' COMMENT '状态',
+      is_anonymous tinyint(1) DEFAULT 0 COMMENT '是否匿名',
+      view_count int DEFAULT 0 COMMENT '浏览次数',
+      like_count int DEFAULT 0 COMMENT '点赞次数',
+      created_at timestamp DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+      updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+      answered_at timestamp NULL DEFAULT NULL COMMENT '回答时间',
+      PRIMARY KEY (id),
+      KEY idx_user_id (user_id),
+      KEY idx_status (status),
+      KEY idx_category (category),
+      KEY idx_created_at (created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='问答表'
+  `,
+  
   // 用户状态变更日志表
   user_status_logs: `
     CREATE TABLE IF NOT EXISTS user_status_logs (
@@ -228,6 +280,20 @@ const createTableSQL = {
       KEY idx_user_id (user_id),
       KEY idx_create_time (create_time)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户状态变更日志表'
+  `,
+  
+  // 动态点赞表
+  post_likes: `
+    CREATE TABLE IF NOT EXISTS post_likes (
+      id int NOT NULL AUTO_INCREMENT COMMENT '点赞ID',
+      post_id varchar(50) NOT NULL COMMENT '动态ID',
+      user_id varchar(50) NOT NULL COMMENT '用户ID',
+      created_at timestamp DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+      PRIMARY KEY (id),
+      UNIQUE KEY uk_post_user (post_id, user_id),
+      KEY idx_post_id (post_id),
+      KEY idx_user_id (user_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='动态点赞表'
   `,
   
   // 管理员会话表
@@ -249,6 +315,13 @@ const initDataSQL = {
     (2, '综合健康评估', '全面健康状况评估和建议', 200.00, 90, '评估', '📋', 2),
     (3, '康复指导', '专业康复师上门指导', 150.00, 120, '康复', '🏃', 3),
     (4, '慢病管理', '糖尿病、高血压等慢病管理', 180.00, 90, '管理', '💊', 4)
+  `,
+  
+  health_knowledge: `
+    INSERT IGNORE INTO health_knowledge (id, title, summary, content, author, category, status) VALUES
+    ('hk_001', '高血压患者的日常饮食注意事项', '高血压是常见的慢性疾病，通过合理的饮食调理可以有效控制血压，改善生活质量...', '高血压患者的饮食管理非常重要，以下是一些重要的注意事项：\n\n1. 控制钠分摄入：每日钠分摄入量不超过6克。\n2. 少吃高脂食物：避免油炸、高胆固醇食物。\n3. 多吃新鲜蔬菜水果：富含钾、镁等矿物质。\n4. 适量运动：每天进行30分钟中等强度运动。', '李医生', '慢病管理', 'published'),
+    ('hk_002', '老年人如何预防心血管疾病', '心血管疾病是老年人的主要健康威胁之一，通过早期预防和科学管理可以大大降低风险...', '老年人预防心血管疾病的方法：\n\n1. 定期检查：每年进行心电图、血脂检查。\n2. 合理饮食：低盐低脂，多吃蔬菜水果。\n3. 适度运动：散步、太极拳等有氧运动。\n4. 戒烟限酒：减少心血管损害。\n5. 保持心情愉快：减少精神压力。', '王医生', '预防保健', 'published'),
+    ('hk_003', '糖尿病患者的运动指导', '适度的运动对糖尿病患者控制血糖非常重要，但需要选择合适的运动方式和强度...', '糖尿病患者运动指导原则：\n\n1. 运动时机：餐后1-2小时运动最佳。\n2. 运动强度：中等强度，以微微出汗为宜。\n3. 运动时间：每次30-45分钟，每周至少150分钟。\n4. 运动方式：散步、游泳、太极拳等有氧运动。\n5. 注意事项：运动前后监测血糖，防止低血糖。', '张医生', '慢病管理', 'published')
   `
 };
 

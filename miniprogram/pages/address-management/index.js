@@ -1,4 +1,7 @@
 // pages/address-management/index.js
+const { API, http, getTestToken } = require('../../config/api.js');
+const authManager = require('../../utils/auth.js');
+
 Page({
   data: {
     addressList: [],
@@ -16,42 +19,108 @@ Page({
   },
 
   onLoad: function() {
-    this.loadAddressList();
+    this.checkAuthAndLoad();
   },
 
   onShow: function() {
+    this.checkAuthAndLoad();
+  },
+
+  // 检查用户认证并加载数据
+  async checkAuthAndLoad() {
+    // 尝试获取测试token
+    try {
+      const existingToken = wx.getStorageSync('token');
+      if (!existingToken) {
+        console.log('未找到token，开始获取测试token...');
+        await getTestToken();
+      } else {
+        console.log('已找到token:', existingToken.substring(0, 20) + '...');
+      }
+    } catch (error) {
+      console.error('获取测试token失败:', error);
+      wx.showToast({
+        title: '获取测试token失败，将显示模拟数据',
+        icon: 'none',
+        duration: 3000
+      });
+    }
+    
+    // 加载地址列表
     this.loadAddressList();
   },
 
   // 加载地址列表
-  loadAddressList() {
-    // 模拟从本地存储获取地址列表
-    const addressList = wx.getStorageSync('addressList') || [
-      {
-        id: 1,
-        contactName: '张三',
-        contactPhone: '13812345678',
-        province: '广东省',
-        city: '深圳市',
-        district: '南山区',
-        detail: '科技园南区科苑路66号',
-        isDefault: true
-      },
-      {
-        id: 2,
-        contactName: '李四',
-        contactPhone: '13987654321',
-        province: '广东省',
-        city: '深圳市',
-        district: '福田区',
-        detail: '华强北路100号',
-        isDefault: false
+  async loadAddressList() {
+    try {
+      wx.showLoading({ title: '加载中...' });
+      
+      console.log('开始调用localhost API:', API.USER.ADDRESSES);
+      console.log('API配置:', API);
+      
+      const result = await http.get(API.USER.ADDRESSES);
+      
+      console.log('服务器响应:', result);
+      
+      if (result.success) {
+        // 将服务器返回的数据处理为适合前端的格式
+        const addressList = result.data ? result.data.addresses || result.data : [];
+        
+        this.setData({
+          addressList: addressList
+        });
+        
+        console.log('地址列表加载成功:', addressList);
+      } else {
+        console.log('服务器返回失败，使用模拟数据');
+        // 如果获取失败，使用模拟数据
+        const mockAddressList = [
+          {
+            id: 1,
+            contactName: '张三',
+            contactPhone: '13812345678',
+            province: '广东省',
+            city: '深圳市',
+            district: '南山区',
+            detail: '科技园南区科苑路66号',
+            isDefault: true
+          }
+        ];
+        
+        this.setData({
+          addressList: mockAddressList
+        });
       }
-    ];
-
-    this.setData({
-      addressList: addressList
-    });
+    } catch (error) {
+      console.error('获取地址列表失败:', error);
+      console.error('错误详情:', JSON.stringify(error));
+      
+      // 发生错误时使用模拟数据
+      const mockAddressList = [
+        {
+          id: 1,
+          contactName: '模拟用户',
+          contactPhone: '13800138000',
+          province: '广东省',
+          city: '深圳市',
+          district: '南山区',
+          detail: '模拟地址（服务器连接失败）',
+          isDefault: true
+        }
+      ];
+      
+      this.setData({
+        addressList: mockAddressList
+      });
+      
+      wx.showToast({
+        title: '服务器连接失败，显示模拟数据',
+        icon: 'none',
+        duration: 3000
+      });
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   // 新增地址
@@ -73,6 +142,10 @@ Page({
 
   // 编辑地址
   editAddress(e) {
+    // 检查事件对象是否存在
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     const address = e.currentTarget.dataset.address;
     this.setData({
       showAddModal: true,
@@ -96,42 +169,80 @@ Page({
   },
 
   // 执行删除操作
-  performDelete(addressId) {
-    const addressList = this.data.addressList.filter(item => item.id !== addressId);
-    
-    // 如果删除的是默认地址，设置第一个为默认
-    if (addressList.length > 0) {
-      const hasDefault = addressList.some(item => item.isDefault);
-      if (!hasDefault) {
-        addressList[0].isDefault = true;
+  async performDelete(addressId) {
+    try {
+      wx.showLoading({ title: '删除中...' });
+      
+      const result = await http.delete(`${API.USER.ADDRESSES}/${addressId}`);
+      
+      if (result.success) {
+        wx.showToast({
+          title: '删除成功',
+          icon: 'success'
+        });
+        
+        // 重新加载列表
+        this.loadAddressList();
+      } else {
+        wx.showToast({
+          title: result.message || '删除失败',
+          icon: 'none'
+        });
       }
+    } catch (error) {
+      console.error('删除地址失败:', error);
+      wx.showToast({
+        title: error.message || '删除失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
     }
-
-    this.setData({ addressList });
-    this.saveToStorage(addressList);
-    
-    wx.showToast({
-      title: '删除成功',
-      icon: 'success'
-    });
   },
 
   // 设置默认地址
-  setDefault(e) {
+  async setDefault(e) {
     const addressId = e.currentTarget.dataset.id;
+    const address = this.data.addressList.find(item => item.id === addressId);
     
-    const addressList = this.data.addressList.map(item => ({
-      ...item,
-      isDefault: item.id === addressId
-    }));
-
-    this.setData({ addressList });
-    this.saveToStorage(addressList);
+    if (!address) {
+      wx.showToast({
+        title: '地址不存在',
+        icon: 'none'
+      });
+      return;
+    }
     
-    wx.showToast({
-      title: '设置成功',
-      icon: 'success'
-    });
+    try {
+      wx.showLoading({ title: '设置中...' });
+      
+      const result = await http.put(`${API.USER.ADDRESSES}/${addressId}`, {
+        isDefault: true
+      });
+      
+      if (result.success) {
+        wx.showToast({
+          title: '设置成功',
+          icon: 'success'
+        });
+        
+        // 重新加载列表
+        this.loadAddressList();
+      } else {
+        wx.showToast({
+          title: result.message || '设置失败',
+          icon: 'none'
+        });
+      }
+    } catch (error) {
+      console.error('设置默认地址失败:', error);
+      wx.showToast({
+        title: error.message || '设置失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   // 关闭弹窗
@@ -168,7 +279,7 @@ Page({
   },
 
   // 保存地址
-  saveAddress() {
+  async saveAddress() {
     const address = this.data.editingAddress;
     
     // 验证必填字段
@@ -214,44 +325,55 @@ Page({
       return;
     }
 
-    let addressList = [...this.data.addressList];
-    
-    if (address.id) {
-      // 编辑现有地址
-      const index = addressList.findIndex(item => item.id === address.id);
-      if (index !== -1) {
-        addressList[index] = address;
+    try {
+      wx.showLoading({ title: '保存中...' });
+      
+      let result;
+      // 将省市区和详细地址合并为一个字段
+      const fullAddress = `${address.province}${address.city}${address.district}${address.detail}`;
+      
+      const addressData = {
+        contactName: address.contactName,
+        contactPhone: address.contactPhone,
+        address: fullAddress,
+        isDefault: address.isDefault || false
+      };
+      
+      if (address.id || address._id) {
+        // 编辑现有地址
+        result = await http.put(`${API.USER.ADDRESSES}/${address.id || address._id}`, addressData);
+      } else {
+        // 新增地址
+        result = await http.post(API.USER.ADDRESSES, addressData);
       }
-    } else {
-      // 新增地址
-      address.id = Date.now();
-      addressList.push(address);
+      
+      if (result.success) {
+        wx.showToast({
+          title: '保存成功',
+          icon: 'success'
+        });
+        
+        this.setData({
+          showAddModal: false
+        });
+        
+        // 重新加载列表
+        this.loadAddressList();
+      } else {
+        wx.showToast({
+          title: result.message || '保存失败',
+          icon: 'none'
+        });
+      }
+    } catch (error) {
+      console.error('保存地址失败:', error);
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
     }
-
-    // 如果设置为默认地址，取消其他地址的默认状态
-    if (address.isDefault) {
-      addressList = addressList.map(item => ({
-        ...item,
-        isDefault: item.id === address.id
-      }));
-    }
-
-    this.setData({
-      addressList: addressList,
-      showAddModal: false
-    });
-
-    this.saveToStorage(addressList);
-
-    wx.showToast({
-      title: '保存成功',
-      icon: 'success'
-    });
-  },
-
-  // 保存到本地存储
-  saveToStorage(addressList) {
-    wx.setStorageSync('addressList', addressList);
   },
 
   // 返回上一页

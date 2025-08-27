@@ -1,0 +1,25 @@
+<!--components/modal/index.wxml-->
+<view class="modal-mask {{position === 'bottom' ? 'bottom' : 'center'}} {{customClass}}" wx:if="{{show}}" bindtap="onMaskTap">
+  <!-- 弹框内容，阻止事件冒泡 -->
+  <view class="modal-container {{position === 'bottom' ? 'bottom-container' : 'center-container'}}" 
+        style="width: {{width}}; height: {{height}}" 
+        catchtap="">
+    
+    <!-- 弹框头部 -->
+    <view class="modal-header" wx:if="{{title || showClose}}">
+      <view class="modal-title">{{title}}</view>
+      <view class="modal-close-btn" wx:if="{{showClose}}" bindtap="onCloseTap">×</view>
+    </view>
+    
+    <!-- 弹框内容 -->
+    <view class="modal-content">
+      <slot></slot>
+    </view>
+    
+    <!-- 弹框底部 -->
+    <view class="modal-footer" wx:if="{{showFooter}}">
+      <button class="modal-btn cancel" bindtap="onCancelTap">{{cancelText}}</button>
+      <button class="modal-btn confirm" bindtap="onConfirmTap">{{confirmText}}</button>
+    </view>
+  </view>
+</view>

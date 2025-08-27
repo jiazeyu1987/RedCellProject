@@ -214,7 +214,9 @@ Page({
 
   // 删除反馈记录
   deleteFeedback(e) {
-    e.stopPropagation();
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     const feedbackId = e.currentTarget.dataset.id;
     const feedback = this.data.feedbackHistory.find(f => f.id === feedbackId);
     

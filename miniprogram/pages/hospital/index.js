@@ -154,10 +154,154 @@ Page({
   },
 
   // 加载附近医院
-  loadNearbyHospitals() {
-    // 模拟获取用户位置并加载附近医院
-    // 可以使用 wx.getLocation 获取用户位置
-    console.log('加载附近医院');
+  async loadNearbyHospitals() {
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'quickstartFunctions',
+        data: {
+          type: 'getHospitals',
+          data: {
+            limit: 20,
+            page: 1
+          }
+        }
+      });
+      
+      if (result.result.success) {
+        this.setData({
+          hospitalList: result.result.data
+        });
+      } else {
+        console.error('获取医院信息失败:', result.result.errMsg);
+        // 使用默认数据
+        this.setData({
+          hospitalList: this.getDefaultHospitals()
+        });
+      }
+    } catch (error) {
+      console.error('加载附近医院失败:', error);
+      // 使用默认数据
+      this.setData({
+        hospitalList: this.getDefaultHospitals()
+      });
+    }
+  },
+
+  // 获取默认医院数据
+  getDefaultHospitals() {
+    return [
+      {
+        id: 1,
+        name: '深圳市人民医院',
+        level: '三级甲等',
+        type: '综合医院',
+        address: '深圳市罗湖区东门北路1017号',
+        phone: '0755-25533018',
+        distance: 2.5,
+        logo: '🏥',
+        specialties: ['心内科', '神经内科', '骨科', '消化内科'],
+        departments: [
+          {
+            id: 101,
+            name: '心内科',
+            expertCount: 8,
+            available: true
+          },
+          {
+            id: 102,
+            name: '神经内科',
+            expertCount: 6,
+            available: true
+          },
+          {
+            id: 103,
+            name: '骨科',
+            expertCount: 5,
+            available: false
+          },
+          {
+            id: 104,
+            name: '消化内科',
+            expertCount: 7,
+            available: true
+          }
+        ]
+      },
+      {
+        id: 2,
+        name: '深圳市中医院',
+        level: '三级甲等',
+        type: '中医医院',
+        address: '深圳市福田区福华路1号',
+        phone: '0755-88359666',
+        distance: 3.2,
+        logo: '🏥',
+        specialties: ['中医内科', '针灸科', '推拿科', '中医妇科'],
+        departments: [
+          {
+            id: 201,
+            name: '中医内科',
+            expertCount: 10,
+            available: true
+          },
+          {
+            id: 202,
+            name: '针灸科',
+            expertCount: 4,
+            available: true
+          },
+          {
+            id: 203,
+            name: '推拿科',
+            expertCount: 3,
+            available: true
+          },
+          {
+            id: 204,
+            name: '中医妇科',
+            expertCount: 5,
+            available: false
+          }
+        ]
+      },
+      {
+        id: 3,
+        name: '北京大学深圳医院',
+        level: '三级甲等',
+        type: '综合医院',
+        address: '深圳市福田区莲花路1120号',
+        phone: '0755-83923333',
+        distance: 4.1,
+        logo: '🏥',
+        specialties: ['肿瘤科', '心血管内科', '呼吸内科', '内分泌科'],
+        departments: [
+          {
+            id: 301,
+            name: '肿瘤科',
+            expertCount: 12,
+            available: true
+          },
+          {
+            id: 302,
+            name: '心血管内科',
+            expertCount: 9,
+            available: true
+          },
+          {
+            id: 303,
+            name: '呼吸内科',
+            expertCount: 6,
+            available: true
+          },
+          {
+            id: 304,
+            name: '内分泌科',
+            expertCount: 7,
+            available: true
+          }
+        ]
+      }
+    ];
   },
 
   // 搜索输入

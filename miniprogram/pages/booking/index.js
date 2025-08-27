@@ -1,5 +1,6 @@
 // pages/booking/index.js
 const app = getApp();
+const { API, http, getTestToken } = require('../../config/api.js');
 
 Page({
   data: {
@@ -65,11 +66,35 @@ Page({
     
     // 地址编辑相关
     showAddressModal: false,
-    editingAddress: {}
+    editingAddress: {
+      contactName: '',
+      contactPhone: '',
+      province: '',
+      city: '',
+      district: '',
+      detail: ''
+    }
   },
 
   onLoad: function() {
     this.initAvailableDates();
+    this.ensureTokenAndLoadAddresses();
+  },
+
+  // 确保有token并加载地址列表
+  async ensureTokenAndLoadAddresses() {
+    try {
+      const existingToken = wx.getStorageSync('token');
+      if (!existingToken) {
+        console.log('预约页面：未找到token，开始获取测试token...');
+        await getTestToken();
+      } else {
+        console.log('预约页面：已找到token:', existingToken.substring(0, 20) + '...');
+      }
+    } catch (error) {
+      console.error('预约页面：获取测试token失败:', error);
+    }
+    
     this.loadAddressList();
   },
 
@@ -98,23 +123,67 @@ Page({
   },
 
   // 加载地址列表
-  loadAddressList() {
-    // 模拟从后台获取用户地址列表
-    const mockAddresses = [
-      {
-        id: 1,
-        contactName: '张三',
-        contactPhone: '138****5678',
-        province: '广东省',
-        city: '深圳市',
-        district: '南山区',
-        detail: '科技园南区科苑路66号'
+  async loadAddressList() {
+    try {
+      console.log('预约页面：开始调用localhost API获取地址列表');
+      
+      const result = await http.get(API.USER.ADDRESSES);
+      
+      console.log('预约页面：服务器响应', result);
+      
+      if (result.success) {
+        // 将服务器返回的数据处理为适合前端的格式
+        const addressList = result.data ? result.data.addresses || result.data : [];
+        
+        this.setData({
+          addressList: addressList
+        });
+        
+        console.log('预约页面：地址列表加载成功', addressList);
+      } else {
+        console.log('预约页面：服务器返回失败，使用模拟数据');
+        // 如果获取失败，使用模拟数据
+        const mockAddresses = [
+          {
+            id: 1,
+            contactName: '张三',
+            contactPhone: '138****5678',
+            province: '广东省',
+            city: '深圳市',
+            district: '南山区',
+            detail: '科技园南区科苑路66号'
+          }
+        ];
+        
+        this.setData({
+          addressList: mockAddresses
+        });
       }
-    ];
-    
-    this.setData({
-      addressList: mockAddresses
-    });
+    } catch (error) {
+      console.error('预约页面：获取地址列表失败', error);
+      // 使用模拟数据
+      const mockAddresses = [
+        {
+          id: 1,
+          contactName: '模拟用户（API连接失败）',
+          contactPhone: '138****5678',
+          province: '广东省',
+          city: '深圳市',
+          district: '南山区',
+          detail: '科技园南区科苑路66号'
+        }
+      ];
+      
+      this.setData({
+        addressList: mockAddresses
+      });
+      
+      wx.showToast({
+        title: '服务器连接失败，显示模拟数据',
+        icon: 'none',
+        duration: 3000
+      });
+    }
   },
 
   // 选择服务类型
@@ -244,7 +313,10 @@ Page({
 
   // 编辑地址
   editAddress(e) {
-    e.stopPropagation();
+    // 检查事件对象是否存在
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     const address = e.currentTarget.dataset.address;
     this.setData({
       showAddressModal: true,
@@ -256,7 +328,14 @@ Page({
   closeAddressModal() {
     this.setData({
       showAddressModal: false,
-      editingAddress: {}
+      editingAddress: {
+        contactName: '',
+        contactPhone: '',
+        province: '',
+        city: '',
+        district: '',
+        detail: ''
+      }
     });
   },
 
@@ -280,7 +359,7 @@ Page({
   },
 
   // 保存地址
-  saveAddress() {
+  async saveAddress() {
     const address = this.data.editingAddress;
     
     // 验证必填字段
@@ -302,30 +381,67 @@ Page({
       return;
     }
 
-    let addressList = [...this.data.addressList];
-    
-    if (address.id) {
-      // 编辑现有地址
-      const index = addressList.findIndex(item => item.id === address.id);
-      if (index !== -1) {
-        addressList[index] = address;
+    try {
+      wx.showLoading({ title: '保存中...' });
+      
+      let result;
+      // 将省市区和详细地址合并为一个address字段
+      const fullAddress = `${address.province}${address.city}${address.district}${address.detail}`;
+      
+      const addressData = {
+        contactName: address.contactName,
+        contactPhone: address.contactPhone,
+        address: fullAddress,
+        isDefault: false
+      };
+      
+      console.log('预约页面：开始保存地址', addressData);
+      
+      if (address.id || address._id) {
+        // 编辑现有地址
+        result = await http.put(`${API.USER.ADDRESSES}/${address.id || address._id}`, addressData);
+      } else {
+        // 新增地址
+        result = await http.post(API.USER.ADDRESSES, addressData);
       }
-    } else {
-      // 新增地址
-      address.id = Date.now();
-      addressList.push(address);
+      
+      console.log('预约页面：保存地址响应', result);
+      
+      if (result.success) {
+        wx.showToast({
+          title: '保存成功',
+          icon: 'success'
+        });
+        
+        this.setData({
+          showAddressModal: false,
+          editingAddress: {
+            contactName: '',
+            contactPhone: '',
+            province: '',
+            city: '',
+            district: '',
+            detail: ''
+          }
+        });
+        
+        // 重新加载地址列表
+        this.loadAddressList();
+      } else {
+        wx.showToast({
+          title: result.message || '保存失败',
+          icon: 'none'
+        });
+      }
+    } catch (error) {
+      console.error('预约页面：保存地址失败', error);
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
     }
-
-    this.setData({
-      addressList: addressList,
-      showAddressModal: false,
-      editingAddress: {}
-    });
-
-    wx.showToast({
-      title: '保存成功',
-      icon: 'success'
-    });
   },
 
   // 查看服务协议
@@ -347,7 +463,7 @@ Page({
   },
 
   // 提交预约
-  submitBooking() {
+  async submitBooking() {
     if (!this.data.agreedToTerms) {
       wx.showToast({
         title: '请先同意服务协议',
@@ -357,19 +473,70 @@ Page({
     }
 
     const bookingData = {
-      service: this.data.selectedService,
-      date: this.data.selectedDate,
-      time: this.data.selectedTime,
-      address: this.data.selectedAddress,
-      payment: this.data.selectedPayment,
-      specialNeeds: this.data.specialNeeds,
-      createTime: new Date().toISOString()
+      serviceType: this.data.selectedService.name === '基础健康监测' ? 'basic_health' :
+                   this.data.selectedService.name === '综合健康评估' ? 'comprehensive_health' :
+                   this.data.selectedService.name === '康复指导' ? 'home_care' :
+                   this.data.selectedService.name === '慢病管理' ? 'emergency_care' : 'basic_health',
+      serviceDate: this.data.selectedDate,
+      serviceTime: this.data.selectedTime,
+      addressId: this.data.selectedAddress.id,
+      notes: this.data.specialNeeds || null
     };
 
-    if (this.data.selectedPayment === 'wechat') {
-      this.processWechatPayment(bookingData);
-    } else {
-      this.processOfflineBooking(bookingData);
+    console.log('预约页面：开始提交预约', bookingData);
+
+    try {
+      wx.showLoading({ title: '正在提交预约...' });
+      
+      // 调用后端API创建预约
+      const result = await http.post(API.SERVICE.BOOK, bookingData);
+      
+      console.log('预约页面：API响应', result);
+      
+      if (result.success) {
+        wx.hideLoading();
+        
+        if (this.data.selectedPayment === 'wechat') {
+          this.processWechatPayment(result.data.booking);
+        } else {
+          this.processOfflineBooking(result.data.booking);
+        }
+      } else {
+        wx.hideLoading();
+        wx.showToast({
+          title: result.message || '预约失败',
+          icon: 'none'
+        });
+      }
+    } catch (error) {
+      console.error('预约页面：提交预约失败', error);
+      wx.hideLoading();
+      
+      // 如果API调用失败，使用模拟流程
+      wx.showModal({
+        title: '网络异常',
+        content: '无法连接服务器，是否继续使用模拟模式？',
+        success: (res) => {
+          if (res.confirm) {
+            // 使用原有模拟流程
+            const mockBookingData = {
+              service: this.data.selectedService,
+              date: this.data.selectedDate,
+              time: this.data.selectedTime,
+              address: this.data.selectedAddress,
+              payment: this.data.selectedPayment,
+              specialNeeds: this.data.specialNeeds,
+              createTime: new Date().toISOString()
+            };
+            
+            if (this.data.selectedPayment === 'wechat') {
+              this.processWechatPayment(mockBookingData);
+            } else {
+              this.processOfflineBooking(mockBookingData);
+            }
+          }
+        }
+      });
     }
   },
 

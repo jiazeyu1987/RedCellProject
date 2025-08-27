@@ -143,13 +143,13 @@
       <view class="payment-methods">
         <view class="payment-item {{selectedPayment === 'wechat' ? 'selected' : ''}}"
               bindtap="selectPayment" data-method="wechat">
-          <image class="payment-icon" src="/images/icons/wechat-pay.png"></image>
+          <image class="payment-icon" src="/images/icons/wechat-pay.svg"></image>
           <text class="payment-name">微信支付</text>
           <view class="check-icon" wx:if="{{selectedPayment === 'wechat'}}">✓</view>
         </view>
         <view class="payment-item {{selectedPayment === 'offline' ? 'selected' : ''}}"
               bindtap="selectPayment" data-method="offline">
-          <image class="payment-icon" src="/images/icons/cash.png"></image>
+          <image class="payment-icon" src="/images/icons/cash.svg"></image>
           <text class="payment-name">到场支付</text>
           <view class="check-icon" wx:if="{{selectedPayment === 'offline'}}">✓</view>
         </view>
@@ -181,7 +181,7 @@
 </view>
 
 <!-- 地址编辑弹窗 -->
-<view class="modal-overlay" wx:if="{{showAddressModal}}" bindtap="closeAddressModal">
+<view class="modal-overlay" wx:if="{{showAddressModal}}">
   <view class="address-modal" catchtap="">
     <view class="modal-header">
       <text class="modal-title">{{editingAddress.id ? '编辑地址' : '新增地址'}}</text>

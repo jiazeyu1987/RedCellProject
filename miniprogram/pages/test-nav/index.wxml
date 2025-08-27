@@ -1,0 +1,69 @@
+<!--pages/test-nav/index.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">功能测试导航</text>
+    <text class="subtitle">选择要测试的功能页面</text>
+  </view>
+
+  <view class="nav-section">
+    <view class="section-title">API连接测试</view>
+    <view class="nav-item" bindtap="navigateToApiTest">
+      <view class="nav-icon">🔗</view>
+      <view class="nav-content">
+        <text class="nav-title">API连接测试</text>
+        <text class="nav-desc">测试localhost服务器连接状态</text>
+      </view>
+      <view class="nav-arrow">→</view>
+    </view>
+  </view>
+
+  <view class="nav-section">
+    <view class="section-title">UI组件测试</view>
+    <view class="nav-item" bindtap="navigateToModalDemo">
+      <view class="nav-icon">💬</view>
+      <view class="nav-content">
+        <text class="nav-title">弹框组件演示</text>
+        <text class="nav-desc">测试可点击遮罩关闭的弹框</text>
+      </view>
+      <view class="nav-arrow">→</view>
+    </view>
+  </view>
+
+  <view class="nav-section">
+    <view class="section-title">地址管理功能</view>
+    <view class="nav-item" bindtap="navigateToAddressManagement">
+      <view class="nav-icon">📍</view>
+      <view class="nav-content">
+        <text class="nav-title">地址管理</text>
+        <text class="nav-desc">测试地址增删改查功能</text>
+      </view>
+      <view class="nav-arrow">→</view>
+    </view>
+    
+    <view class="nav-item" bindtap="navigateToBooking">
+      <view class="nav-icon">📅</view>
+      <view class="nav-content">
+        <text class="nav-title">预约服务</text>
+        <text class="nav-desc">测试预约页面的地址功能</text>
+      </view>
+      <view class="nav-arrow">→</view>
+    </view>
+  </view>
+
+  <view class="nav-section">
+    <view class="section-title">配置信息</view>
+    <view class="config-item">
+      <text class="config-label">服务器地址:</text>
+      <text class="config-value">{{serverConfig.baseURL}}</text>
+    </view>
+    <view class="config-item">
+      <text class="config-label">API路径:</text>
+      <text class="config-value">{{serverConfig.addresses}}</text>
+    </view>
+  </view>
+
+  <view class="actions">
+    <button class="action-btn primary" bindtap="testAllPages">快速测试所有页面</button>
+    <button class="action-btn secondary" bindtap="viewLogs">查看控制台日志</button>
+  </view>
+</view>

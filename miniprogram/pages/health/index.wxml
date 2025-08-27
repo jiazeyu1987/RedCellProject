@@ -107,7 +107,7 @@
 </view>
 
 <!-- 快速记录弹窗 -->
-<view class="modal-overlay" wx:if="{{showRecordModal}}" bindtap="closeRecordModal">
+<view class="modal-overlay" wx:if="{{showRecordModal}}">
   <view class="record-modal" catchtap="">
     <view class="modal-header">
       <text class="modal-title">快速记录健康数据</text>

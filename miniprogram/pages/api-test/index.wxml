@@ -1,0 +1,68 @@
+<!--pages/api-test/index.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">API连接测试</text>
+    <text class="subtitle">测试与localhost服务器的连接</text>
+  </view>
+
+  <view class="test-section">
+    <view class="section-title">服务器配置</view>
+    <view class="config-item">
+      <text class="label">服务器地址:</text>
+      <text class="value">{{serverConfig.baseURL}}</text>
+    </view>
+    <view class="config-item">
+      <text class="label">API前缀:</text>
+      <text class="value">{{serverConfig.apiPrefix}}</text>
+    </view>
+    <view class="config-item">
+      <text class="label">超时时间:</text>
+      <text class="value">{{serverConfig.timeout}}ms</text>
+    </view>
+  </view>
+
+  <view class="test-section">
+    <view class="section-title">连接测试</view>
+    <button 
+      class="test-btn {{testStatus.health ? 'success' : (testStatus.health === false ? 'error' : '')}}" 
+      bindtap="testHealthCheck" 
+      loading="{{testing.health}}"
+    >
+      健康检查 {{testStatus.health ? '✓' : (testStatus.health === false ? '✗' : '')}}
+    </button>
+    
+    <button 
+      class="test-btn {{testStatus.addresses ? 'success' : (testStatus.addresses === false ? 'error' : '')}}" 
+      bindtap="testAddressesAPI" 
+      loading="{{testing.addresses}}"
+    >
+      地址API测试 {{testStatus.addresses ? '✓' : (testStatus.addresses === false ? '✗' : '')}}
+    </button>
+  </view>
+
+  <view class="test-section" wx:if="{{testResults.length > 0}}">
+    <view class="section-title">测试结果</view>
+    <view class="result-list">
+      <view 
+        class="result-item {{item.success ? 'success' : 'error'}}" 
+        wx:for="{{testResults}}" 
+        wx:key="index"
+      >
+        <view class="result-header">
+          <text class="result-title">{{item.title}}</text>
+          <text class="result-status">{{item.success ? '成功' : '失败'}}</text>
+        </view>
+        <view class="result-detail">
+          <text>{{item.message}}</text>
+        </view>
+        <view class="result-time">
+          <text>{{item.time}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="actions">
+    <button class="clear-btn" bindtap="clearResults">清除结果</button>
+  </view>
+</view>

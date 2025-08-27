@@ -1,0 +1,112 @@
+/* pages/modal-demo/index.wxss */
+
+.container {
+  padding: 40rpx;
+  min-height: 100vh;
+  background: #F8F9FA;
+}
+
+.demo-section {
+  background: white;
+  border-radius: 16rpx;
+  padding: 40rpx;
+  margin-bottom: 30rpx;
+}
+
+.section-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.section-desc {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 40rpx;
+  line-height: 1.5;
+}
+
+.demo-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.demo-btn {
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 28rpx;
+  background: #1890FF;
+  color: white;
+  border: none;
+}
+
+.demo-btn.system {
+  background: #52C41A;
+}
+
+.divider {
+  height: 1rpx;
+  background: #E5E5E5;
+  margin: 40rpx 0;
+}
+
+/* 弹框内容样式 */
+.modal-demo-content {
+  text-align: center;
+  padding: 20rpx 0;
+}
+
+.demo-tip {
+  font-size: 24rpx;
+  color: #1890FF;
+  margin-top: 30rpx;
+  padding: 20rpx;
+  background: #F0F8FF;
+  border-radius: 8rpx;
+  border-left: 6rpx solid #1890FF;
+  text-align: left;
+}
+
+.demo-options {
+  margin-top: 30rpx;
+}
+
+.option-item {
+  padding: 24rpx;
+  margin: 16rpx 0;
+  background: #F8F9FA;
+  border-radius: 8rpx;
+  text-align: center;
+  color: #333;
+}
+
+.custom-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.demo-icon {
+  width: 120rpx;
+  height: 120rpx;
+}
+
+.demo-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.demo-text {
+  font-size: 28rpx;
+  color: #666;
+  text-align: center;
+}
+
+/* 自定义弹框样式 */
+.custom-modal-demo .modal-container {
+  border: 4rpx solid #1890FF;
+}

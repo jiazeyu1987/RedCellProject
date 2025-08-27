@@ -88,7 +88,9 @@ Page({
 
   // 查看报告
   viewReport(e) {
-    e.stopPropagation();
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     const id = e.currentTarget.dataset.id;
     wx.navigateTo({
       url: `/pages/health-report/index?serviceId=${id}`
@@ -97,7 +99,9 @@ Page({
 
   // 观看录像
   watchVideo(e) {
-    e.stopPropagation();
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     const id = e.currentTarget.dataset.id;
     wx.navigateTo({
       url: `/pages/service-video/index?serviceId=${id}`
@@ -106,7 +110,9 @@ Page({
 
   // 评价服务
   rateService(e) {
-    e.stopPropagation();
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     const id = e.currentTarget.dataset.id;
     wx.navigateTo({
       url: `/pages/service-rating/index?serviceId=${id}`
@@ -115,7 +121,9 @@ Page({
 
   // 联系医护人员
   contactNurse(e) {
-    e.stopPropagation();
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     const nurse = e.currentTarget.dataset.nurse;
     
     wx.showModal({
@@ -134,7 +142,9 @@ Page({
 
   // 取消服务
   cancelService(e) {
-    e.stopPropagation();
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
     const id = e.currentTarget.dataset.id;
     
     wx.showModal({

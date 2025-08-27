@@ -1,0 +1,93 @@
+<!--pages/modal-demo/index.wxml-->
+<view class="container">
+  <view class="demo-section">
+    <view class="section-title">弹框组件演示</view>
+    <view class="section-desc">
+      以下弹框支持点击遮罩区域关闭，提供更好的用户体验
+    </view>
+
+    <view class="demo-buttons">
+      <button class="demo-btn" bindtap="showCenter">居中弹框</button>
+      <button class="demo-btn" bindtap="showBottom">底部弹框</button>
+      <button class="demo-btn" bindtap="showCustom">自定义弹框</button>
+      <button class="demo-btn" bindtap="showConfirm">确认弹框</button>
+    </view>
+
+    <view class="divider"></view>
+
+    <view class="section-title">系统弹框对比</view>
+    <view class="section-desc">
+      微信原生弹框只能通过按钮关闭
+    </view>
+    
+    <view class="demo-buttons">
+      <button class="demo-btn system" bindtap="showSystemModal">系统弹框</button>
+    </view>
+  </view>
+</view>
+
+<!-- 居中弹框 -->
+<custom-modal 
+  show="{{showCenterModal}}"
+  title="居中弹框"
+  position="center"
+  mask-closable="{{true}}"
+  bind:close="onModalClose">
+  <view class="modal-demo-content">
+    <text>{{demoText}}</text>
+    <view class="demo-tip">💡 点击遮罩区域或关闭按钮都可以关闭弹框</view>
+  </view>
+</custom-modal>
+
+<!-- 底部弹框 -->
+<custom-modal 
+  show="{{showBottomModal}}"
+  title="底部弹框"
+  position="bottom"
+  mask-closable="{{true}}"
+  bind:close="onModalClose">
+  <view class="modal-demo-content">
+    <text>这是一个从底部弹出的弹框</text>
+    <view class="demo-options">
+      <view class="option-item">选项一</view>
+      <view class="option-item">选项二</view>
+      <view class="option-item">选项三</view>
+    </view>
+  </view>
+</custom-modal>
+
+<!-- 自定义弹框 -->
+<custom-modal 
+  show="{{showCustomModal}}"
+  title="自定义样式弹框"
+  position="center"
+  width="80%"
+  mask-closable="{{true}}"
+  custom-class="custom-modal-demo"
+  bind:close="onModalClose">
+  <view class="modal-demo-content">
+    <view class="custom-content">
+      <image class="demo-icon" src="/images/icons/success.svg"></image>
+      <text class="demo-title">操作成功</text>
+      <text class="demo-text">你的操作已经完成，请查看相关结果</text>
+    </view>
+  </view>
+</custom-modal>
+
+<!-- 确认弹框 -->
+<custom-modal 
+  show="{{showConfirmModal}}"
+  title="确认操作"
+  position="center"
+  mask-closable="{{false}}"
+  show-footer="{{true}}"
+  cancel-text="取消"
+  confirm-text="确定"
+  bind:close="onModalClose"
+  bind:cancel="onModalCancel"
+  bind:confirm="onModalConfirm">
+  <view class="modal-demo-content">
+    <text>确定要执行这个操作吗？此操作不可撤销。</text>
+    <view class="demo-tip">⚠️ 这个弹框不支持点击遮罩关闭</view>
+  </view>
+</custom-modal>

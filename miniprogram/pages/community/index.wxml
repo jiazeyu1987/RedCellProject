@@ -87,3 +87,85 @@
     </view>
   </view>
 </view>
+
+<!-- 发布动态弹框 -->
+<view class="modal-overlay" wx:if="{{showPublishModal}}">
+  <view class="publish-modal" catchtap="">
+    <view class="modal-header">
+      <text class="modal-title">发布动态</text>
+    </view>
+    
+    <view class="modal-content">
+      <!-- 内容输入 -->
+      <view class="input-section">
+        <textarea 
+          class="content-input" 
+          placeholder="分享你的健康生活..."
+          value="{{publishContent}}"
+          bindinput="onContentInput"
+          maxlength="500"
+          auto-height="{{true}}"
+          cursor-spacing="10">
+        </textarea>
+        <text class="char-count">{{publishContent.length}}/500</text>
+      </view>
+      
+      <!-- 图片选择 -->
+      <view class="image-section">
+        <view class="image-list">
+          <view class="image-item" wx:for="{{publishImages}}" wx:key="index">
+            <image class="preview-image" src="{{item}}" mode="aspectFill"></image>
+            <view class="remove-btn" bindtap="removeImage" data-index="{{index}}">×</view>
+          </view>
+          <view class="add-image-btn" wx:if="{{publishImages.length < 9}}" bindtap="chooseImages">
+            <text class="add-icon">+</text>
+            <text class="add-text">添加图片</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="modal-actions">
+      <button class="modal-btn secondary" bindtap="closePublishModal">取消</button>
+      <button class="modal-btn primary" bindtap="submitPost">发布</button>
+    </view>
+  </view>
+</view>
+
+<!-- 提问咨询弹框 -->
+<view class="modal-overlay" wx:if="{{showQuestionModal}}">
+  <view class="question-modal" catchtap="">
+    <view class="modal-header">
+      <text class="modal-title">提问咨询</text>
+    </view>
+    
+    <view class="modal-content">
+      <!-- 问题输入 -->
+      <view class="input-section">
+        <textarea 
+          class="content-input" 
+          placeholder="请描述你的健康问题，医生会尽快为你解答..."
+          value="{{questionContent}}"
+          bindinput="onQuestionInput"
+          maxlength="200"
+          auto-height="{{true}}"
+          cursor-spacing="10">
+        </textarea>
+        <text class="char-count">{{questionContent.length}}/200</text>
+      </view>
+      
+      <!-- 提示信息 -->
+      <view class="tips-section">
+        <text class="tips-title">提问提示：</text>
+        <text class="tips-item">• 请尽量详细描述症状和情况</text>
+        <text class="tips-item">• 医生将在24小时内回复</text>
+        <text class="tips-item">• 紧急情况请拨打120或直接就医</text>
+      </view>
+    </view>
+    
+    <view class="modal-actions">
+      <button class="modal-btn secondary" bindtap="closeQuestionModal">取消</button>
+      <button class="modal-btn primary" bindtap="submitQuestion">提交</button>
+    </view>
+  </view>
+</view>
