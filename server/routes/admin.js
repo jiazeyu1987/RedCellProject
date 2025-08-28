@@ -3,7 +3,7 @@ const JWTUtils = require('../utils/jwt');
 const UserModel = require('../models/User');
 const Utils = require('../utils');
 const { adminAuthMiddleware, checkAdminPermission } = require('../middlewares/auth');
-const { query } = require('../config/database');
+const { query, transaction } = require('../config/database');
 const adminSession = require('../utils/adminSession');
 
 const router = express.Router();
@@ -565,55 +565,60 @@ router.post('/assign-user', adminAuthMiddleware, async (req, res) => {
       );
     }
 
-    // 开始事务
-    await query('START TRANSACTION');
-
-    try {
+    // 使用事务处理分配操作
+    const result = await transaction(async (connection) => {
       // 创建分配记录
       const assignmentId = `assign_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      await query(`
+      
+      // 确保所有参数不为 undefined，将 undefined 转换为 null
+      const safeUserId = userId !== undefined ? userId : null;
+      const safeProviderId = providerId !== undefined ? providerId : null;
+      const safeAssignmentType = assignmentType !== undefined ? assignmentType : 'manual';
+      const safeDistance = distance !== undefined ? distance : null;
+      const safeMatchScore = matchScore !== undefined ? matchScore : null;
+      const safeNotes = notes !== undefined ? notes : null;
+      
+      await connection.execute(`
         INSERT INTO user_assignments 
         (id, user_id, provider_id, assignment_type, assigned_by, assignment_reason, distance_meters, match_score, status)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')
-      `, [assignmentId, userId, providerId, assignmentType, 'admin', notes, distance, matchScore]);
+      `, [assignmentId, safeUserId, safeProviderId, safeAssignmentType, 'admin', safeNotes, safeDistance, safeMatchScore]);
 
       // 更新用户状态
-      await query(`
+      await connection.execute(`
         UPDATE users 
         SET assigned_provider_id = ?, assignment_status = 'assigned'
         WHERE id = ?
-      `, [providerId, userId]);
+      `, [safeProviderId, safeUserId]);
 
       // 更新服务者用户数
-      await query(`
+      await connection.execute(`
         UPDATE service_providers 
         SET current_users = current_users + 1
         WHERE id = ?
-      `, [providerId]);
+      `, [safeProviderId]);
 
       // 创建历史记录
       const historyId = `history_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      await query(`
+      const safeHistoryReason = safeNotes || '管理员手动分配';
+      
+      await connection.execute(`
         INSERT INTO assignment_history
         (id, assignment_id, action, reason, operator)
         VALUES (?, ?, 'created', ?, 'admin')
-      `, [historyId, assignmentId, notes || '管理员手动分配']);
+      `, [historyId, assignmentId, safeHistoryReason]);
 
-      await query('COMMIT');
-
-      Utils.response(res, {
+      return {
         assignmentId,
-        userId,
-        providerId,
-        distance,
-        matchScore,
+        userId: safeUserId,
+        providerId: safeProviderId,
+        distance: safeDistance,
+        matchScore: safeMatchScore,
         message: '用户分配成功'
-      });
+      };
+    });
 
-    } catch (error) {
-      await query('ROLLBACK');
-      throw error;
-    }
+    Utils.response(res, result);
 
   } catch (error) {
     console.error('分配用户失败:', error);

@@ -33,10 +33,32 @@ async function testConnection() {
   }
 }
 
+// 安全处理参数，将undefined转换为null
+function sanitizeParams(params) {
+  if (!Array.isArray(params)) {
+    return params === undefined ? null : params;
+  }
+  
+  return params.map(param => param === undefined ? null : param);
+}
+
 // 执行查询
 async function query(sql, params = []) {
   try {
-    const [rows] = await pool.execute(sql, params);
+    // 检查是否为事务控制语句，如果是则抛出有用的错误信息
+    const transactionCommands = ['START TRANSACTION', 'BEGIN', 'COMMIT', 'ROLLBACK'];
+    const upperSql = sql.trim().toUpperCase();
+    
+    for (const cmd of transactionCommands) {
+      if (upperSql.startsWith(cmd)) {
+        throw new Error(`不能直接执行事务命令 "${cmd}"。请使用 transaction() 函数来处理事务操作。`);
+      }
+    }
+    
+    // 安全处理参数
+    const safeParams = sanitizeParams(params);
+    
+    const [rows] = await pool.execute(sql, safeParams);
     return rows;
   } catch (error) {
     // 在测试环境中对预期的重复条目错误不输出详细日志
@@ -53,6 +75,13 @@ async function query(sql, params = []) {
 // 执行事务
 async function transaction(callback) {
   const connection = await pool.getConnection();
+  
+  // 为connection添加安全的execute方法
+  const originalExecute = connection.execute.bind(connection);
+  connection.execute = function(sql, params = []) {
+    const safeParams = sanitizeParams(params);
+    return originalExecute(sql, safeParams);
+  };
   
   try {
     await connection.beginTransaction();
@@ -89,5 +118,6 @@ module.exports = {
   query,
   transaction,
   testConnection,
-  initDatabase
+  initDatabase,
+  sanitizeParams
 };
