@@ -1,6 +1,7 @@
 const express = require('express');
 const JWTUtils = require('../utils/jwt');
 const UserModel = require('../models/User');
+const EnhancedUserModel = require('../models/EnhancedUser');
 const Utils = require('../utils');
 const { adminAuthMiddleware, checkAdminPermission } = require('../middlewares/auth');
 const { query, transaction } = require('../config/database');
@@ -196,6 +197,60 @@ router.get('/users', adminAuthMiddleware, async (req, res) => {
   }
 });
 
+// 获取增强用户列表 - 包含订阅、付费、地址、健康信息
+router.get('/users/enhanced', adminAuthMiddleware, async (req, res) => {
+  try {
+    console.log('📊 获取增强用户列表请求:', req.query);
+    
+    const params = {
+      page: parseInt(req.query.page) || 1,
+      pageSize: parseInt(req.query.pageSize) || 20,
+      keyword: req.query.keyword,
+      status: req.query.status,
+      subscriptionStatus: req.query.subscriptionStatus,
+      sortBy: req.query.sortBy || 'u.created_at',
+      sortOrder: req.query.sortOrder || 'desc'
+    };
+    
+    const result = await EnhancedUserModel.getEnhancedUsers(params);
+    
+    // 获取统计信息
+    const statistics = await EnhancedUserModel.getUserPoolStatistics();
+    
+    const response = {
+      success: true,
+      data: {
+        users: result.users,
+        pagination: result.pagination,
+        statistics: {
+          totalUsers: statistics.total_users,
+          activeSubscribers: statistics.active_subscribers,
+          expiredSubscribers: statistics.expired_subscribers,
+          nonSubscribers: statistics.non_subscribers,
+          totalRevenue: parseFloat(statistics.total_revenue || 0),
+          averagePayment: parseFloat(statistics.avg_payment_amount || 0),
+          activeUsers: statistics.active_users,
+          inactiveUsers: statistics.inactive_users
+        }
+      },
+      timestamp: Date.now()
+    };
+    
+    console.log(`✅ 增强用户列表查询成功: ${result.users.length} 条记录`);
+    res.json(response);
+    
+  } catch (error) {
+    console.error('❌ 获取增强用户列表失败:', error);
+    
+    // 返回错误响应
+    res.status(500).json({
+      success: false,
+      message: '获取增强用户列表失败: ' + error.message,
+      timestamp: Date.now()
+    });
+  }
+});
+
 // 获取用户详情
 router.get('/users/:userId', adminAuthMiddleware, async (req, res) => {
   try {
@@ -222,6 +277,42 @@ router.get('/users/:userId', adminAuthMiddleware, async (req, res) => {
   } catch (error) {
     console.error('获取用户详情失败:', error);
     Utils.error(res, '获取用户详情失败');
+  }
+});
+
+// 获取用户完整详情 - 包含订阅、付费、地址、健康信息
+router.get('/users/:userId/complete', adminAuthMiddleware, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log(`📊 获取用户完整详情: ${userId}`);
+    
+    const userComplete = await EnhancedUserModel.getUserComplete(userId);
+    
+    if (!userComplete) {
+      return res.status(404).json({
+        success: false,
+        message: '用户不存在',
+        timestamp: Date.now()
+      });
+    }
+    
+    const response = {
+      success: true,
+      data: userComplete,
+      timestamp: Date.now()
+    };
+    
+    console.log(`✅ 用户完整详情获取成功: ${userId}`);
+    res.json(response);
+    
+  } catch (error) {
+    console.error('❌ 获取用户完整详情失败:', error);
+    
+    res.status(500).json({
+      success: false,
+      message: '获取用户完整详情失败: ' + error.message,
+      timestamp: Date.now()
+    });
   }
 });
 

@@ -127,13 +127,26 @@ export const adminAPI = {
 
   // 用户池管理
   getUserPool: (params) => api.get('/admin/user-pool', { params }),
+  
+  // 增强用户列表 - 包含订阅、付费、地址、健康信息
+  getEnhancedUsers: (params) => api.get('/admin/users/enhanced', { params }),
+  
   getUserDetail: (userId) => api.get(`/admin/users/${userId}`),
+  
+  // 获取用户完整详情 - 包含订阅、付费、地址、健康信息
+  getUserComplete: (userId) => api.get(`/admin/users/${userId}/complete`),
+  
   updateUserStatus: (userId, status, reason) => 
     api.put(`/admin/users/${userId}/status`, { status, reason }),
   assignUser: (userId, providerId, notes) => 
     api.post('/admin/assign-user', { userId, providerId, notes }),
   batchAssignUsers: (userIds, algorithm, preferences) =>
     api.post('/admin/auto-assign', { userIds, algorithm, preferences }),
+
+  // 套餐管理接口
+  getSubscriptionPackages: () => api.get('/admin/subscription-packages'),
+  updateUserSubscription: (userId, subscriptionData) => 
+    api.put(`/admin/users/${userId}/subscription`, subscriptionData),
 
   // 服务者管理
   getServiceProviders: (params) => api.get('/admin/service-providers', { params }),

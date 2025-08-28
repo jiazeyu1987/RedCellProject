@@ -43,7 +43,9 @@ const UserPool = () => {
   const [filters, setFilters] = useState({
     keyword: '',
     status: '',
-    assignmentStatus: ''
+    subscriptionStatus: '',
+    sortBy: 'u.created_at',
+    sortOrder: 'desc'
   });
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [assignModalVisible, setAssignModalVisible] = useState(false);
@@ -58,7 +60,9 @@ const UserPool = () => {
   const fetchUserPool = async (params = {}) => {
     try {
       setLoading(true);
-      const response = await adminAPI.getUserPool({
+      
+      // 使用增强用户列表API
+      const response = await adminAPI.getEnhancedUsers({
         page: pagination.current,
         pageSize: pagination.pageSize,
         ...filters,
@@ -71,58 +75,133 @@ const UserPool = () => {
         setPagination(prev => ({
           ...prev,
           total: paginationData.total,
-          current: paginationData.page
+          current: paginationData.current
         }));
-        setStatistics(statistics);
+        setStatistics({
+          totalUsers: statistics.totalUsers,
+          assignedUsers: statistics.activeSubscribers + statistics.expiredSubscribers,
+          unassignedUsers: statistics.nonSubscribers,
+          activeSubscribers: statistics.activeSubscribers,
+          expiredSubscribers: statistics.expiredSubscribers,
+          totalRevenue: statistics.totalRevenue,
+          averagePayment: statistics.averagePayment
+        });
+        
+        console.log('✅ 增强用户列表加载成功:', users.length, '条记录');
       }
     } catch (error) {
-      console.error('获取用户池数据失败:', error);
-      message.error('获取用户池数据失败');
+      console.error('获取增强用户列表失败:', error);
+      message.error('获取用户数据失败，使用模拟数据');
       
       // 使用模拟数据
       setUsers([
         {
           id: 1,
           nickname: '张大爷',
-          real_name: '张明华',
+          realName: '张明华',
           phone: '138****5678',
           age: 75,
           gender: '男',
-          assignment_status: 'unassigned',
           status: 'active',
-          created_at: '2024-01-15 10:30:00',
-          provider_name: null
+          registerTime: '2024-01-15 10:30:00',
+          subscription: {
+            packageName: '健康守护型',
+            level: 3,
+            status: 'active',
+            endDate: '2024-09-15',
+            monthlyPrice: 298.00,
+            servicesRemaining: 2
+          },
+          payment: {
+            totalSpent: 1490.00,
+            lastPaymentTime: '2024-08-15 14:20:00',
+            paymentCount: 5
+          },
+          address: {
+            default: {
+              contactName: '张明华',
+              contactPhone: '13812345678',
+              address: '北京市朝阳区望京街道101号',
+              lastServiceTime: '2024-08-20 09:00:00'
+            }
+          },
+          health: {
+            recordCount: 45,
+            lastRecordTime: '2024-08-24 08:30:00',
+            riskLevel: 'medium',
+            mainConditions: ['高血压', '糖尿病']
+          }
         },
         {
           id: 2,
           nickname: '王奶奶',
-          real_name: '王丽华',
+          realName: '王丽华',
           phone: '139****6789',
           age: 68,
           gender: '女',
-          assignment_status: 'assigned',
           status: 'active',
-          created_at: '2024-01-16 14:20:00',
-          provider_name: '李护士'
+          registerTime: '2024-01-16 14:20:00',
+          subscription: null,
+          payment: {
+            totalSpent: 0,
+            lastPaymentTime: null,
+            paymentCount: 0
+          },
+          address: null,
+          health: {
+            recordCount: 12,
+            lastRecordTime: '2024-08-22 15:10:00',
+            riskLevel: 'low',
+            mainConditions: []
+          }
         },
         {
           id: 3,
           nickname: '李大妈',
-          real_name: '李秀英',
+          realName: '李秀英',
           phone: '137****4567',
           age: 72,
           gender: '女',
-          assignment_status: 'unassigned',
           status: 'active',
-          created_at: '2024-01-17 09:15:00',
-          provider_name: null
+          registerTime: '2024-01-17 09:15:00',
+          subscription: {
+            packageName: '专业护理型',
+            level: 4,
+            status: 'expired',
+            endDate: '2024-08-01',
+            monthlyPrice: 498.00,
+            servicesRemaining: 0
+          },
+          payment: {
+            totalSpent: 996.00,
+            lastPaymentTime: '2024-06-01 10:30:00',
+            paymentCount: 2
+          },
+          address: {
+            default: {
+              contactName: '李秀英',
+              contactPhone: '13712345678',
+              address: '上海市浦东新区世纪大道1588号',
+              lastServiceTime: '2024-07-25 14:00:00'
+            }
+          },
+          health: {
+            recordCount: 67,
+            lastRecordTime: '2024-08-23 11:20:00',
+            riskLevel: 'high',
+            mainConditions: ['心脏病', '高血压', '关节炎']
+          }
         }
       ]);
       
       setStatistics({
         totalUsers: 156,
         assignedUsers: 89,
-        unassignedUsers: 67
+        unassignedUsers: 67,
+        activeSubscribers: 45,
+        expiredSubscribers: 44,
+        totalRevenue: 125600.00,
+        averagePayment: 805.13
       });
       
       setPagination(prev => ({
@@ -187,13 +266,138 @@ const UserPool = () => {
         <Space direction="vertical" size={2}>
           <Text strong>{record.nickname}</Text>
           <Text type="secondary" style={{ fontSize: '12px' }}>
-            {record.real_name || '未填写'} | {record.age}岁 | {record.gender}
+            {record.realName || '未填写'} | {record.age}岁 | {record.gender}
           </Text>
           <Text type="secondary" style={{ fontSize: '12px' }}>
             {record.phone}
           </Text>
         </Space>
       ),
+    },
+    {
+      title: '订阅套餐',
+      key: 'subscription',
+      render: (_, record) => {
+        if (!record.subscription) {
+          return <Tag color="default">未订阅</Tag>;
+        }
+        
+        const { subscription } = record;
+        const statusColors = {
+          active: 'green',
+          expired: 'red', 
+          paused: 'orange',
+          cancelled: 'red'
+        };
+        
+        const statusTexts = {
+          active: '有效',
+          expired: '已过期',
+          paused: '已暂停',
+          cancelled: '已取消'
+        };
+        
+        return (
+          <Space direction="vertical" size={2}>
+            <div>
+              <Text strong>{subscription.packageName}</Text>
+              <Text type="secondary" style={{ fontSize: '12px', marginLeft: 4 }}>
+                (Lv.{subscription.level})
+              </Text>
+            </div>
+            <Tag color={statusColors[subscription.status]}>
+              {statusTexts[subscription.status]}
+            </Tag>
+            <Text style={{ fontSize: '12px', color: '#666' }}>
+              至 {subscription.endDate} | 剩余 {subscription.servicesRemaining} 次
+            </Text>
+          </Space>
+        );
+      }
+    },
+    {
+      title: '付费信息',
+      key: 'payment',
+      render: (_, record) => (
+        <Space direction="vertical" size={2}>
+          <Text strong style={{ color: '#1890ff' }}>¥{record.payment.totalSpent}</Text>
+          <Text style={{ fontSize: '12px', color: '#666' }}>
+            共 {record.payment.paymentCount} 次付费
+          </Text>
+          {record.payment.lastPaymentTime && (
+            <Text style={{ fontSize: '12px', color: '#666' }}>
+              最近: {new Date(record.payment.lastPaymentTime).toLocaleDateString()}
+            </Text>
+          )}
+        </Space>
+      )
+    },
+    {
+      title: '服务地址',
+      key: 'address',
+      render: (_, record) => {
+        if (!record.address) {
+          return <Text type="secondary">未设置</Text>;
+        }
+        
+        const { address } = record;
+        return (
+          <Space direction="vertical" size={2}>
+            <Text strong>{address.default.contactName}</Text>
+            <Text style={{ fontSize: '12px', color: '#666' }}>
+              {address.default.contactPhone}
+            </Text>
+            <Tooltip title={address.default.address}>
+              <Text style={{ fontSize: '12px', color: '#666' }} ellipsis>
+                {address.default.address.length > 20 
+                  ? address.default.address.substring(0, 20) + '...' 
+                  : address.default.address}
+              </Text>
+            </Tooltip>
+            {address.default.lastServiceTime && (
+              <Text style={{ fontSize: '12px', color: '#999' }}>
+                上次服务: {new Date(address.default.lastServiceTime).toLocaleDateString()}
+              </Text>
+            )}
+          </Space>
+        );
+      }
+    },
+    {
+      title: '健康状况',
+      key: 'health',
+      render: (_, record) => {
+        const riskColors = {
+          low: 'green',
+          medium: 'orange',
+          high: 'red',
+          unknown: 'default'
+        };
+        
+        const riskTexts = {
+          low: '低风险',
+          medium: '中风险',
+          high: '高风险',
+          unknown: '未知'
+        };
+        
+        return (
+          <Space direction="vertical" size={2}>
+            <Tag color={riskColors[record.health.riskLevel]}>
+              {riskTexts[record.health.riskLevel]}
+            </Tag>
+            <Text style={{ fontSize: '12px', color: '#666' }}>
+              {record.health.recordCount} 条记录
+            </Text>
+            {record.health.mainConditions && record.health.mainConditions.length > 0 && (
+              <Text style={{ fontSize: '12px', color: '#666' }}>
+                {record.health.mainConditions.slice(0, 2).join(', ')}
+                {record.health.mainConditions.length > 2 && '...'}
+              </Text>
+            )}
+          </Space>
+        );
+      }
     },
     {
       title: '分配状态',
