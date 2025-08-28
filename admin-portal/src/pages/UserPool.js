@@ -1,0 +1,735 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Table,
+  Card,
+  Space,
+  Button,
+  Input,
+  Select,
+  Tag,
+  Modal,
+  Form,
+  message,
+  Row,
+  Col,
+  Statistic,
+  Tooltip,
+  Popconfirm,
+  Typography
+} from 'antd';
+import {
+  SearchOutlined,
+  UserAddOutlined,
+  SettingOutlined,
+  ReloadOutlined,
+  ExportOutlined,
+  UserOutlined,
+  EnvironmentOutlined
+} from '@ant-design/icons';
+import { adminAPI } from '../utils/api';
+
+const { Option } = Select;
+const { Title, Text } = Typography;
+
+const UserPool = () => {
+  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 20,
+    total: 0
+  });
+  const [statistics, setStatistics] = useState({});
+  const [filters, setFilters] = useState({
+    keyword: '',
+    status: '',
+    assignmentStatus: ''
+  });
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [assignModalVisible, setAssignModalVisible] = useState(false);
+  const [batchAssignModalVisible, setBatchAssignModalVisible] = useState(false);
+  const [providers, setProviders] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  
+  const [assignForm] = Form.useForm();
+  const [batchAssignForm] = Form.useForm();
+
+  // 获取用户池数据
+  const fetchUserPool = async (params = {}) => {
+    try {
+      setLoading(true);
+      const response = await adminAPI.getUserPool({
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        ...filters,
+        ...params
+      });
+
+      if (response.data.success) {
+        const { users, pagination: paginationData, statistics } = response.data.data;
+        setUsers(users);
+        setPagination(prev => ({
+          ...prev,
+          total: paginationData.total,
+          current: paginationData.page
+        }));
+        setStatistics(statistics);
+      }
+    } catch (error) {
+      console.error('获取用户池数据失败:', error);
+      message.error('获取用户池数据失败');
+      
+      // 使用模拟数据
+      setUsers([
+        {
+          id: 1,
+          nickname: '张大爷',
+          real_name: '张明华',
+          phone: '138****5678',
+          age: 75,
+          gender: '男',
+          assignment_status: 'unassigned',
+          status: 'active',
+          created_at: '2024-01-15 10:30:00',
+          provider_name: null
+        },
+        {
+          id: 2,
+          nickname: '王奶奶',
+          real_name: '王丽华',
+          phone: '139****6789',
+          age: 68,
+          gender: '女',
+          assignment_status: 'assigned',
+          status: 'active',
+          created_at: '2024-01-16 14:20:00',
+          provider_name: '李护士'
+        },
+        {
+          id: 3,
+          nickname: '李大妈',
+          real_name: '李秀英',
+          phone: '137****4567',
+          age: 72,
+          gender: '女',
+          assignment_status: 'unassigned',
+          status: 'active',
+          created_at: '2024-01-17 09:15:00',
+          provider_name: null
+        }
+      ]);
+      
+      setStatistics({
+        totalUsers: 156,
+        assignedUsers: 89,
+        unassignedUsers: 67
+      });
+      
+      setPagination(prev => ({
+        ...prev,
+        total: 156
+      }));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 获取服务提供者列表
+  const fetchProviders = async () => {
+    try {
+      const response = await adminAPI.getServiceProviders({ pageSize: 100 });
+      if (response.data.success) {
+        setProviders(response.data.data.providers);
+      }
+    } catch (error) {
+      console.error('获取服务提供者失败:', error);
+      // 使用模拟数据
+      setProviders([
+        {
+          id: 'provider_001',
+          name: '李护士',
+          profession: 'nurse',
+          current_users: 15,
+          max_users: 20,
+          status: 'active'
+        },
+        {
+          id: 'provider_002',
+          name: '王医生',
+          profession: 'doctor',
+          current_users: 10,
+          max_users: 15,
+          status: 'active'
+        },
+        {
+          id: 'provider_003',
+          name: '张康复师',
+          profession: 'therapist',
+          current_users: 8,
+          max_users: 12,
+          status: 'active'
+        }
+      ]);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserPool();
+    fetchProviders();
+  }, []);
+
+  // 表格列定义
+  const columns = [
+    {
+      title: '用户信息',
+      key: 'userInfo',
+      render: (_, record) => (
+        <Space direction="vertical" size={2}>
+          <Text strong>{record.nickname}</Text>
+          <Text type="secondary" style={{ fontSize: '12px' }}>
+            {record.real_name || '未填写'} | {record.age}岁 | {record.gender}
+          </Text>
+          <Text type="secondary" style={{ fontSize: '12px' }}>
+            {record.phone}
+          </Text>
+        </Space>
+      ),
+    },
+    {
+      title: '分配状态',
+      dataIndex: 'assignment_status',
+      key: 'assignment_status',
+      render: (status, record) => {
+        const statusConfig = {
+          'unassigned': { color: 'default', text: '待分配' },
+          'assigned': { color: 'success', text: '已分配' },
+          'in_service': { color: 'processing', text: '服务中' }
+        };
+        const config = statusConfig[status] || statusConfig['unassigned'];
+        
+        return (
+          <Space direction="vertical" size={2}>
+            <Tag color={config.color}>{config.text}</Tag>
+            {record.provider_name && (
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                服务者: {record.provider_name}
+              </Text>
+            )}
+          </Space>
+        );
+      },
+    },
+    {
+      title: '用户状态',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => {
+        const statusConfig = {
+          'active': { color: 'success', text: '正常' },
+          'inactive': { color: 'default', text: '未激活' },
+          'disabled': { color: 'error', text: '已禁用' }
+        };
+        const config = statusConfig[status] || statusConfig['active'];
+        return <Tag color={config.color}>{config.text}</Tag>;
+      },
+    },
+    {
+      title: '注册时间',
+      dataIndex: 'created_at',
+      key: 'created_at',
+      render: (time) => (
+        <Text type="secondary">{time}</Text>
+      ),
+    },
+    {
+      title: '操作',
+      key: 'action',
+      render: (_, record) => (
+        <Space>
+          <Tooltip title="查看详情">
+            <Button 
+              size="small" 
+              icon={<UserOutlined />}
+              onClick={() => handleViewUser(record)}
+            />
+          </Tooltip>
+          
+          {record.assignment_status === 'unassigned' && (
+            <Tooltip title="分配服务者">
+              <Button 
+                size="small" 
+                type="primary"
+                icon={<UserAddOutlined />}
+                onClick={() => handleAssignUser(record)}
+              />
+            </Tooltip>
+          )}
+          
+          {record.assignment_status === 'assigned' && (
+            <Tooltip title="重新分配">
+              <Button 
+                size="small"
+                icon={<SettingOutlined />}
+                onClick={() => handleReassignUser(record)}
+              />
+            </Tooltip>
+          )}
+        </Space>
+      ),
+    },
+  ];
+
+  // 处理表格变化
+  const handleTableChange = (paginationConfig, filters, sorter) => {
+    const newPagination = {
+      ...pagination,
+      current: paginationConfig.current,
+      pageSize: paginationConfig.pageSize
+    };
+    setPagination(newPagination);
+    fetchUserPool({ 
+      page: paginationConfig.current, 
+      pageSize: paginationConfig.pageSize 
+    });
+  };
+
+  // 处理筛选
+  const handleSearch = () => {
+    setPagination(prev => ({ ...prev, current: 1 }));
+    fetchUserPool({ page: 1 });
+  };
+
+  // 重置筛选
+  const handleReset = () => {
+    setFilters({
+      keyword: '',
+      status: '',
+      assignmentStatus: ''
+    });
+    setPagination(prev => ({ ...prev, current: 1 }));
+    fetchUserPool({ 
+      page: 1,
+      keyword: '',
+      status: '',
+      assignmentStatus: ''
+    });
+  };
+
+  // 查看用户详情
+  const handleViewUser = (user) => {
+    Modal.info({
+      title: '用户详情',
+      width: 600,
+      content: (
+        <div style={{ padding: '16px 0' }}>
+          <Row gutter={[16, 16]}>
+            <Col span={12}>
+              <Text strong>昵称：</Text>
+              <Text>{user.nickname}</Text>
+            </Col>
+            <Col span={12}>
+              <Text strong>真实姓名：</Text>
+              <Text>{user.real_name || '未填写'}</Text>
+            </Col>
+            <Col span={12}>
+              <Text strong>手机号：</Text>
+              <Text>{user.phone}</Text>
+            </Col>
+            <Col span={12}>
+              <Text strong>年龄：</Text>
+              <Text>{user.age}岁</Text>
+            </Col>
+            <Col span={12}>
+              <Text strong>性别：</Text>
+              <Text>{user.gender}</Text>
+            </Col>
+            <Col span={12}>
+              <Text strong>注册时间：</Text>
+              <Text>{user.created_at}</Text>
+            </Col>
+            <Col span={24}>
+              <Text strong>分配状态：</Text>
+              <Text>{user.assignment_status === 'assigned' ? '已分配' : '待分配'}</Text>
+              {user.provider_name && (
+                <>
+                  <br />
+                  <Text strong>当前服务者：</Text>
+                  <Text>{user.provider_name}</Text>
+                </>
+              )}
+            </Col>
+          </Row>
+        </div>
+      ),
+    });
+  };
+
+  // 分配用户
+  const handleAssignUser = (user) => {
+    setCurrentUser(user);
+    setAssignModalVisible(true);
+    assignForm.resetFields();
+  };
+
+  // 重新分配用户
+  const handleReassignUser = (user) => {
+    setCurrentUser(user);
+    setAssignModalVisible(true);
+    assignForm.resetFields();
+  };
+
+  // 执行分配
+  const handleAssignSubmit = async (values) => {
+    try {
+      const response = await adminAPI.assignUser(
+        currentUser.id,
+        values.providerId,
+        values.notes
+      );
+
+      if (response.data.success) {
+        message.success('用户分配成功');
+        setAssignModalVisible(false);
+        fetchUserPool();
+      }
+    } catch (error) {
+      console.error('分配用户失败:', error);
+      message.error('分配用户失败');
+    }
+  };
+
+  // 批量分配
+  const handleBatchAssign = () => {
+    if (selectedRowKeys.length === 0) {
+      message.warning('请选择要分配的用户');
+      return;
+    }
+    setBatchAssignModalVisible(true);
+    batchAssignForm.resetFields();
+  };
+
+  // 执行批量分配
+  const handleBatchAssignSubmit = async (values) => {
+    try {
+      const response = await adminAPI.batchAssignUsers(
+        selectedRowKeys,
+        values.algorithm,
+        {
+          maxDistance: values.maxDistance,
+          considerSpecialty: values.considerSpecialty,
+          considerSchedule: values.considerSchedule,
+          balanceLoad: values.balanceLoad
+        }
+      );
+
+      if (response.data.success) {
+        const { assignments, failed, statistics } = response.data.data;
+        
+        if (failed.length > 0) {
+          message.warning(`成功分配 ${assignments.length} 个用户，${failed.length} 个用户分配失败`);
+        } else {
+          message.success(`成功分配 ${assignments.length} 个用户`);
+        }
+        
+        setBatchAssignModalVisible(false);
+        setSelectedRowKeys([]);
+        fetchUserPool();
+      }
+    } catch (error) {
+      console.error('批量分配失败:', error);
+      message.error('批量分配失败');
+    }
+  };
+
+  return (
+    <div>
+      {/* 统计卡片 */}
+      <Row gutter={16} style={{ marginBottom: 16 }}>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="总用户数"
+              value={statistics.totalUsers || 0}
+              prefix={<UserOutlined />}
+              valueStyle={{ color: '#1890ff' }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="已分配"
+              value={statistics.assignedUsers || 0}
+              prefix={<UserAddOutlined />}
+              valueStyle={{ color: '#52c41a' }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="待分配"
+              value={statistics.unassignedUsers || 0}
+              prefix={<UserOutlined />}
+              valueStyle={{ color: '#fa8c16' }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="分配率"
+              value={statistics.totalUsers > 0 ? 
+                Math.round((statistics.assignedUsers / statistics.totalUsers) * 100) : 0
+              }
+              suffix="%"
+              prefix={<SettingOutlined />}
+              valueStyle={{ color: '#722ed1' }}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      <Card>
+        {/* 筛选工具栏 */}
+        <Row gutter={16} style={{ marginBottom: 16 }}>
+          <Col flex="auto">
+            <Space>
+              <Input
+                placeholder="搜索用户昵称、姓名或手机号"
+                prefix={<SearchOutlined />}
+                value={filters.keyword}
+                onChange={(e) => setFilters(prev => ({ ...prev, keyword: e.target.value }))}
+                onPressEnter={handleSearch}
+                style={{ width: 280 }}
+              />
+              
+              <Select
+                placeholder="分配状态"
+                value={filters.assignmentStatus}
+                onChange={(value) => setFilters(prev => ({ ...prev, assignmentStatus: value }))}
+                style={{ width: 120 }}
+                allowClear
+              >
+                <Option value="unassigned">待分配</Option>
+                <Option value="assigned">已分配</Option>
+                <Option value="in_service">服务中</Option>
+              </Select>
+
+              <Select
+                placeholder="用户状态"
+                value={filters.status}
+                onChange={(value) => setFilters(prev => ({ ...prev, status: value }))}
+                style={{ width: 120 }}
+                allowClear
+              >
+                <Option value="active">正常</Option>
+                <Option value="inactive">未激活</Option>
+                <Option value="disabled">已禁用</Option>
+              </Select>
+
+              <Button type="primary" onClick={handleSearch}>
+                搜索
+              </Button>
+              
+              <Button onClick={handleReset}>
+                重置
+              </Button>
+            </Space>
+          </Col>
+
+          <Col>
+            <Space>
+              <Button
+                type="primary"
+                icon={<UserAddOutlined />}
+                onClick={handleBatchAssign}
+                disabled={selectedRowKeys.length === 0}
+              >
+                批量分配 ({selectedRowKeys.length})
+              </Button>
+              
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={() => fetchUserPool()}
+              >
+                刷新
+              </Button>
+              
+              <Button
+                icon={<ExportOutlined />}
+                onClick={() => message.info('导出功能开发中')}
+              >
+                导出
+              </Button>
+            </Space>
+          </Col>
+        </Row>
+
+        {/* 用户列表表格 */}
+        <Table
+          columns={columns}
+          dataSource={users}
+          rowKey="id"
+          loading={loading}
+          pagination={{
+            ...pagination,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => 
+              `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
+          }}
+          rowSelection={{
+            selectedRowKeys,
+            onChange: setSelectedRowKeys,
+            getCheckboxProps: (record) => ({
+              disabled: record.assignment_status === 'assigned',
+            }),
+          }}
+          onChange={handleTableChange}
+        />
+      </Card>
+
+      {/* 分配用户弹窗 */}
+      <Modal
+        title={`分配用户 - ${currentUser?.nickname}`}
+        open={assignModalVisible}
+        onCancel={() => setAssignModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <Form
+          form={assignForm}
+          layout="vertical"
+          onFinish={handleAssignSubmit}
+        >
+          <Form.Item
+            name="providerId"
+            label="选择服务提供者"
+            rules={[{ required: true, message: '请选择服务提供者' }]}
+          >
+            <Select placeholder="请选择服务提供者">
+              {providers.filter(p => p.current_users < p.max_users).map(provider => (
+                <Option key={provider.id} value={provider.id}>
+                  <Space direction="vertical" size={2}>
+                    <Text>{provider.name} ({provider.profession})</Text>
+                    <Text type="secondary" style={{ fontSize: '12px' }}>
+                      负载: {provider.current_users}/{provider.max_users}
+                    </Text>
+                  </Space>
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="notes"
+            label="分配备注"
+          >
+            <Input.TextArea 
+              placeholder="请输入分配原因或备注信息"
+              rows={3}
+            />
+          </Form.Item>
+
+          <Form.Item style={{ marginBottom: 0 }}>
+            <Space>
+              <Button type="primary" htmlType="submit">
+                确认分配
+              </Button>
+              <Button onClick={() => setAssignModalVisible(false)}>
+                取消
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 批量分配弹窗 */}
+      <Modal
+        title={`批量智能分配 - 已选择 ${selectedRowKeys.length} 个用户`}
+        open={batchAssignModalVisible}
+        onCancel={() => setBatchAssignModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <Form
+          form={batchAssignForm}
+          layout="vertical"
+          initialValues={{
+            algorithm: 'comprehensive',
+            maxDistance: 5000,
+            considerSpecialty: true,
+            considerSchedule: true,
+            balanceLoad: true
+          }}
+          onFinish={handleBatchAssignSubmit}
+        >
+          <Form.Item
+            name="algorithm"
+            label="分配算法"
+            rules={[{ required: true, message: '请选择分配算法' }]}
+          >
+            <Select>
+              <Option value="distance_priority">距离优先</Option>
+              <Option value="load_balance">负载均衡</Option>
+              <Option value="specialty_match">专业匹配</Option>
+              <Option value="comprehensive">综合评分</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="maxDistance"
+            label="最大服务距离（米）"
+            rules={[{ required: true, message: '请输入最大服务距离' }]}
+          >
+            <Input type="number" addonAfter="米" />
+          </Form.Item>
+
+          <Row gutter={16}>
+            <Col span={8}>
+              <Form.Item
+                name="considerSpecialty"
+                valuePropName="checked"
+                label=""
+              >
+                <Text>考虑专业匹配</Text>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="considerSchedule"
+                valuePropName="checked"
+                label=""
+              >
+                <Text>考虑时间安排</Text>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="balanceLoad"
+                valuePropName="checked"
+                label=""
+              >
+                <Text>负载均衡</Text>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item style={{ marginBottom: 0 }}>
+            <Space>
+              <Button type="primary" htmlType="submit">
+                开始批量分配
+              </Button>
+              <Button onClick={() => setBatchAssignModalVisible(false)}>
+                取消
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
+  );
+};
+
+export default UserPool;

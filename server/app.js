@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 // 中间件配置
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://servicewechat.com'],
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'https://servicewechat.com'],
   credentials: true
 }));
 
@@ -44,6 +44,13 @@ app.use(`${apiPrefix}/hospitals`, hospitalRoutes);
 app.use(`${apiPrefix}/admin`, adminRoutes);
 app.use(`${apiPrefix}/upload`, uploadRoutes);
 app.use(`${apiPrefix}/config`, configRoutes);
+
+// 打印路由信息（调试用）
+console.log('\n📝 注册的路由:');
+console.log(`${apiPrefix}/admin - 管理员路由`);
+console.log(`${apiPrefix}/auth - 认证路由`);
+console.log(`健康检查: /health`);
+console.log('');
 
 // 健康检查端点
 app.get('/health', (req, res) => {

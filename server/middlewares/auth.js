@@ -37,7 +37,7 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-// 管理员认证中间件
+// 管理员认证中间件 - 统一认证逻辑
 const adminAuthMiddleware = async (req, res, next) => {
   try {
     const token = JWTUtils.extractToken(req);
@@ -46,31 +46,74 @@ const adminAuthMiddleware = async (req, res, next) => {
       return Utils.error(res, '管理员未登录', 401);
     }
     
-    // 先验证JWT token（这样过期的token能返回正确的错误消息）
-    const decoded = JWTUtils.verifyAdminToken(token);
+    console.log('🔍 验证管理员token:', { token: token.substring(0, 20) + '...' });
     
-    // 然后检查session是否有效
-    const isValid = await adminSession.isValidSession(token);
-    if (!isValid) {
-      return Utils.error(res, 'session已失效', 401);
+    let adminInfo = null;
+    let authMethod = null;
+    
+    // 统一的认证流程
+    try {
+      // 1. 优先尝试简单token格式（推荐格式）
+      if (token.startsWith('admin_token_')) {
+        const isValid = await adminSession.isValidSession(token);
+        if (isValid) {
+          adminInfo = {
+            id: 'admin',
+            username: 'admin',
+            permissions: ['viewUserData', 'viewSensitiveInfo', 'exportData', 'freezeUser']
+          };
+          authMethod = 'simple_token';
+        }
+      } else {
+        // 2. 尝试JWT token格式（兼容性支持）
+        try {
+          const decoded = JWTUtils.verifyAdminToken(token);
+          const isValid = await adminSession.isValidSession(token);
+          
+          if (isValid) {
+            adminInfo = {
+              id: decoded.adminId || 'admin',
+              username: decoded.username || 'admin',
+              permissions: decoded.permissions || ['viewUserData', 'viewSensitiveInfo', 'exportData', 'freezeUser']
+            };
+            authMethod = 'jwt_token';
+          }
+        } catch (jwtError) {
+          // JWT解析失败，尝试作为简单token处理
+          const isValid = await adminSession.isValidSession(token);
+          if (isValid) {
+            adminInfo = {
+              id: 'admin',
+              username: 'admin',
+              permissions: ['viewUserData', 'viewSensitiveInfo', 'exportData', 'freezeUser']
+            };
+            authMethod = 'fallback_simple';
+          }
+        }
+      }
+      
+      // 3. 验证结果处理
+      if (!adminInfo) {
+        console.log('❌ 认证失败：token无效或已过期');
+        return Utils.error(res, 'Token已失效，请重新登录', 401);
+      }
+      
+      req.admin = adminInfo;
+      console.log(`✅ 管理员认证成功 (${authMethod}):`, {
+        username: adminInfo.username,
+        permissions: adminInfo.permissions.length
+      });
+      
+      return next();
+      
+    } catch (authError) {
+      console.log('❌ 认证过程异常:', authError.message);
+      return Utils.error(res, 'session已失效，请重新登录', 401);
     }
     
-    req.admin = {
-      id: decoded.adminId,
-      username: decoded.username,
-      permissions: decoded.permissions || []
-    };
-    
-    next();
   } catch (error) {
-    // 在非测试环境或非预期错误时输出日忕
-    const isExpectedError = error.message.includes('过期') || error.message.includes('格式错误');
-    const isTestEnv = process.env.NODE_ENV === 'test';
-    
-    if (!isTestEnv || !isExpectedError) {
-      console.error('管理员认证失败:', error);
-    }
-    Utils.error(res, error.message, 401);
+    console.error('管理员认证中间件异常:', error);
+    return Utils.error(res, '认证失败，请重新登录', 401);
   }
 };
 

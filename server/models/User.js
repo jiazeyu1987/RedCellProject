@@ -144,15 +144,35 @@ class UserModel {
   
   // 更新用户登录信息
   static async updateLoginInfo(userId, loginIP) {
-    // 暂时只更新updated_at字段，因为数据库中没有last_login_time和last_login_ip字段
-    const sql = `
-      UPDATE users 
-      SET updated_at = ?
-      WHERE id = ?
-    `;
-    
-    const now = new Date();
-    await query(sql, [now, userId]);
+    // 检查数据库表是否包含登录信息字段
+    try {
+      const sql = `
+        UPDATE users 
+        SET last_login_ip = ?, last_login_time = ?, updated_at = ?
+        WHERE id = ?
+      `;
+      
+      const now = new Date();
+      await query(sql, [loginIP, now, now, userId]);
+      
+      console.log(`✅ 用户 ${userId} 登录信息已更新: IP=${loginIP}`);
+    } catch (error) {
+      // 如果字段不存在，回退到只更新updated_at
+      if (error.code === 'ER_BAD_FIELD_ERROR') {
+        console.log('⚠️ 数据库表缺少登录信息字段，仅更新时间戳');
+        const fallbackSQL = `
+          UPDATE users 
+          SET updated_at = ?
+          WHERE id = ?
+        `;
+        
+        const now = new Date();
+        await query(fallbackSQL, [now, userId]);
+      } else {
+        console.error('更新用户登录信息失败:', error);
+        throw error;
+      }
+    }
   }
   
   // 更新用户信息

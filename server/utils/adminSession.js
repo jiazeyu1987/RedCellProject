@@ -8,17 +8,36 @@ const memoryStore = new Map();
 // 创建session
 async function createSession(token, sessionData) {
   // 验证输入参数
-  if (!sessionData || typeof sessionData !== 'object') {
-    throw new Error('无效的sessionData');
+  if (!token || typeof token !== 'string') {
+    throw new Error('无效的token');
   }
   
-  if (!sessionData.expires_at || !(sessionData.expires_at instanceof Date)) {
-    throw new Error('sessionData必须包含有效的expires_at字段');
+  // 如果sessionData为null或undefined，创建默认数据
+  if (!sessionData || typeof sessionData !== 'object') {
+    sessionData = {
+      created_at: new Date(),
+      expires_at: new Date(Date.now() + 30 * 60 * 1000) // 30分钟后过期
+    };
+  }
+  
+  // 确保有expires_at字段
+  if (!sessionData.expires_at) {
+    sessionData.expires_at = new Date(Date.now() + 30 * 60 * 1000);
+  }
+  
+  // 确保expires_at是Date对象
+  if (!(sessionData.expires_at instanceof Date)) {
+    if (typeof sessionData.expires_at === 'string') {
+      sessionData.expires_at = new Date(sessionData.expires_at);
+    } else {
+      sessionData.expires_at = new Date(Date.now() + 30 * 60 * 1000);
+    }
   }
   
   if (isTestEnv) {
     // 测试环境使用内存存储
     memoryStore.set(token, sessionData);
+    console.log('💾 已将session保存到内存:', { token: token.substring(0, 20) + '...', expires_at: sessionData.expires_at });
     return sessionData;
   }
   
@@ -31,9 +50,10 @@ async function createSession(token, sessionData) {
     await query(sql, [
       token,
       sessionData.expires_at,
-      sessionData.created_at
+      sessionData.created_at || new Date()
     ]);
     
+    console.log('💾 已将session保存到数据库:', { token: token.substring(0, 20) + '...', expires_at: sessionData.expires_at });
     return sessionData;
   } catch (error) {
     console.error('创建admin session失败:', error);

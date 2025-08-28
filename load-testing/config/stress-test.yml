@@ -1,0 +1,89 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: "预热阶段"
+    - duration: 180
+      arrivalRate: 20
+      name: "压力测试"
+    - duration: 120
+      arrivalRate: 50
+      name: "高压力测试"
+    - duration: 60
+      arrivalRate: 10
+      name: "恢复阶段"
+  processor: '../src/testProcessor.js'
+  variables:
+    apiPrefix: 'v1'
+    
+scenarios:
+  - name: "并发用户注册"
+    weight: 50
+    flow:
+      - function: "generateUserData"
+      - post:
+          url: "/{{ apiPrefix }}/auth/register"
+          json:
+            openId: "{{ openId }}"
+            nickname: "{{ nickname }}"
+            realName: "{{ realName }}"
+            phone: "{{ phone }}"
+            age: "{{ age }}"
+            gender: "{{ gender }}"
+            healthCondition: "{{ healthCondition }}"
+          expect:
+            - statusCode: [200, 201, 400, 409]
+      - think: 1
+
+  - name: "管理员操作压力测试"
+    weight: 30
+    flow:
+      - post:
+          url: "/{{ apiPrefix }}/admin/login"
+          json:
+            password: "admin123"
+          capture:
+            - json: "$.data.token"
+              as: "adminToken"
+      - loop:
+          - get:
+              url: "/{{ apiPrefix }}/admin/user-pool"
+              headers:
+                Authorization: "Bearer {{ adminToken }}"
+              qs:
+                page: "{{ $randomInt(1, 5) }}"
+                pageSize: 20
+          - get:
+              url: "/{{ apiPrefix }}/admin/service-providers"
+              headers:
+                Authorization: "Bearer {{ adminToken }}"
+          - get:
+              url: "/{{ apiPrefix }}/admin/dashboard/stats"
+              headers:
+                Authorization: "Bearer {{ adminToken }}"
+        count: 3
+      - think: 1
+
+  - name: "批量分配压力测试"
+    weight: 20
+    flow:
+      - post:
+          url: "/{{ apiPrefix }}/admin/login"
+          json:
+            password: "admin123"
+          capture:
+            - json: "$.data.token"
+              as: "adminToken"
+      - function: "generateBatchAssignmentData"
+      - post:
+          url: "/{{ apiPrefix }}/admin/auto-assign"
+          headers:
+            Authorization: "Bearer {{ adminToken }}"
+          json:
+            userIds: "{{ userIds }}"
+            algorithm: "{{ algorithm }}"
+            maxDistance: 5000
+          expect:
+            - statusCode: [200, 400, 404]
+      - think: 2

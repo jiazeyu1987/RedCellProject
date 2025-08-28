@@ -1,0 +1,37 @@
+{
+  "name": "health-guard-load-testing",
+  "version": "1.0.0",
+  "description": "健康守护压力测试系统",
+  "main": "index.js",
+  "scripts": {
+    "test": "node src/testRunner.js",
+    "generate-users": "node src/userGenerator.js",
+    "load-test": "artillery run config/test-config.yml",
+    "stress-test": "artillery run config/stress-test.yml",
+    "peak-test": "artillery run config/peak-test.yml",
+    "scheduled-test": "node src/scheduledTesting.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "artillery": "^2.0.0",
+    "faker": "^5.5.3",
+    "node-cron": "^3.0.3",
+    "axios": "^1.6.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "mysql2": "^3.6.5",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": [
+    "load-testing",
+    "stress-testing",
+    "performance",
+    "artillery",
+    "faker"
+  ],
+  "author": "Health Guard Team",
+  "license": "MIT"
+}
