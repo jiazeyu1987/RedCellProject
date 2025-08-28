@@ -37,11 +37,11 @@ async function testDatabaseConnection() {
     // 2. 检查数据库是否存在
     console.log('\n2️⃣ 检查数据库是否存在...');
     const databaseName = process.env.DB_DATABASE || 'health_guard_db';
-    const [databases] = await basicConnection.execute('SHOW DATABASES LIKE ?', [databaseName]);
+    const [databases] = await basicConnection.execute(`SHOW DATABASES LIKE '${databaseName}'`);
     
     if (databases.length === 0) {
       console.log(`⚠️  数据库 '${databaseName}' 不存在，正在创建...`);
-      await basicConnection.execute(`CREATE DATABASE IF NOT EXISTS ${databaseName} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+      await basicConnection.execute(`CREATE DATABASE IF NOT EXISTS \`${databaseName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
       console.log(`✅ 数据库 '${databaseName}' 创建成功`);
     } else {
       console.log(`✅ 数据库 '${databaseName}' 已存在`);

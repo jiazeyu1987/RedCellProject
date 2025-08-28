@@ -116,7 +116,7 @@ static async update(userId, updateData) {
 **解决方案**:
 ```bash
 # 1. 运行特定测试
-cd server && npm test -- --testPathPattern=user
+cd server ; npm test -- --testPathPattern=user
 
 # 2. 查看覆盖率报告
 npm run coverage

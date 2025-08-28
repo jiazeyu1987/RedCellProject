@@ -69,7 +69,7 @@ node api-monitor.js start
 ### 测试和质量
 ```bash
 # 运行测试套件
-cd server && npm test
+cd server ; npm test
 
 # 代码覆盖率
 npm run coverage

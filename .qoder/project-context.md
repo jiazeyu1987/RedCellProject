@@ -31,13 +31,13 @@ wx_mini_program/
 ## 常用命令
 ```bash
 # 启动服务器
-cd server && npm start
+cd server ; npm start
 
 # 启动管理后台
-cd admin-portal && npm start
+cd admin-portal ; npm start
 
 # 运行测试
-cd server && npm test
+cd server ; npm test
 
 # API冲突检测
 node api-scanner.js
