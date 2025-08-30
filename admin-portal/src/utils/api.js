@@ -178,6 +178,10 @@ export const adminAPI = {
   // 生成随机用户
   generateRandomUsers: (count = 10) => 
     api.post('/admin/generate-random-users', { count }),
+    
+  // 删除最新用户
+  deleteLatestUsers: (count = 10) => 
+    api.delete('/admin/users/latest', { params: { count } }),
 };
 
 export default api;

@@ -1492,6 +1492,29 @@ async function generateRandomPayment(userId) {
   }
 }
 
+// 删除最新的N个用户
+router.delete('/users/latest', adminAuthMiddleware, async (req, res) => {
+  try {
+    const { count = 10 } = req.query;
+    
+    // 验证数量参数，确保是整数
+    const deleteCount = Math.min(Math.max(parseInt(count) || 10, 1), 50);
+    
+    console.log(`🗑️ 准备删除最新的 ${deleteCount} 个用户`);
+    
+    // 调用UserModel删除最新用户
+    const result = await UserModel.deleteLatestUsers(deleteCount);
+    
+    console.log(`✅ 成功删除 ${result.deletedCount} 个用户`);
+    
+    Utils.response(res, result, `成功删除 ${result.deletedCount} 个最新用户`);
+    
+  } catch (error) {
+    console.error('删除最新用户失败:', error);
+    Utils.error(res, '删除用户失败: ' + error.message);
+  }
+});
+
 // 生成随机健康数据
 async function generateRandomHealthData(userId) {
   try {

@@ -654,6 +654,33 @@ const UserPool = () => {
     generateUsersForm.resetFields();
   };
 
+  // 删除最新10个用户
+  const handleDeleteLatestUsers = () => {
+    Modal.confirm({
+      title: '确认删除',
+      content: '您确定要删除最新的10个用户吗？此操作不可撤销！',
+      okText: '确认删除',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          setLoading(true);
+          const response = await adminAPI.deleteLatestUsers(10);
+          
+          if (response.data.success) {
+            message.success(`成功删除 ${response.data.data.deletedCount} 个最新用户`);
+            fetchUserPool(); // 刷新用户列表
+          }
+        } catch (error) {
+          console.error('删除最新用户失败:', error);
+          message.error('删除最新用户失败: ' + (error.response?.data?.message || error.message));
+        } finally {
+          setLoading(false);
+        }
+      }
+    });
+  };
+
   // 执行生成随机用户
   const handleGenerateUsersSubmit = async (values) => {
     try {
@@ -834,6 +861,15 @@ const UserPool = () => {
                 style={{ borderColor: '#52c41a', color: '#52c41a' }}
               >
                 生成随机用户
+              </Button>
+              
+              <Button
+                danger
+                icon={<UserOutlined />}
+                onClick={handleDeleteLatestUsers}
+                style={{ borderColor: '#ff4d4f', color: '#ff4d4f' }}
+              >
+                删除最新10个用户
               </Button>
               
               <Button

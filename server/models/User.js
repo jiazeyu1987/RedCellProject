@@ -458,6 +458,58 @@ class UserModel {
     return result[0];
   }
   
+  // 删除最新的N个用户
+  static async deleteLatestUsers(count = 10) {
+    try {
+      // 确保count是整数
+      const limitCount = parseInt(count) || 10;
+      
+      // 确保limitCount是有效的正整数
+      if (isNaN(limitCount) || limitCount <= 0) {
+        throw new Error('Invalid count parameter: must be a positive integer');
+      }
+      
+      // 确保limitCount不超过合理范围，防止SQL注入
+      const safeLimit = Math.min(limitCount, 100);
+      
+      // 调试信息
+      console.log('DEBUG: limitCount value:', safeLimit, 'type:', typeof safeLimit);
+      
+      // 先查询最新的N个用户
+      // 使用字符串拼接而不是参数化查询来避免LIMIT参数问题
+      const selectSql = `
+        SELECT id, nickname, created_at 
+        FROM users 
+        ORDER BY created_at DESC 
+        LIMIT ${safeLimit}
+      `;
+      const latestUsers = await query(selectSql);
+      
+      if (latestUsers.length === 0) {
+        return { deletedCount: 0, users: [] };
+      }
+      
+      // 获取要删除的用户ID列表
+      const userIds = latestUsers.map(user => user.id);
+      
+      // 构建删除语句 - 注意：实际生产环境中应该考虑关联数据的删除
+      const deleteSql = `
+        DELETE FROM users 
+        WHERE id IN (${userIds.map(() => '?').join(',')})
+      `;
+      
+      const result = await query(deleteSql, userIds);
+      
+      return {
+        deletedCount: result.affectedRows,
+        users: latestUsers
+      };
+    } catch (error) {
+      console.error('删除最新用户失败:', error);
+      throw new Error('删除用户失败: ' + error.message);
+    }
+  }
+  
   // 获取安全的用户信息（用于返回给前端）
   static getSafeUserInfo(user) {
     if (!user) return null;

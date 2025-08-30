@@ -39,7 +39,17 @@ function sanitizeParams(params) {
     return params === undefined ? null : params;
   }
   
-  return params.map(param => param === undefined ? null : param);
+  return params.map(param => {
+    // 特殊处理数字类型的参数，确保它们是有效的数字
+    if (typeof param === 'number' && !isNaN(param)) {
+      return param;
+    }
+    // 处理可能的数字字符串
+    if (typeof param === 'string' && !isNaN(Number(param)) && param.trim() !== '') {
+      return Number(param);
+    }
+    return param === undefined ? null : param;
+  });
 }
 
 // 执行查询
