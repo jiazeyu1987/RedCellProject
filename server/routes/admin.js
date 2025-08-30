@@ -12,6 +12,10 @@ const router = express.Router();
 // 引入分配算法
 const assignmentAlgorithm = require('../utils/assignmentAlgorithm');
 
+// 引入随机用户生成工具
+const faker = require('faker');
+faker.locale = 'zh_CN';
+
 // 简化的管理员登录接口（用于调试）
 router.post('/simple-login', async (req, res) => {
   try {
@@ -1107,6 +1111,455 @@ router.get('/assignment-history', adminAuthMiddleware, async (req, res) => {
     Utils.error(res, '获取分配历史失败');
   }
 });
+
+// 生成随机用户接口
+router.post('/generate-random-users', adminAuthMiddleware, async (req, res) => {
+  try {
+    console.log('🎲 开始生成随机用户...');
+    const { count = 10 } = req.body;
+    
+    if (count < 1 || count > 50) {
+      return Utils.error(res, '用户数量必须在1-50之间', 400);
+    }
+    
+    const results = {
+      success: [],
+      failed: [],
+      statistics: {
+        total: count,
+        successCount: 0,
+        failedCount: 0
+      }
+    };
+    
+    // 生成随机用户数据
+    for (let i = 0; i < count; i++) {
+      try {
+        const userData = generateRandomUserData();
+        
+        // 插入用户基础信息
+        const userResult = await insertRandomUser(userData);
+        
+        if (userResult.success) {
+          const userId = userResult.userId;
+          
+          // 生成随机地址
+          await generateRandomAddress(userId, userData.locationInfo);
+          
+          // 30%概率生成订阅套餐
+          if (Math.random() < 0.7) {
+            await generateRandomSubscription(userId);
+          }
+          
+          // 50%概率生成支付记录
+          if (Math.random() < 0.5) {
+            await generateRandomPayment(userId);
+          }
+          
+          // 生成健康数据
+          await generateRandomHealthData(userId);
+          
+          results.success.push({
+            id: userId,
+            nickname: userData.nickname,
+            realName: userData.realName,
+            phone: userData.phone
+          });
+          results.statistics.successCount++;
+          
+          console.log(`✅ 用户生成成功: ${userData.nickname} (${userData.phone})`);
+        } else {
+          results.failed.push({
+            error: userResult.error,
+            userData: userData.nickname
+          });
+          results.statistics.failedCount++;
+        }
+        
+      } catch (error) {
+        console.error(`❌ 生成第${i+1}个用户失败:`, error);
+        results.failed.push({
+          error: error.message,
+          index: i + 1
+        });
+        results.statistics.failedCount++;
+      }
+    }
+    
+    console.log(`🎉 随机用户生成完成: 成功${results.statistics.successCount}个, 失败${results.statistics.failedCount}个`);
+    
+    Utils.response(res, results, `随机用户生成完成: 成功${results.statistics.successCount}个`);
+    
+  } catch (error) {
+    console.error('💥 生成随机用户异常:', error);
+    Utils.error(res, '生成随机用户失败: ' + error.message);
+  }
+});
+
+// 生成随机用户数据
+function generateRandomUserData() {
+  const age = faker.datatype.number({min: 60, max: 90});
+  const gender = faker.random.arrayElement(['男', '女']);
+  const realName = generateChineseName();
+  const location = generateBeijingLocation();
+  const health = generateHealthCondition();
+  
+  // 计算生日
+  const currentYear = new Date().getFullYear();
+  const birthYear = currentYear - age;
+  const birthday = faker.date.between(`${birthYear}-01-01`, `${birthYear}-12-31`);
+  
+  return {
+    openId: `wx_random_${faker.datatype.uuid().replace(/-/g, '')}`,
+    nickname: age >= 70 ? `${realName.charAt(0)}${gender === '男' ? '大爷' : '奶奶'}` : `${realName.charAt(0)}${gender === '男' ? '叔叔' : '阿姨'}`,
+    realName: realName,
+    phone: '1' + faker.datatype.number({min: 3000000000, max: 8999999999}).toString(),
+    email: generateEmail(realName),
+    age: age,
+    gender: gender,
+    birthday: birthday.toISOString().split('T')[0],
+    memberLevel: faker.random.arrayElement(['regular', 'vip']),
+    status: 'active',
+    healthCondition: health.condition,
+    locationInfo: location
+  };
+}
+
+// 生成中国常见姓氏和名字
+function generateChineseName() {
+  const familyNames = [
+    '王', '李', '张', '刘', '陈', '杨', '赵', '黄', '周', '吴',
+    '徐', '孙', '胡', '朱', '高', '林', '何', '郭', '马', '罗',
+    '梁', '宋', '郑', '谢', '韩', '唐', '冯', '于', '董', '萧'
+  ];
+  
+  const givenNames = [
+    '建华', '明', '敏', '静', '丽', '强', '磊', '军', '洋', '勇',
+    '艳', '杰', '娟', '涛', '超', '秀英', '霞', '平', '刚', '桂英',
+    '伟', '芳', '秀兰', '国华', '华', '玉兰', '春', '金凤', '玉梅'
+  ];
+  
+  const familyName = faker.random.arrayElement(familyNames);
+  const givenName = faker.random.arrayElement(givenNames);
+  
+  return `${familyName}${givenName}`;
+}
+
+// 生成北京市随机地址和坐标
+function generateBeijingLocation() {
+  const districts = [
+    { 
+      name: '朝阳区', 
+      center: [39.9204, 116.4490],
+      streets: ['三里屯街道', '建国门外街道', '呼家楼街道', '八里庄街道', '双井街道']
+    },
+    { 
+      name: '海淀区', 
+      center: [39.9593, 116.2979],
+      streets: ['中关村街道', '万寿路街道', '羊坊店街道', '甘家口街道', '学院路街道']
+    },
+    { 
+      name: '西城区', 
+      center: [39.9142, 116.3660],
+      streets: ['西长安街街道', '新街口街道', '月坛街道', '德胜街道', '金融街街道']
+    },
+    { 
+      name: '东城区', 
+      center: [39.9180, 116.4175],
+      streets: ['东华门街道', '景山街道', '交道口街道', '安定门街道', '北新桥街道']
+    }
+  ];
+  
+  const district = faker.random.arrayElement(districts);
+  const street = faker.random.arrayElement(district.streets);
+  
+  // 在区中心附近生成随机坐标
+  const offsetLat = (Math.random() - 0.5) * 0.018;
+  const offsetLng = (Math.random() - 0.5) * 0.018;
+  
+  return {
+    district: district.name,
+    street: street,
+    address: `${district.name}${street}${faker.datatype.number({min: 1, max: 999})}号${faker.datatype.number({min: 1, max: 30})}单元${faker.datatype.number({min: 101, max: 2999})}室`,
+    latitude: district.center[0] + offsetLat,
+    longitude: district.center[1] + offsetLng
+  };
+}
+
+// 生成邮箱地址
+function generateEmail(realName) {
+  const emailProviders = ['163.com', 'qq.com', '126.com', 'sina.com', 'gmail.com'];
+  const provider = faker.random.arrayElement(emailProviders);
+  
+  const namePrefix = realName.replace(/[^\w]/g, '').toLowerCase();
+  const randomSuffix = faker.datatype.number({min: 100, max: 9999});
+  
+  return `${namePrefix}${randomSuffix}@${provider}`;
+}
+
+// 生成健康状况描述
+function generateHealthCondition() {
+  const conditions = [
+    { condition: 'healthy', description: '身体健康' },
+    { condition: 'high_blood_pressure', description: '高血压' },
+    { condition: 'diabetes', description: '糖尿病' },
+    { condition: 'heart_disease', description: '心脏病' },
+    { condition: 'arthritis', description: '关节炎' },
+    { condition: 'chronic_pain', description: '慢性疼痛' },
+    { condition: 'hypertension_diabetes', description: '高血压合并糖尿病' }
+  ];
+  
+  return faker.random.arrayElement(conditions);
+}
+
+// 插入随机用户到数据库
+async function insertRandomUser(userData) {
+  try {
+    const sql = `
+      INSERT INTO users (
+        open_id, nickname, real_name, phone, email, age, gender, birthday,
+        member_level, status, health_condition, latitude, longitude,
+        assignment_status, service_count, total_spent, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'unassigned', 0, 0, NOW(), NOW())
+    `;
+    
+    const values = [
+      userData.openId,
+      userData.nickname,
+      userData.realName,
+      userData.phone,
+      userData.email,
+      userData.age,
+      userData.gender,
+      userData.birthday,
+      userData.memberLevel,
+      userData.status,
+      userData.healthCondition,
+      userData.locationInfo.latitude,
+      userData.locationInfo.longitude
+    ];
+    
+    const result = await query(sql, values);
+    return { success: true, userId: result.insertId };
+    
+  } catch (error) {
+    console.error('插入用户失败:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// 生成随机地址
+async function generateRandomAddress(userId, locationInfo) {
+  try {
+    const addressSql = `
+      INSERT INTO user_addresses (
+        id, user_id, contact_name, contact_phone, address, 
+        latitude, longitude, is_default, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
+    `;
+    
+    const addressId = `addr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const contactName = generateChineseName();
+    const contactPhone = '1' + faker.datatype.number({min: 3000000000, max: 8999999999}).toString();
+    
+    const addressValues = [
+      addressId,
+      userId,
+      contactName,
+      contactPhone,
+      locationInfo.address,
+      locationInfo.latitude,
+      locationInfo.longitude
+    ];
+    
+    await query(addressSql, addressValues);
+    console.log(`  📍 地址生成成功: ${locationInfo.address}`);
+    
+  } catch (error) {
+    console.error('生成地址失败:', error);
+  }
+}
+
+// 生成随机订阅套餐
+async function generateRandomSubscription(userId) {
+  try {
+    const packages = [
+      { id: 'plan_level_1', name: '贴心关怀型', price: 98.00, level: 1 },
+      { id: 'plan_level_2', name: '基础保障型', price: 168.00, level: 2 },
+      { id: 'plan_level_3', name: '健康守护型', price: 298.00, level: 3 },
+      { id: 'plan_level_4', name: '专业护理型', price: 498.00, level: 4 },
+      { id: 'plan_level_5', name: '贴心陪护型', price: 798.00, level: 5 }
+    ];
+    
+    const selectedPackage = faker.random.arrayElement(packages);
+    const status = faker.random.arrayElement(['active', 'expired', 'cancelled']);
+    
+    const now = new Date();
+    let startDate, endDate;
+    
+    if (status === 'active') {
+      startDate = faker.date.between(
+        new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000),
+        new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000)
+      );
+      endDate = faker.date.between(
+        new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
+        new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000)
+      );
+    } else {
+      startDate = faker.date.between(
+        new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000),
+        new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000)
+      );
+      endDate = faker.date.between(
+        startDate,
+        new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000)
+      );
+    }
+    
+    const subscriptionSql = `
+      INSERT INTO user_subscriptions (
+        id, user_id, plan_id, status, start_date, end_date,
+        remaining_quota, purchase_price, create_time, update_time
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    
+    const subscriptionId = `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const remainingQuota = status === 'active' ? faker.datatype.number({min: 0, max: 10}) : 0;
+    
+    const subscriptionValues = [
+      subscriptionId,
+      userId,
+      selectedPackage.id,
+      status,
+      startDate,
+      endDate,
+      remainingQuota,
+      selectedPackage.price,
+      startDate,
+      now
+    ];
+    
+    await query(subscriptionSql, subscriptionValues);
+    console.log(`  📦 订阅生成成功: ${selectedPackage.name} (${status})`);
+    
+  } catch (error) {
+    console.error('生成订阅失败:', error);
+  }
+}
+
+// 生成随机支付记录
+async function generateRandomPayment(userId) {
+  try {
+    const paymentCount = faker.datatype.number({min: 1, max: 5});
+    
+    for (let i = 0; i < paymentCount; i++) {
+      const amount = faker.datatype.number({min: 98, max: 798});
+      const paymentDate = faker.date.between(
+        new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
+        new Date()
+      );
+      
+      const paymentSql = `
+        INSERT INTO user_payments (
+          id, user_id, amount, payment_method, payment_status,
+          transaction_id, payment_time, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      
+      const paymentId = `pay_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 9)}`;
+      const transactionId = `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      const paymentValues = [
+        paymentId,
+        userId,
+        amount,
+        faker.random.arrayElement(['wechat', 'alipay', 'card']),
+        'completed',
+        transactionId,
+        paymentDate,
+        paymentDate,
+        new Date()
+      ];
+      
+      await query(paymentSql, paymentValues);
+    }
+    
+    console.log(`  💰 支付记录生成成功: ${paymentCount}条`);
+    
+  } catch (error) {
+    console.error('生成支付记录失败:', error);
+  }
+}
+
+// 生成随机健康数据
+async function generateRandomHealthData(userId) {
+  try {
+    const healthTypes = [
+      { type: 'bloodPressure', unit: 'mmHg' },
+      { type: 'bloodSugar', unit: 'mmol/L' },
+      { type: 'heartRate', unit: '次/分' },
+      { type: 'weight', unit: 'kg' }
+    ];
+    
+    for (const healthType of healthTypes) {
+      const recordCount = faker.datatype.number({min: 1, max: 3});
+      
+      for (let i = 0; i < recordCount; i++) {
+        let value;
+        
+        switch (healthType.type) {
+          case 'bloodPressure':
+            value = {
+              systolic: faker.datatype.number({min: 110, max: 180}),
+              diastolic: faker.datatype.number({min: 70, max: 110})
+            };
+            break;
+          case 'bloodSugar':
+            value = faker.datatype.float({min: 4.0, max: 12.0, precision: 0.1});
+            break;
+          case 'heartRate':
+            value = faker.datatype.number({min: 60, max: 100});
+            break;
+          case 'weight':
+            value = faker.datatype.float({min: 45.0, max: 85.0, precision: 0.1});
+            break;
+        }
+        
+        const recordDate = faker.date.between(
+          new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+          new Date()
+        );
+        
+        const healthSql = `
+          INSERT INTO health_records (
+            id, user_id, type, value, unit, record_time, source, created_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        
+        const recordId = `health_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        const healthValues = [
+          recordId,
+          userId,
+          healthType.type,
+          JSON.stringify(value),
+          healthType.unit,
+          recordDate,
+          faker.random.arrayElement(['self', 'nurse', 'device']),
+          recordDate
+        ];
+        
+        await query(healthSql, healthValues);
+      }
+    }
+    
+    console.log(`  🏥 健康数据生成成功`);
+    
+  } catch (error) {
+    console.error('生成健康数据失败:', error);
+  }
+}
 
 // 辅助函数
 function calculateDistance(lat1, lon1, lat2, lon2) {

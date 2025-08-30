@@ -50,11 +50,14 @@ const UserPool = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [assignModalVisible, setAssignModalVisible] = useState(false);
   const [batchAssignModalVisible, setBatchAssignModalVisible] = useState(false);
+  const [generateUsersModalVisible, setGenerateUsersModalVisible] = useState(false);
+  const [generateUsersLoading, setGenerateUsersLoading] = useState(false);
   const [providers, setProviders] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   
   const [assignForm] = Form.useForm();
   const [batchAssignForm] = Form.useForm();
+  const [generateUsersForm] = Form.useForm();
 
   // 获取用户池数据
   const fetchUserPool = async (params = {}) => {
@@ -645,6 +648,76 @@ const UserPool = () => {
     }
   };
 
+  // 生成随机用户
+  const handleGenerateRandomUsers = () => {
+    setGenerateUsersModalVisible(true);
+    generateUsersForm.resetFields();
+  };
+
+  // 执行生成随机用户
+  const handleGenerateUsersSubmit = async (values) => {
+    try {
+      setGenerateUsersLoading(true);
+      
+      const response = await adminAPI.generateRandomUsers(values.count);
+
+      if (response.data.success) {
+        const { statistics, success, failed } = response.data.data;
+        
+        if (failed.length > 0) {
+          message.warning(
+            `成功生成 ${statistics.successCount} 个用户，${statistics.failedCount} 个用户生成失败`
+          );
+        } else {
+          message.success(`成功生成 ${statistics.successCount} 个随机用户`);
+        }
+        
+        // 显示详细结果
+        if (success.length > 0) {
+          Modal.info({
+            title: '随机用户生成结果',
+            width: 800,
+            content: (
+              <div style={{ padding: '16px 0' }}>
+                <p><strong>成功生成 {statistics.successCount} 个用户：</strong></p>
+                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                  {success.map((user, index) => (
+                    <div key={index} style={{ marginBottom: '8px', padding: '8px', background: '#f0f2f5', borderRadius: '4px' }}>
+                      <Text strong>{user.nickname}</Text>
+                      <Text type="secondary" style={{ marginLeft: '8px' }}>({user.realName})</Text>
+                      <br />
+                      <Text type="secondary" style={{ fontSize: '12px' }}>手机号：{user.phone}</Text>
+                    </div>
+                  ))}
+                </div>
+                {failed.length > 0 && (
+                  <div style={{ marginTop: '16px' }}>
+                    <p style={{ color: '#ff4d4f' }}><strong>失败 {statistics.failedCount} 个：</strong></p>
+                    <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
+                      {failed.map((fail, index) => (
+                        <div key={index} style={{ marginBottom: '4px', color: '#ff4d4f', fontSize: '12px' }}>
+                          {fail.userData || `第${fail.index}个用户`}: {fail.error}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ),
+          });
+        }
+        
+        setGenerateUsersModalVisible(false);
+        fetchUserPool(); // 刷新用户列表
+      }
+    } catch (error) {
+      console.error('生成随机用户失败:', error);
+      message.error('生成随机用户失败');
+    } finally {
+      setGenerateUsersLoading(false);
+    }
+  };
+
   return (
     <div>
       {/* 统计卡片 */}
@@ -751,6 +824,16 @@ const UserPool = () => {
                 disabled={selectedRowKeys.length === 0}
               >
                 批量分配 ({selectedRowKeys.length})
+              </Button>
+              
+              <Button
+                type="primary"
+                ghost
+                icon={<UserAddOutlined />}
+                onClick={handleGenerateRandomUsers}
+                style={{ borderColor: '#52c41a', color: '#52c41a' }}
+              >
+                生成随机用户
               </Button>
               
               <Button
@@ -926,6 +1009,73 @@ const UserPool = () => {
                 开始批量分配
               </Button>
               <Button onClick={() => setBatchAssignModalVisible(false)}>
+                取消
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 生成随机用户弹窗 */}
+      <Modal
+        title="生成随机用户"
+        open={generateUsersModalVisible}
+        onCancel={() => setGenerateUsersModalVisible(false)}
+        footer={null}
+        width={500}
+      >
+        <div style={{ marginBottom: '16px' }}>
+          <Text type="secondary">
+            将为系统生成随机用户，包括基础信息、地址、健康数据、订阅套餐和支付记录。
+          </Text>
+        </div>
+        
+        <Form
+          form={generateUsersForm}
+          layout="vertical"
+          initialValues={{ count: 10 }}
+          onFinish={handleGenerateUsersSubmit}
+        >
+          <Form.Item
+            name="count"
+            label="生成用户数量"
+            rules={[
+              { required: true, message: '请输入用户数量' },
+              { type: 'number', min: 1, max: 50, message: '用户数量必须在1-50之间' }
+            ]}
+          >
+            <Input 
+              type="number" 
+              placeholder="请输入1-50之间的数字"
+              addonAfter="个用户"
+              min={1}
+              max={50}
+            />
+          </Form.Item>
+
+          <div style={{ marginBottom: '16px', padding: '12px', background: '#f0f8ff', borderRadius: '6px', border: '1px solid #d6f3ff' }}>
+            <Text strong style={{ color: '#1890ff' }}>生成的数据包括：</Text>
+            <ul style={{ margin: '8px 0 0 0', paddingLeft: '20px', color: '#666' }}>
+              <li>基础信息：姓名、手机号、年龄、性别等</li>
+              <li>地址信息：北京市各区随机地址</li>
+              <li>健康数据：血压、血糖、心率、体重等</li>
+              <li>订阅套餐：70%概率生成随机套餐</li>
+              <li>支付记录：50%概率生成支付历史</li>
+              <li>病情信息：高血压、糖尿病等常见病情</li>
+            </ul>
+          </div>
+
+          <Form.Item style={{ marginBottom: 0 }}>
+            <Space>
+              <Button 
+                type="primary" 
+                htmlType="submit"
+                loading={generateUsersLoading}
+                icon={<UserAddOutlined />}
+              >
+                {generateUsersLoading ? '生成中...' : '开始生成'}
+              </Button>
+              <Button onClick={() => setGenerateUsersModalVisible(false)}>
                 取消
               </Button>
             </Space>

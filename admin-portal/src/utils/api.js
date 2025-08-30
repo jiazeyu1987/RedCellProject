@@ -174,6 +174,10 @@ export const adminAPI = {
       params: { userIds: userIds.join(','), format },
       responseType: 'blob'
     }),
+
+  // 生成随机用户
+  generateRandomUsers: (count = 10) => 
+    api.post('/admin/generate-random-users', { count }),
 };
 
 export default api;
