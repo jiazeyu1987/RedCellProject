@@ -1,0 +1,55 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/login/login",
+    "pages/forgot-password/forgot-password",
+    "pages/bind-phone/bind-phone",
+    "pages/logs/logs"
+  ],
+
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#007AFF",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/logs/logs",
+        "text": "日志"
+      }
+    ]
+  },
+
+  "window": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "记录员小程序",
+    "navigationBarBackgroundColor": "#007AFF",
+    "backgroundColor": "#F8F8F8",
+    "backgroundTextStyle": "light",
+    "enablePullDownRefresh": true,
+    "onReachBottomDistance": 50
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "您的位置信息将用于验证服务地点"
+    },
+    "scope.camera": {
+      "desc": "您的摄像头将用于拍摄服务记录照片"
+    },
+    "scope.record": {
+      "desc": "您的录音功能将用于记录服务语音备注"
+    }
+  },
+  "requiredBackgroundModes": [
+    "location"
+  ],
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "darkmode": false,
+  "themeLocation": "theme.json"
+}

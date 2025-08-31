@@ -1,0 +1,142 @@
+<view class="time-picker {{extraClass}}" style="{{extraStyle}}">
+  <!-- 时间选择器触发器 -->
+  <view class="picker-trigger" bindtap="onTriggerClick">
+    <view class="trigger-content {{disabled ? 'trigger-disabled' : ''}}">
+      <view class="trigger-text">
+        <text class="{{!displayValue ? 'trigger-placeholder' : ''}}">
+          {{displayValue || placeholder || '请选择时间'}}
+        </text>
+      </view>
+      <view class="trigger-icon">
+        <text class="icon-arrow">{{visible ? '▲' : '▼'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 时间选择器弹窗 -->
+  <view class="picker-popup {{visible ? 'popup-visible' : ''}}" wx:if="{{visible}}">
+    <view class="popup-mask" bindtap="onMaskClick"></view>
+    <view class="popup-content">
+      <!-- 弹窗头部 -->
+      <view class="popup-header">
+        <view class="header-title">{{title || '选择时间'}}</view>
+        <view class="header-actions">
+          <text class="action-cancel" bindtap="onCancelClick">取消</text>
+          <text class="action-confirm" bindtap="onConfirmClick">确定</text>
+        </view>
+      </view>
+
+      <!-- 时间选择器主体 -->
+      <view class="picker-body">
+        <!-- 快捷选择 -->
+        <view class="quick-select" wx:if="{{showQuickSelect}}">
+          <view class="quick-title">快捷选择</view>
+          <view class="quick-options">
+            <view 
+              class="quick-option {{item.active ? 'option-active' : ''}}"
+              wx:for="{{quickOptions}}" 
+              wx:key="{{item.key}}"
+              bindtap="onQuickSelect"
+              data-key="{{item.key}}"
+              data-value="{{item.value}}"
+            >
+              {{item.label}}
+            </view>
+          </view>
+        </view>
+
+        <!-- 日期选择 -->
+        <view class="date-select" wx:if="{{mode === 'datetime' || mode === 'date'}}">
+          <picker 
+            mode="date"
+            value="{{dateValue}}"
+            start="{{dateStart}}"
+            end="{{dateEnd}}"
+            bindchange="onDateChange"
+          >
+            <view class="select-item">
+              <text class="select-label">日期</text>
+              <text class="select-value">{{dateDisplayValue}}</text>
+            </view>
+          </picker>
+        </view>
+
+        <!-- 时间选择 -->
+        <view class="time-select" wx:if="{{mode === 'datetime' || mode === 'time'}}">
+          <picker 
+            mode="time"
+            value="{{timeValue}}"
+            bindchange="onTimeChange"
+          >
+            <view class="select-item">
+              <text class="select-label">时间</text>
+              <text class="select-value">{{timeDisplayValue}}</text>
+            </view>
+          </picker>
+        </view>
+
+        <!-- 自定义时间范围选择 -->
+        <view class="range-select" wx:if="{{type === 'range'}}">
+          <view class="range-item">
+            <text class="range-label">开始时间</text>
+            <picker 
+              mode="{{mode}}"
+              value="{{startValue}}"
+              start="{{rangeStart}}"
+              end="{{rangeEnd}}"
+              bindchange="onStartChange"
+            >
+              <text class="range-value">{{startDisplayValue}}</text>
+            </picker>
+          </view>
+          <view class="range-separator">至</view>
+          <view class="range-item">
+            <text class="range-label">结束时间</text>
+            <picker 
+              mode="{{mode}}"
+              value="{{endValue}}"
+              start="{{rangeStart}}"
+              end="{{rangeEnd}}"
+              bindchange="onEndChange"
+            >
+              <text class="range-value">{{endDisplayValue}}</text>
+            </picker>
+          </view>
+        </view>
+
+        <!-- 重复设置 -->
+        <view class="repeat-select" wx:if="{{showRepeat}}">
+          <view class="repeat-title">重复设置</view>
+          <view class="repeat-options">
+            <view 
+              class="repeat-option {{repeatType === item.value ? 'option-active' : ''}}"
+              wx:for="{{repeatOptions}}" 
+              wx:key="{{item.value}}"
+              bindtap="onRepeatSelect"
+              data-value="{{item.value}}"
+            >
+              {{item.label}}
+            </view>
+          </view>
+        </view>
+
+        <!-- 提醒设置 -->
+        <view class="reminder-select" wx:if="{{showReminder}}">
+          <view class="reminder-title">提醒设置</view>
+          <view class="reminder-options">
+            <view 
+              class="reminder-option {{item.checked ? 'option-checked' : ''}}"
+              wx:for="{{reminderOptions}}" 
+              wx:key="{{item.value}}"
+              bindtap="onReminderSelect"
+              data-index="{{index}}"
+            >
+              <text class="option-checkbox">{{item.checked ? '☑' : '☐'}}</text>
+              <text class="option-text">{{item.label}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

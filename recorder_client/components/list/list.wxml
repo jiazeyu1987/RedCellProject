@@ -1,0 +1,87 @@
+<view class="{{listClass}} {{extraClass}}" style="{{extraStyle}}">
+  <!-- 列表头部 -->
+  <view class="list-header" wx:if="{{showHeader}}">
+    <view class="list-title" wx:if="{{title}}">{{title}}</view>
+    <view class="list-subtitle" wx:if="{{subtitle}}">{{subtitle}}</view>
+    <view class="list-extra" wx:if="{{headerExtra}}">
+      <slot name="header-extra"></slot>
+    </view>
+  </view>
+
+  <!-- 列表内容 -->
+  <view class="list-content">
+    <!-- 空状态 -->
+    <view class="list-empty" wx:if="{{!items.length && showEmpty}}">
+      <view class="empty-icon" wx:if="{{emptyIcon}}">
+        <image src="{{emptyIcon}}" class="empty-icon-image" />
+      </view>
+      <view class="empty-text">{{emptyText || '暂无数据'}}</view>
+      <view class="empty-action" wx:if="{{emptyAction}}">
+        <slot name="empty-action"></slot>
+      </view>
+    </view>
+
+    <!-- 列表项 -->
+    <view class="list-items" wx:else>
+      <view 
+        class="list-item {{item.disabled ? 'list-item-disabled' : ''}} {{clickable ? 'list-item-clickable' : ''}}"
+        wx:for="{{items}}" 
+        wx:key="{{item.id || index}}"
+        bindtap="onItemClick"
+        bindlongpress="onItemLongPress"
+        data-index="{{index}}"
+        data-item="{{item}}"
+      >
+        <!-- 左侧图标或头像 -->
+        <view class="list-item-prefix" wx:if="{{item.prefix || item.avatar || item.icon}}">
+          <image 
+            wx:if="{{item.avatar}}" 
+            src="{{item.avatar}}" 
+            class="item-avatar {{item.avatarShape === 'square' ? 'avatar-square' : 'avatar-round'}}"
+          />
+          <image 
+            wx:elif="{{item.icon}}" 
+            src="{{item.icon}}" 
+            class="item-icon"
+          />
+          <view wx:elif="{{item.prefix}}" class="item-prefix">
+            <slot name="prefix" wx:key="prefix-{{index}}"></slot>
+          </view>
+        </view>
+
+        <!-- 主要内容 -->
+        <view class="list-item-content">
+          <view class="item-title">{{item.title}}</view>
+          <view class="item-subtitle" wx:if="{{item.subtitle}}">{{item.subtitle}}</view>
+          <view class="item-description" wx:if="{{item.description}}">{{item.description}}</view>
+        </view>
+
+        <!-- 右侧内容 -->
+        <view class="list-item-suffix" wx:if="{{item.suffix || item.arrow || item.value || item.badge}}">
+          <!-- 徽章 -->
+          <view class="item-badge" wx:if="{{item.badge}}">
+            <text class="badge-text">{{item.badge}}</text>
+          </view>
+          
+          <!-- 值显示 -->
+          <view class="item-value" wx:if="{{item.value}}">{{item.value}}</view>
+          
+          <!-- 自定义后缀 -->
+          <view class="item-suffix" wx:if="{{item.suffix}}">
+            <slot name="suffix" wx:key="suffix-{{index}}"></slot>
+          </view>
+          
+          <!-- 箭头 -->
+          <view class="item-arrow" wx:if="{{item.arrow}}">
+            <text class="arrow-icon">></text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 列表底部 -->
+  <view class="list-footer" wx:if="{{showFooter}}">
+    <slot name="footer"></slot>
+  </view>
+</view>

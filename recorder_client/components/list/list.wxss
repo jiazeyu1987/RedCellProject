@@ -1,0 +1,261 @@
+/* 列表组件样式 */
+.list-container {
+  background: #ffffff;
+}
+
+/* 列表头部 */
+.list-header {
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  position: relative;
+}
+
+.list-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1.4;
+  margin-bottom: 8rpx;
+}
+
+.list-subtitle {
+  font-size: 28rpx;
+  color: #666666;
+  line-height: 1.4;
+}
+
+.list-extra {
+  position: absolute;
+  top: 32rpx;
+  right: 32rpx;
+}
+
+/* 列表内容 */
+.list-content {
+  position: relative;
+}
+
+/* 空状态 */
+.list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 32rpx;
+  color: #999999;
+}
+
+.empty-icon {
+  margin-bottom: 24rpx;
+}
+
+.empty-icon-image {
+  width: 120rpx;
+  height: 120rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999999;
+  margin-bottom: 24rpx;
+}
+
+.empty-action {
+  
+}
+
+/* 列表项 */
+.list-items {
+  
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid #f8f8f8;
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-item-clickable {
+  cursor: pointer;
+}
+
+.list-item-clickable:active {
+  background-color: #f8f8f8;
+}
+
+.list-item-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* 左侧前缀 */
+.list-item-prefix {
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+.item-avatar {
+  width: 80rpx;
+  height: 80rpx;
+}
+
+.avatar-round {
+  border-radius: 50%;
+}
+
+.avatar-square {
+  border-radius: 8rpx;
+}
+
+.item-icon {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.item-prefix {
+  
+}
+
+/* 主要内容 */
+.list-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-title {
+  font-size: 32rpx;
+  color: #1a1a1a;
+  line-height: 1.4;
+  margin-bottom: 4rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-subtitle {
+  font-size: 28rpx;
+  color: #666666;
+  line-height: 1.4;
+  margin-bottom: 4rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-description {
+  font-size: 24rpx;
+  color: #999999;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* 右侧后缀 */
+.list-item-suffix {
+  display: flex;
+  align-items: center;
+  margin-left: 24rpx;
+  flex-shrink: 0;
+}
+
+.item-badge {
+  background: #ff4444;
+  color: #ffffff;
+  border-radius: 20rpx;
+  padding: 4rpx 12rpx;
+  margin-right: 12rpx;
+}
+
+.badge-text {
+  font-size: 20rpx;
+  font-weight: 500;
+}
+
+.item-value {
+  font-size: 28rpx;
+  color: #666666;
+  margin-right: 12rpx;
+}
+
+.item-suffix {
+  margin-right: 12rpx;
+}
+
+.item-arrow {
+  color: #cccccc;
+  font-size: 28rpx;
+}
+
+.arrow-icon {
+  transform: rotate(0deg);
+  transition: transform 0.2s ease;
+}
+
+.list-item-clickable:active .arrow-icon {
+  transform: rotate(90deg);
+}
+
+/* 列表底部 */
+.list-footer {
+  padding: 24rpx 32rpx;
+  border-top: 1rpx solid #f0f0f0;
+  background: #fafafa;
+}
+
+/* 变体样式 */
+.list-container.list-bordered {
+  border: 1rpx solid #f0f0f0;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.list-container.list-card {
+  margin: 24rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* 分割线样式 */
+.list-container.list-divided .list-item {
+  border-bottom: 1rpx solid #e0e0e0;
+}
+
+/* 无分割线样式 */
+.list-container.list-plain .list-item {
+  border-bottom: none;
+}
+
+/* 紧凑模式 */
+.list-container.list-compact .list-item {
+  padding: 16rpx 32rpx;
+}
+
+.list-container.list-compact .item-title {
+  font-size: 28rpx;
+}
+
+.list-container.list-compact .item-subtitle {
+  font-size: 24rpx;
+}
+
+/* 响应式设计 */
+@media (max-width: 750rpx) {
+  .list-header,
+  .list-item,
+  .list-footer {
+    padding-left: 24rpx;
+    padding-right: 24rpx;
+  }
+}

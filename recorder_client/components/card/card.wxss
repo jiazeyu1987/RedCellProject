@@ -1,0 +1,92 @@
+/* 卡片组件样式 */
+.card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  margin: 24rpx;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.12);
+}
+
+/* 卡片头部 */
+.card-header {
+  padding: 32rpx 32rpx 0 32rpx;
+  position: relative;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1.4;
+  margin-bottom: 8rpx;
+}
+
+.card-subtitle {
+  font-size: 28rpx;
+  color: #666666;
+  line-height: 1.4;
+  margin-bottom: 16rpx;
+}
+
+.card-extra {
+  position: absolute;
+  top: 32rpx;
+  right: 32rpx;
+}
+
+/* 卡片主体内容 */
+.card-body {
+  padding: 32rpx;
+}
+
+.card-header + .card-body {
+  padding-top: 16rpx;
+}
+
+/* 卡片底部 */
+.card-footer {
+  padding: 0 32rpx 32rpx 32rpx;
+  border-top: 1rpx solid #f0f0f0;
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+}
+
+/* 卡片变体样式 */
+.card.card-shadow-none {
+  box-shadow: none;
+  border: 1rpx solid #f0f0f0;
+}
+
+.card.card-bordered {
+  border: 1rpx solid #e0e0e0;
+}
+
+.card.card-hover {
+  cursor: pointer;
+}
+
+.card.card-hover:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* 响应式设计 */
+@media (max-width: 750rpx) {
+  .card {
+    margin: 16rpx;
+  }
+  
+  .card-header,
+  .card-body {
+    padding: 24rpx;
+  }
+  
+  .card-footer {
+    padding: 0 24rpx 24rpx 24rpx;
+  }
+}

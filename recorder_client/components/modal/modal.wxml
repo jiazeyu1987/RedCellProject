@@ -1,0 +1,55 @@
+<!-- 弹窗遮罩层 -->
+<view 
+  class="modal-overlay {{visible ? 'modal-overlay-visible' : ''}} {{maskClosable ? 'modal-overlay-closable' : ''}}" 
+  style="{{overlayStyle}}"
+  bindtap="onOverlayClick"
+  wx:if="{{visible || animating}}"
+>
+  <!-- 弹窗容器 -->
+  <view 
+    class="modal-container {{modalClass}} {{extraClass}}" 
+    style="{{containerStyle}}"
+    bindtap="onContainerClick"
+  >
+    <!-- 弹窗头部 -->
+    <view class="modal-header" wx:if="{{showHeader}}">
+      <view class="modal-title" wx:if="{{title}}">{{title}}</view>
+      <view class="modal-subtitle" wx:if="{{subtitle}}">{{subtitle}}</view>
+      <view class="modal-close" wx:if="{{closable}}" bindtap="onCloseClick">
+        <text class="close-icon">×</text>
+      </view>
+      <view class="modal-header-extra" wx:if="{{headerExtra}}">
+        <slot name="header"></slot>
+      </view>
+    </view>
+
+    <!-- 弹窗内容 -->
+    <view class="modal-content">
+      <slot></slot>
+    </view>
+
+    <!-- 弹窗底部 -->
+    <view class="modal-footer" wx:if="{{showFooter}}">
+      <slot name="footer">
+        <!-- 默认按钮 -->
+        <view class="default-footer" wx:if="{{!footerCustom}}">
+          <button 
+            class="footer-button footer-button-cancel" 
+            wx:if="{{showCancel}}"
+            bindtap="onCancelClick"
+          >
+            {{cancelText || '取消'}}
+          </button>
+          <button 
+            class="footer-button footer-button-confirm" 
+            wx:if="{{showConfirm}}"
+            bindtap="onConfirmClick"
+            loading="{{confirmLoading}}"
+          >
+            {{confirmText || '确定'}}
+          </button>
+        </view>
+      </slot>
+    </view>
+  </view>
+</view>

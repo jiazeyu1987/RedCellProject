@@ -1,0 +1,29 @@
+<view class="status-tag {{tagClass}} {{extraClass}}" style="{{extraStyle}}" bindtap="onTagClick">
+  <!-- 左侧图标或状态点 -->
+  <view class="tag-prefix" wx:if="{{icon || dot}}">
+    <image 
+      wx:if="{{icon}}" 
+      src="{{icon}}" 
+      class="tag-icon"
+    />
+    <view 
+      wx:elif="{{dot}}" 
+      class="tag-dot"
+    ></view>
+  </view>
+
+  <!-- 标签文本 -->
+  <view class="tag-text">
+    <slot>{{text}}</slot>
+  </view>
+
+  <!-- 右侧关闭按钮 -->
+  <view class="tag-close" wx:if="{{closable}}" bindtap="onCloseClick">
+    <text class="close-icon">×</text>
+  </view>
+
+  <!-- 右侧图标 -->
+  <view class="tag-suffix" wx:if="{{suffixIcon}}">
+    <image src="{{suffixIcon}}" class="tag-suffix-icon" />
+  </view>
+</view>

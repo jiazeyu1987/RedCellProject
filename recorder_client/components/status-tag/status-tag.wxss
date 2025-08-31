@@ -1,0 +1,340 @@
+/* 状态标签组件样式 */
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 8rpx 16rpx;
+  border-radius: 6rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  line-height: 1;
+  border: 1rpx solid transparent;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+/* 标签前缀 */
+.tag-prefix {
+  margin-right: 8rpx;
+  display: flex;
+  align-items: center;
+}
+
+.tag-icon {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+.tag-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* 标签文本 */
+.tag-text {
+  flex: 1;
+  white-space: nowrap;
+}
+
+/* 关闭按钮 */
+.tag-close {
+  margin-left: 8rpx;
+  width: 28rpx;
+  height: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.tag-close:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.close-icon {
+  font-size: 20rpx;
+  line-height: 1;
+  color: inherit;
+}
+
+/* 后缀图标 */
+.tag-suffix {
+  margin-left: 8rpx;
+}
+
+.tag-suffix-icon {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+/* 基础颜色样式 */
+
+/* 默认标签 */
+.status-tag.tag-default {
+  background: #f8f8f8;
+  color: #666666;
+  border-color: #e0e0e0;
+}
+
+/* 主要标签 */
+.status-tag.tag-primary {
+  background: #e6f7ff;
+  color: #1890ff;
+  border-color: #91d5ff;
+}
+
+/* 成功标签 */
+.status-tag.tag-success {
+  background: #f6ffed;
+  color: #52c41a;
+  border-color: #b7eb8f;
+}
+
+/* 警告标签 */
+.status-tag.tag-warning {
+  background: #fffbe6;
+  color: #faad14;
+  border-color: #ffe58f;
+}
+
+/* 错误标签 */
+.status-tag.tag-error {
+  background: #fff2f0;
+  color: #ff4d4f;
+  border-color: #ffccc7;
+}
+
+/* 信息标签 */
+.status-tag.tag-info {
+  background: #f0f8ff;
+  color: #1890ff;
+  border-color: #bae7ff;
+}
+
+/* 状态特定样式 */
+
+/* 待处理状态 */
+.status-tag.tag-pending {
+  background: #f0f0f0;
+  color: #999999;
+  border-color: #d9d9d9;
+}
+
+/* 进行中状态 */
+.status-tag.tag-processing {
+  background: #e6f7ff;
+  color: #1890ff;
+  border-color: #91d5ff;
+}
+
+/* 已完成状态 */
+.status-tag.tag-completed {
+  background: #f6ffed;
+  color: #52c41a;
+  border-color: #b7eb8f;
+}
+
+/* 已取消状态 */
+.status-tag.tag-cancelled {
+  background: #fff2f0;
+  color: #ff4d4f;
+  border-color: #ffccc7;
+}
+
+/* 已暂停状态 */
+.status-tag.tag-paused {
+  background: #fffbe6;
+  color: #faad14;
+  border-color: #ffe58f;
+}
+
+/* 已过期状态 */
+.status-tag.tag-expired {
+  background: #f5f5f5;
+  color: #8c8c8c;
+  border-color: #d9d9d9;
+}
+
+/* 业务状态样式 */
+
+/* 在线状态 */
+.status-tag.tag-online {
+  background: #f6ffed;
+  color: #52c41a;
+  border-color: #b7eb8f;
+}
+
+/* 离线状态 */
+.status-tag.tag-offline {
+  background: #f5f5f5;
+  color: #8c8c8c;
+  border-color: #d9d9d9;
+}
+
+/* 繁忙状态 */
+.status-tag.tag-busy {
+  background: #fff2f0;
+  color: #ff4d4f;
+  border-color: #ffccc7;
+}
+
+/* 空闲状态 */
+.status-tag.tag-idle {
+  background: #e6f7ff;
+  color: #1890ff;
+  border-color: #91d5ff;
+}
+
+/* 标签尺寸 */
+
+/* 小尺寸 */
+.status-tag.tag-small {
+  padding: 4rpx 12rpx;
+  font-size: 20rpx;
+  border-radius: 4rpx;
+}
+
+.status-tag.tag-small .tag-icon,
+.status-tag.tag-small .tag-suffix-icon {
+  width: 20rpx;
+  height: 20rpx;
+}
+
+.status-tag.tag-small .tag-dot {
+  width: 12rpx;
+  height: 12rpx;
+}
+
+.status-tag.tag-small .tag-close {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+.status-tag.tag-small .close-icon {
+  font-size: 16rpx;
+}
+
+/* 中等尺寸（默认） */
+.status-tag.tag-medium {
+  padding: 8rpx 16rpx;
+  font-size: 24rpx;
+  border-radius: 6rpx;
+}
+
+/* 大尺寸 */
+.status-tag.tag-large {
+  padding: 12rpx 20rpx;
+  font-size: 28rpx;
+  border-radius: 8rpx;
+}
+
+.status-tag.tag-large .tag-icon,
+.status-tag.tag-large .tag-suffix-icon {
+  width: 28rpx;
+  height: 28rpx;
+}
+
+.status-tag.tag-large .tag-dot {
+  width: 20rpx;
+  height: 20rpx;
+}
+
+.status-tag.tag-large .tag-close {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+.status-tag.tag-large .close-icon {
+  font-size: 24rpx;
+}
+
+/* 标签形状 */
+
+/* 圆角标签（默认） */
+.status-tag.tag-rounded {
+  border-radius: 20rpx;
+}
+
+/* 圆形标签 */
+.status-tag.tag-round {
+  border-radius: 50rpx;
+}
+
+/* 方形标签 */
+.status-tag.tag-square {
+  border-radius: 0;
+}
+
+/* 边框样式 */
+
+/* 有边框 */
+.status-tag.tag-bordered {
+  background: transparent;
+  border-width: 2rpx;
+}
+
+.status-tag.tag-bordered.tag-primary {
+  color: #1890ff;
+  border-color: #1890ff;
+}
+
+.status-tag.tag-bordered.tag-success {
+  color: #52c41a;
+  border-color: #52c41a;
+}
+
+.status-tag.tag-bordered.tag-warning {
+  color: #faad14;
+  border-color: #faad14;
+}
+
+.status-tag.tag-bordered.tag-error {
+  color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+/* 填充样式 */
+.status-tag.tag-filled {
+  border: none;
+}
+
+.status-tag.tag-filled.tag-primary {
+  background: #1890ff;
+  color: #ffffff;
+}
+
+.status-tag.tag-filled.tag-success {
+  background: #52c41a;
+  color: #ffffff;
+}
+
+.status-tag.tag-filled.tag-warning {
+  background: #faad14;
+  color: #ffffff;
+}
+
+.status-tag.tag-filled.tag-error {
+  background: #ff4d4f;
+  color: #ffffff;
+}
+
+/* 可点击样式 */
+.status-tag.tag-clickable {
+  cursor: pointer;
+}
+
+.status-tag.tag-clickable:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+/* 禁用状态 */
+.status-tag.tag-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: not-allowed;
+}

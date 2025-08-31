@@ -1,0 +1,43 @@
+<button 
+  class="custom-button {{buttonClass}} {{extraClass}}" 
+  style="{{extraStyle}}"
+  disabled="{{disabled || loading}}"
+  open-type="{{openType}}"
+  form-type="{{formType}}"
+  bindtap="onButtonClick"
+  bindgetuserinfo="onGetUserInfo"
+  bindcontact="onContact"
+  bindgetphonenumber="onGetPhoneNumber"
+  bindopensetting="onOpenSetting"
+  bindlaunchapp="onLaunchApp"
+  bindchooseavatar="onChooseAvatar"
+>
+  <!-- 加载状态 -->
+  <view class="button-loading" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text" wx:if="{{loadingText}}">{{loadingText}}</text>
+  </view>
+
+  <!-- 正常状态 -->
+  <view class="button-content" wx:else>
+    <!-- 左侧图标 -->
+    <view class="button-icon-left" wx:if="{{iconLeft}}">
+      <image src="{{iconLeft}}" class="button-icon-image" />
+    </view>
+
+    <!-- 按钮文字 -->
+    <view class="button-text">
+      <slot>{{text}}</slot>
+    </view>
+
+    <!-- 右侧图标 -->
+    <view class="button-icon-right" wx:if="{{iconRight}}">
+      <image src="{{iconRight}}" class="button-icon-image" />
+    </view>
+
+    <!-- 角标 -->
+    <view class="button-badge" wx:if="{{badge}}">
+      <text class="badge-text">{{badge}}</text>
+    </view>
+  </view>
+</button>

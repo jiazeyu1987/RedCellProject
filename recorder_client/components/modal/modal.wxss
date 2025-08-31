@@ -1,0 +1,318 @@
+/* 弹窗组件样式 */
+
+/* 遮罩层 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.modal-overlay-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-overlay-closable {
+  cursor: pointer;
+}
+
+/* 弹窗容器 */
+.modal-container {
+  background: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  max-width: 90%;
+  max-height: 80%;
+  min-width: 520rpx;
+  box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.15);
+  transform: scale(0.8) translateY(-50rpx);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.modal-overlay-visible .modal-container {
+  transform: scale(1) translateY(0);
+}
+
+/* 弹窗头部 */
+.modal-header {
+  position: relative;
+  padding: 40rpx 40rpx 24rpx 40rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  line-height: 1.4;
+  margin-bottom: 8rpx;
+  padding-right: 80rpx;
+}
+
+.modal-subtitle {
+  font-size: 28rpx;
+  color: #666666;
+  line-height: 1.4;
+  padding-right: 80rpx;
+}
+
+.modal-close {
+  position: absolute;
+  top: 32rpx;
+  right: 32rpx;
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f8f8f8;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.modal-close:hover {
+  background: #e8e8e8;
+}
+
+.close-icon {
+  font-size: 40rpx;
+  color: #666666;
+  line-height: 1;
+}
+
+.modal-header-extra {
+  margin-top: 16rpx;
+}
+
+/* 弹窗内容 */
+.modal-content {
+  padding: 40rpx;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 8rpx;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #f8f8f8;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: #cccccc;
+  border-radius: 4rpx;
+}
+
+/* 弹窗底部 */
+.modal-footer {
+  padding: 24rpx 40rpx 40rpx 40rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.default-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 24rpx;
+}
+
+.footer-button {
+  padding: 16rpx 32rpx;
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120rpx;
+}
+
+.footer-button::after {
+  border: none;
+}
+
+.footer-button-cancel {
+  background: #ffffff;
+  color: #666666;
+  border: 2rpx solid #e0e0e0;
+}
+
+.footer-button-cancel:active {
+  background: #f8f8f8;
+  transform: scale(0.98);
+}
+
+.footer-button-confirm {
+  background: #007AFF;
+  color: #ffffff;
+}
+
+.footer-button-confirm:active {
+  background: #0056CC;
+  transform: scale(0.98);
+}
+
+/* 弹窗类型样式 */
+
+/* 默认弹窗 */
+.modal-container.modal-default {
+  
+}
+
+/* 居中弹窗 */
+.modal-container.modal-center {
+  margin: auto;
+}
+
+/* 底部弹窗 */
+.modal-container.modal-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 100%;
+  border-radius: 32rpx 32rpx 0 0;
+  transform: translateY(100%);
+  margin: 0;
+}
+
+.modal-overlay-visible .modal-container.modal-bottom {
+  transform: translateY(0);
+}
+
+/* 顶部弹窗 */
+.modal-container.modal-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  max-width: 100%;
+  border-radius: 0 0 32rpx 32rpx;
+  transform: translateY(-100%);
+  margin: 0;
+}
+
+.modal-overlay-visible .modal-container.modal-top {
+  transform: translateY(0);
+}
+
+/* 全屏弹窗 */
+.modal-container.modal-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 0;
+  margin: 0;
+}
+
+/* 小尺寸弹窗 */
+.modal-container.modal-small {
+  min-width: 400rpx;
+  max-width: 480rpx;
+}
+
+.modal-container.modal-small .modal-content {
+  padding: 32rpx;
+}
+
+.modal-container.modal-small .modal-header {
+  padding: 32rpx 32rpx 20rpx 32rpx;
+}
+
+.modal-container.modal-small .modal-footer {
+  padding: 20rpx 32rpx 32rpx 32rpx;
+}
+
+/* 大尺寸弹窗 */
+.modal-container.modal-large {
+  min-width: 680rpx;
+  max-width: 90%;
+}
+
+/* 警告弹窗 */
+.modal-container.modal-warning .modal-title {
+  color: #faad14;
+}
+
+.modal-container.modal-warning .footer-button-confirm {
+  background: #faad14;
+}
+
+.modal-container.modal-warning .footer-button-confirm:active {
+  background: #d48806;
+}
+
+/* 错误弹窗 */
+.modal-container.modal-error .modal-title {
+  color: #ff4d4f;
+}
+
+.modal-container.modal-error .footer-button-confirm {
+  background: #ff4d4f;
+}
+
+.modal-container.modal-error .footer-button-confirm:active {
+  background: #d9363e;
+}
+
+/* 成功弹窗 */
+.modal-container.modal-success .modal-title {
+  color: #52c41a;
+}
+
+.modal-container.modal-success .footer-button-confirm {
+  background: #52c41a;
+}
+
+.modal-container.modal-success .footer-button-confirm:active {
+  background: #389e0d;
+}
+
+/* 无头部样式 */
+.modal-container.modal-no-header .modal-content {
+  padding-top: 40rpx;
+}
+
+/* 无底部样式 */
+.modal-container.modal-no-footer .modal-content {
+  padding-bottom: 40rpx;
+}
+
+/* 响应式设计 */
+@media (max-width: 750rpx) {
+  .modal-container {
+    min-width: 90%;
+    max-width: 95%;
+  }
+  
+  .modal-header,
+  .modal-content,
+  .modal-footer {
+    padding-left: 32rpx;
+    padding-right: 32rpx;
+  }
+  
+  .modal-container.modal-small {
+    min-width: 90%;
+  }
+  
+  .modal-container.modal-large {
+    min-width: 95%;
+  }
+}

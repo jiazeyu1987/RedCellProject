@@ -1,0 +1,20 @@
+<view class="{{cardClass}} {{extraClass}}" style="{{extraStyle}}" bindtap="onCardClick" bindlongpress="onCardLongPress">
+  <!-- 卡片头部 -->
+  <view class="card-header" wx:if="{{showHeader}}">
+    <view class="card-title" wx:if="{{title}}">{{title}}</view>
+    <view class="card-subtitle" wx:if="{{subtitle}}">{{subtitle}}</view>
+    <view class="card-extra" wx:if="{{extra}}">
+      <slot name="extra"></slot>
+    </view>
+  </view>
+
+  <!-- 卡片内容 -->
+  <view class="card-body">
+    <slot></slot>
+  </view>
+
+  <!-- 卡片底部 -->
+  <view class="card-footer" wx:if="{{showFooter}}">
+    <slot name="footer"></slot>
+  </view>
+</view>

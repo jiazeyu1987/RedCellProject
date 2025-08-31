@@ -1,0 +1,368 @@
+/* 时间选择器组件样式 */
+.time-picker {
+  position: relative;
+  width: 100%;
+}
+
+/* 触发器样式 */
+.picker-trigger {
+  
+}
+
+.trigger-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx;
+  background: #ffffff;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.trigger-content:hover {
+  border-color: #007AFF;
+}
+
+.trigger-disabled {
+  background: #f5f5f5;
+  color: #999999;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.trigger-text {
+  flex: 1;
+  font-size: 32rpx;
+  color: #1a1a1a;
+}
+
+.trigger-placeholder {
+  color: #999999;
+}
+
+.trigger-icon {
+  margin-left: 16rpx;
+  color: #cccccc;
+  font-size: 24rpx;
+  transition: transform 0.2s ease;
+}
+
+/* 弹窗样式 */
+.picker-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.popup-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.popup-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.popup-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-radius: 32rpx 32rpx 0 0;
+  max-height: 80%;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.popup-visible .popup-content {
+  transform: translateY(0);
+}
+
+/* 弹窗头部 */
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.header-actions {
+  display: flex;
+  gap: 32rpx;
+}
+
+.action-cancel,
+.action-confirm {
+  font-size: 32rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 6rpx;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-cancel {
+  color: #666666;
+}
+
+.action-cancel:active {
+  background: #f8f8f8;
+}
+
+.action-confirm {
+  color: #007AFF;
+  font-weight: 500;
+}
+
+.action-confirm:active {
+  background: #e6f7ff;
+}
+
+/* 选择器主体 */
+.picker-body {
+  padding: 32rpx;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* 快捷选择 */
+.quick-select {
+  margin-bottom: 32rpx;
+}
+
+.quick-title {
+  font-size: 28rpx;
+  color: #666666;
+  margin-bottom: 16rpx;
+}
+
+.quick-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.quick-option {
+  padding: 16rpx 24rpx;
+  background: #f8f8f8;
+  color: #666666;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-option:active {
+  background: #e0e0e0;
+}
+
+.option-active {
+  background: #007AFF !important;
+  color: #ffffff !important;
+}
+
+/* 日期时间选择 */
+.date-select,
+.time-select {
+  margin-bottom: 24rpx;
+}
+
+.select-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  cursor: pointer;
+}
+
+.select-label {
+  font-size: 32rpx;
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+.select-value {
+  font-size: 32rpx;
+  color: #007AFF;
+}
+
+/* 范围选择 */
+.range-select {
+  margin-bottom: 32rpx;
+}
+
+.range-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
+  cursor: pointer;
+}
+
+.range-label {
+  font-size: 32rpx;
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+.range-value {
+  font-size: 32rpx;
+  color: #007AFF;
+}
+
+.range-separator {
+  text-align: center;
+  font-size: 28rpx;
+  color: #666666;
+  margin: 8rpx 0;
+}
+
+/* 重复设置 */
+.repeat-select {
+  margin-bottom: 32rpx;
+}
+
+.repeat-title {
+  font-size: 28rpx;
+  color: #666666;
+  margin-bottom: 16rpx;
+}
+
+.repeat-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.repeat-option {
+  padding: 16rpx 24rpx;
+  background: #f8f8f8;
+  color: #666666;
+  border: 2rpx solid transparent;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.repeat-option:active {
+  background: #e0e0e0;
+}
+
+.repeat-option.option-active {
+  background: #e6f7ff;
+  color: #007AFF;
+  border-color: #007AFF;
+}
+
+/* 提醒设置 */
+.reminder-select {
+  margin-bottom: 16rpx;
+}
+
+.reminder-title {
+  font-size: 28rpx;
+  color: #666666;
+  margin-bottom: 16rpx;
+}
+
+.reminder-options {
+  
+}
+
+.reminder-option {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reminder-option:active {
+  background: #f8f8f8;
+}
+
+.option-checkbox {
+  font-size: 32rpx;
+  color: #007AFF;
+  margin-right: 16rpx;
+}
+
+.option-text {
+  font-size: 32rpx;
+  color: #1a1a1a;
+}
+
+.option-checked .option-text {
+  color: #007AFF;
+}
+
+/* 响应式设计 */
+@media (max-width: 750rpx) {
+  .popup-content {
+    max-height: 90%;
+  }
+  
+  .picker-body {
+    padding: 24rpx;
+    max-height: 70vh;
+  }
+  
+  .popup-header {
+    padding: 24rpx;
+  }
+  
+  .quick-options,
+  .repeat-options {
+    gap: 12rpx;
+  }
+  
+  .quick-option,
+  .repeat-option {
+    padding: 12rpx 20rpx;
+    font-size: 26rpx;
+  }
+}
+
+/* 滚动条样式 */
+.picker-body::-webkit-scrollbar {
+  width: 8rpx;
+}
+
+.picker-body::-webkit-scrollbar-track {
+  background: #f8f8f8;
+}
+
+.picker-body::-webkit-scrollbar-thumb {
+  background: #cccccc;
+  border-radius: 4rpx;
+}
+
+.picker-body::-webkit-scrollbar-thumb:hover {
+  background: #999999;
+}

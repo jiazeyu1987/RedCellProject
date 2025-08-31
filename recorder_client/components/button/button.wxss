@@ -1,0 +1,305 @@
+/* 按钮组件样式 */
+.custom-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  line-height: 1;
+  padding: 24rpx 32rpx;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* 移除默认样式 */
+.custom-button::after {
+  border: none;
+}
+
+/* 按钮内容布局 */
+.button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.button-text {
+  flex: 1;
+  text-align: center;
+}
+
+.button-icon-left {
+  margin-right: 16rpx;
+}
+
+.button-icon-right {
+  margin-left: 16rpx;
+}
+
+.button-icon-image {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+/* 角标 */
+.button-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  background: #ff4444;
+  color: #ffffff;
+  border-radius: 20rpx;
+  padding: 4rpx 12rpx;
+  font-size: 20rpx;
+  font-weight: 500;
+  min-width: 32rpx;
+  height: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-text {
+  line-height: 1;
+}
+
+/* 加载状态 */
+.button-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner {
+  width: 32rpx;
+  height: 32rpx;
+  border: 4rpx solid rgba(255, 255, 255, 0.3);
+  border-top: 4rpx solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  margin-left: 16rpx;
+  font-size: 28rpx;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 按钮类型样式 */
+
+/* 主要按钮 */
+.custom-button.button-primary {
+  background: #007AFF;
+  color: #ffffff;
+}
+
+.custom-button.button-primary:not([disabled]):active {
+  background: #0056CC;
+  transform: scale(0.98);
+}
+
+/* 次要按钮 */
+.custom-button.button-secondary {
+  background: #ffffff;
+  color: #007AFF;
+  border: 2rpx solid #007AFF;
+}
+
+.custom-button.button-secondary:not([disabled]):active {
+  background: #f0f8ff;
+  transform: scale(0.98);
+}
+
+/* 成功按钮 */
+.custom-button.button-success {
+  background: #52c41a;
+  color: #ffffff;
+}
+
+.custom-button.button-success:not([disabled]):active {
+  background: #389e0d;
+  transform: scale(0.98);
+}
+
+/* 警告按钮 */
+.custom-button.button-warning {
+  background: #faad14;
+  color: #ffffff;
+}
+
+.custom-button.button-warning:not([disabled]):active {
+  background: #d48806;
+  transform: scale(0.98);
+}
+
+/* 危险按钮 */
+.custom-button.button-danger {
+  background: #ff4d4f;
+  color: #ffffff;
+}
+
+.custom-button.button-danger:not([disabled]):active {
+  background: #d9363e;
+  transform: scale(0.98);
+}
+
+/* 信息按钮 */
+.custom-button.button-info {
+  background: #1890ff;
+  color: #ffffff;
+}
+
+.custom-button.button-info:not([disabled]):active {
+  background: #096dd9;
+  transform: scale(0.98);
+}
+
+/* 文字按钮 */
+.custom-button.button-text {
+  background: transparent;
+  color: #007AFF;
+  border: none;
+}
+
+.custom-button.button-text:not([disabled]):active {
+  background: rgba(0, 122, 255, 0.1);
+  transform: scale(0.98);
+}
+
+/* 链接按钮 */
+.custom-button.button-link {
+  background: transparent;
+  color: #007AFF;
+  border: none;
+  text-decoration: underline;
+}
+
+.custom-button.button-link:not([disabled]):active {
+  color: #0056CC;
+}
+
+/* 按钮尺寸 */
+
+/* 大尺寸 */
+.custom-button.button-large {
+  padding: 32rpx 48rpx;
+  font-size: 36rpx;
+  border-radius: 12rpx;
+}
+
+/* 中等尺寸（默认） */
+.custom-button.button-medium {
+  padding: 24rpx 32rpx;
+  font-size: 32rpx;
+  border-radius: 8rpx;
+}
+
+/* 小尺寸 */
+.custom-button.button-small {
+  padding: 16rpx 24rpx;
+  font-size: 28rpx;
+  border-radius: 6rpx;
+}
+
+.custom-button.button-small .button-icon-image {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+/* 迷你尺寸 */
+.custom-button.button-mini {
+  padding: 12rpx 16rpx;
+  font-size: 24rpx;
+  border-radius: 4rpx;
+}
+
+.custom-button.button-mini .button-icon-image {
+  width: 20rpx;
+  height: 20rpx;
+}
+
+/* 按钮形状 */
+
+/* 圆形按钮 */
+.custom-button.button-round {
+  border-radius: 50rpx;
+}
+
+/* 圆角按钮 */
+.custom-button.button-rounded {
+  border-radius: 24rpx;
+}
+
+/* 方形按钮 */
+.custom-button.button-square {
+  border-radius: 0;
+}
+
+/* 按钮宽度 */
+
+/* 块级按钮 */
+.custom-button.button-block {
+  width: 100%;
+  display: flex;
+}
+
+/* 禁用状态 */
+.custom-button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* 幽灵按钮（透明背景） */
+.custom-button.button-ghost {
+  background: transparent;
+  border: 2rpx solid;
+}
+
+.custom-button.button-ghost.button-primary {
+  color: #007AFF;
+  border-color: #007AFF;
+}
+
+.custom-button.button-ghost.button-success {
+  color: #52c41a;
+  border-color: #52c41a;
+}
+
+.custom-button.button-ghost.button-warning {
+  color: #faad14;
+  border-color: #faad14;
+}
+
+.custom-button.button-ghost.button-danger {
+  color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+/* 渐变按钮 */
+.custom-button.button-gradient {
+  background: linear-gradient(45deg, #007AFF, #5AC8FA);
+  color: #ffffff;
+}
+
+.custom-button.button-gradient:not([disabled]):active {
+  background: linear-gradient(45deg, #0056CC, #32A3F5);
+}
+
+/* 阴影按钮 */
+.custom-button.button-shadow {
+  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
+}
+
+.custom-button.button-shadow:not([disabled]):active {
+  box-shadow: 0 2rpx 8rpx rgba(0, 122, 255, 0.4);
+}

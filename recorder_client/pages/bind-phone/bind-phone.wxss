@@ -1,0 +1,247 @@
+/* pages/bind-phone/bind-phone.wxss */
+.bind-phone-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+  padding: 0 40rpx;
+  box-sizing: border-box;
+}
+
+/* 顶部区域 */
+.header-section {
+  padding: 120rpx 0 80rpx;
+  text-align: center;
+  color: #ffffff;
+}
+
+.title {
+  font-size: 44rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
+}
+
+.desc {
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.4;
+}
+
+/* 表单区域 */
+.form-section {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 60rpx 40rpx 40rpx;
+  box-shadow: 0 -4rpx 24rpx rgba(0, 0, 0, 0.1);
+}
+
+/* 输入框组 */
+.input-group {
+  margin-bottom: 40rpx;
+}
+
+.input-group.error .input-wrapper {
+  border-color: #ff4757;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #f8f9fa;
+  border: 2rpx solid transparent;
+  border-radius: 16rpx;
+  padding: 0 20rpx;
+  height: 88rpx;
+  transition: all 0.3s ease;
+}
+
+.input-wrapper:focus-within {
+  border-color: #667eea;
+  background: #ffffff;
+  box-shadow: 0 0 0 6rpx rgba(102, 126, 234, 0.1);
+}
+
+.input-icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 20rpx;
+}
+
+.icon {
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+}
+
+.input-field {
+  flex: 1;
+  font-size: 30rpx;
+  color: #333333;
+  background: transparent;
+}
+
+.input-field::placeholder {
+  color: #999999;
+}
+
+.input-action {
+  width: 32rpx;
+  height: 32rpx;
+  margin-left: 20rpx;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.input-action:active {
+  opacity: 1;
+}
+
+/* 短信验证码按钮 */
+.sms-btn {
+  min-width: 140rpx;
+  height: 60rpx;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 20rpx;
+  transition: all 0.3s ease;
+}
+
+.sms-btn.active {
+  background: #667eea;
+  color: #ffffff;
+}
+
+.sms-btn.disabled {
+  background: #f0f0f0;
+  color: #cccccc;
+}
+
+.error-text {
+  color: #ff4757;
+  font-size: 24rpx;
+  margin-top: 10rpx;
+  margin-left: 20rpx;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  margin-top: 60rpx;
+  margin-bottom: 40rpx;
+}
+
+.bind-btn {
+  width: 100%;
+  height: 88rpx;
+  border-radius: 16rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  border: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bind-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.3);
+}
+
+.bind-btn.disabled {
+  background: #f0f0f0;
+  color: #cccccc;
+}
+
+.skip-btn {
+  width: 100%;
+  height: 88rpx;
+  background: transparent;
+  color: #666666;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  transition: all 0.3s ease;
+}
+
+.skip-btn:active {
+  background: #f8f9fa;
+  border-color: #cccccc;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+}
+
+.loading-icon {
+  width: 30rpx;
+  height: 30rpx;
+  border: 3rpx solid rgba(255, 255, 255, 0.3);
+  border-top: 3rpx solid #ffffff;
+  border-radius: 50%;
+  margin-right: 15rpx;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 安全提示 */
+.security-tip {
+  display: flex;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-top: 40rpx;
+  backdrop-filter: blur(10rpx);
+}
+
+.tip-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 20rpx;
+  margin-top: 5rpx;
+}
+
+.tip-content {
+  flex: 1;
+}
+
+.tip-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 8rpx;
+}
+
+.tip-desc {
+  font-size: 24rpx;
+  color: #666666;
+  line-height: 1.5;
+}
+
+/* 适配不同屏幕 */
+@media screen and (max-height: 667px) {
+  .header-section {
+    padding: 80rpx 0 60rpx;
+  }
+  
+  .form-section {
+    padding: 40rpx 40rpx 30rpx;
+  }
+}
+
+/* 安全区域适配 */
+.bind-phone-container {
+  padding-bottom: env(safe-area-inset-bottom);
+}

@@ -1,0 +1,36 @@
+<view class="bottom-nav {{extraClass}}" style="{{extraStyle}}">
+  <view class="nav-items">
+    <view 
+      class="nav-item {{item.active ? 'nav-item-active' : ''}}" 
+      wx:for="{{items}}" 
+      wx:key="{{item.key}}"
+      bindtap="onNavItemClick"
+      data-index="{{index}}"
+      data-key="{{item.key}}"
+    >
+      <!-- 图标 -->
+      <view class="nav-icon">
+        <image 
+          wx:if="{{item.icon}}" 
+          src="{{item.active ? item.activeIcon || item.icon : item.icon}}" 
+          class="nav-icon-image"
+        />
+        <text wx:elif="{{item.iconText}}" class="nav-icon-text {{item.active ? 'nav-icon-text-active' : ''}}">
+          {{item.iconText}}
+        </text>
+      </view>
+      
+      <!-- 文字 -->
+      <view class="nav-text {{item.active ? 'nav-text-active' : ''}}">
+        {{item.text}}
+      </view>
+      
+      <!-- 角标 -->
+      <view wx:if="{{item.badge}}" class="nav-badge">
+        <text wx:if="{{item.badge > 99}}" class="nav-badge-text">99+</text>
+        <text wx:elif="{{item.badge > 0}}" class="nav-badge-text">{{item.badge}}</text>
+        <view wx:else class="nav-badge-dot"></view>
+      </view>
+    </view>
+  </view>
+</view>

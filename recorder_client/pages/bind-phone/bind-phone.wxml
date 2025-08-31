@@ -1,0 +1,89 @@
+<!--pages/bind-phone/bind-phone.wxml-->
+<view class="bind-phone-container">
+  <!-- 顶部区域 -->
+  <view class="header-section">
+    <view class="title">绑定手机号</view>
+    <view class="desc">为了账户安全，请绑定您的手机号</view>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="form-section">
+    <!-- 手机号输入 -->
+    <view class="input-group {{phoneError ? 'error' : ''}}">
+      <view class="input-wrapper">
+        <view class="input-icon">
+          <image src="/assets/icons/phone.png" class="icon"></image>
+        </view>
+        <input 
+          class="input-field" 
+          type="number" 
+          placeholder="请输入手机号" 
+          value="{{phone}}"
+          bindinput="onPhoneInput"
+          bindfocus="onPhoneFocus"
+          bindblur="onPhoneBlur"
+          maxlength="11"
+        />
+        <view class="input-action" wx:if="{{phone}}" bindtap="clearPhone">
+          <image src="/assets/icons/clear.png" class="icon"></image>
+        </view>
+      </view>
+      <view class="error-text" wx:if="{{phoneError}}">{{phoneError}}</view>
+    </view>
+
+    <!-- 验证码输入 -->
+    <view class="input-group {{smsCodeError ? 'error' : ''}}">
+      <view class="input-wrapper">
+        <view class="input-icon">
+          <image src="/assets/icons/sms.png" class="icon"></image>
+        </view>
+        <input 
+          class="input-field" 
+          type="number" 
+          placeholder="请输入6位验证码" 
+          value="{{smsCode}}"
+          bindinput="onSmsCodeInput"
+          bindfocus="onSmsCodeFocus"
+          bindblur="onSmsCodeBlur"
+          maxlength="6"
+        />
+        <view class="sms-btn {{canSendSms ? 'active' : 'disabled'}}" bindtap="sendSmsCode">
+          <text wx:if="{{smsCountdown > 0}}">{{smsCountdown}}s</text>
+          <text wx:elif="{{sendingSms}}">发送中...</text>
+          <text wx:else>{{isFirstSend ? '获取验证码' : '重新发送'}}</text>
+        </view>
+      </view>
+      <view class="error-text" wx:if="{{smsCodeError}}">{{smsCodeError}}</view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button 
+        class="bind-btn {{canBind && !isLoading ? 'active' : 'disabled'}}" 
+        bindtap="bindPhone"
+        disabled="{{!canBind || isLoading}}"
+      >
+        <view wx:if="{{isLoading}}" class="loading">
+          <view class="loading-icon"></view>
+          <text>绑定中...</text>
+        </view>
+        <text wx:else>确认绑定</text>
+      </button>
+
+      <button class="skip-btn" bindtap="skipBinding">
+        <text>暂时跳过</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 安全提示 -->
+  <view class="security-tip">
+    <view class="tip-icon">
+      <image src="/assets/icons/shield.png" class="icon"></image>
+    </view>
+    <view class="tip-content">
+      <view class="tip-title">安全保障</view>
+      <view class="tip-desc">绑定手机号后，您可以使用手机号登录，提升账户安全性</view>
+    </view>
+  </view>
+</view>
