@@ -1,0 +1,286 @@
+<!--components/time-adjust-modal/time-adjust-modal.wxml-->
+<modal
+  visible="{{visible}}"
+  title="{{isBatch ? '批量调整时间' : '调整预约时间'}}"
+  type="fullscreen"
+  showFooter="{{false}}"
+  maskClosable="{{false}}"
+  bind:close="closeModal">
+  
+  <!-- 弹窗内容 -->
+  <view class="time-adjust-container">
+    
+    <!-- 步骤指示器 -->
+    <view class="step-indicator">
+      <view class="step-item {{modalState.step >= 1 ? 'active' : ''}}" data-step="1">
+        <view class="step-number">1</view>
+        <view class="step-title">选择时间</view>
+      </view>
+      <view class="step-line {{modalState.step >= 2 ? 'active' : ''}}"></view>
+      <view class="step-item {{modalState.step >= 2 ? 'active' : ''}}" data-step="2" wx:if="{{conflictResult.hasConflict}}">
+        <view class="step-number">2</view>
+        <view class="step-title">解决冲突</view>
+      </view>
+      <view class="step-line {{modalState.step >= 3 ? 'active' : ''}}" wx:if="{{conflictResult.hasConflict}}"></view>
+      <view class="step-item {{modalState.step >= 3 || (modalState.step >= 2 && !conflictResult.hasConflict) ? 'active' : ''}}" 
+            data-step="{{conflictResult.hasConflict ? 3 : 2}}">
+        <view class="step-number">{{conflictResult.hasConflict ? 3 : 2}}</view>
+        <view class="step-title">确认调整</view>
+      </view>
+    </view>
+
+    <!-- 第一步：时间选择 -->
+    <view class="step-content" wx:if="{{modalState.step === 1}}">
+      
+      <!-- 当前预约信息 -->
+      <view class="current-appointment">
+        <view class="section-title">
+          <text class="title-icon">📅</text>
+          <text class="title-text">当前预约</text>
+        </view>
+        <view class="appointment-card">
+          <view class="appointment-time">
+            <text class="date">{{originalTime.date}}</text>
+            <text class="time">{{originalTime.startTime}} - {{originalTime.endTime}}</text>
+          </view>
+          <view class="appointment-info" wx:if="{{!isBatch}}">
+            <text class="patient">患者：{{appointmentInfo.patientName}}</text>
+            <text class="service">服务：{{appointmentInfo.serviceType}}</text>
+          </view>
+          <view class="batch-info" wx:else>
+            <text class="count">共 {{batchAppointments.length}} 个预约</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 新时间选择 -->
+      <view class="time-selection">
+        <view class="section-title">
+          <text class="title-icon">🕒</text>
+          <text class="title-text">选择新时间</text>
+        </view>
+        
+        <!-- 日期选择 -->
+        <form-item 
+          label="调整日期"
+          required="{{true}}"
+          error="{{!validation.dateValid}}"
+          errorText="请选择调整日期">
+          <picker 
+            mode="date"
+            value="{{newTime.date}}"
+            start="{{datePickerConfig.minDate}}"
+            end="{{datePickerConfig.maxDate}}"
+            bind:change="onDateChange">
+            <view class="picker-display {{newTime.date ? '' : 'placeholder'}}">
+              {{newTime.date || '请选择日期'}}
+            </view>
+          </picker>
+        </form-item>
+
+        <!-- 开始时间选择 -->
+        <form-item 
+          label="开始时间"
+          required="{{true}}"
+          error="{{!validation.timeValid}}"
+          errorText="请选择服务时间">
+          <picker 
+            mode="time"
+            value="{{newTime.startTime}}"
+            bind:change="onStartTimeChange">
+            <view class="picker-display {{newTime.startTime ? '' : 'placeholder'}}">
+              {{newTime.startTime || '请选择开始时间'}}
+            </view>
+          </picker>
+        </form-item>
+
+        <!-- 结束时间选择 -->
+        <form-item 
+          label="结束时间"
+          required="{{true}}"
+          error="{{!validation.timeValid}}"
+          errorText="请选择结束时间">
+          <picker 
+            mode="time"
+            value="{{newTime.endTime}}"
+            bind:change="onEndTimeChange">
+            <view class="picker-display {{newTime.endTime ? '' : 'placeholder'}}">
+              {{newTime.endTime || '请选择结束时间'}}
+            </view>
+          </picker>
+        </form-item>
+      </view>
+
+      <!-- 智能推荐 -->
+      <view class="smart-recommend" wx:if="{{showSmartRecommend && recommendedSlots.length > 0}}">
+        <view class="section-title">
+          <text class="title-icon">🤖</text>
+          <text class="title-text">智能推荐</text>
+        </view>
+        
+        <view class="recommend-list">
+          <view 
+            class="recommend-item {{selectedRecommend === index ? 'selected' : ''}}"
+            wx:for="{{recommendedSlots}}"
+            wx:key="index"
+            data-index="{{index}}"
+            bind:tap="onRecommendSelect">
+            <view class="recommend-time">
+              <text class="date">{{item.date}}</text>
+              <text class="time">{{item.startTime}} - {{item.endTime}}</text>
+            </view>
+            <view class="recommend-info">
+              <view class="score">推荐度: {{item.score}}%</view>
+              <view class="reason">{{item.reason}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 调整原因选择 -->
+      <view class="reason-selection">
+        <view class="section-title">
+          <text class="title-icon">📝</text>
+          <text class="title-text">调整原因</text>
+        </view>
+        
+        <view class="reason-options">
+          <view 
+            class="reason-option {{adjustReason === item ? 'selected' : ''}}"
+            wx:for="{{reasonOptions}}"
+            wx:key="*this"
+            data-reason="{{item}}"
+            bind:tap="onReasonSelect">
+            {{item}}
+          </view>
+        </view>
+        
+        <!-- 自定义原因输入 -->
+        <form-item 
+          wx:if="{{modalState.showReasonInput}}"
+          label="详细原因"
+          required="{{true}}">
+          <textarea 
+            placeholder="请详细说明调整原因..."
+            value="{{adjustReason}}"
+            maxlength="200"
+            bind:input="onReasonInput"
+            class="reason-input">
+          </textarea>
+        </form-item>
+      </view>
+    </view>
+
+    <!-- 第二步：冲突解决 -->
+    <view class="step-content" wx:if="{{modalState.step === 2 && conflictResult.hasConflict}}">
+      <view class="conflict-warning">
+        <view class="warning-header">
+          <text class="warning-icon">⚠️</text>
+          <text class="warning-title">时间冲突提醒</text>
+        </view>
+        <text class="warning-message">您选择的时间与以下预约存在冲突，请选择其他时间或处理冲突。</text>
+      </view>
+
+      <!-- 冲突预约列表 -->
+      <view class="conflict-list">
+        <view class="conflict-item" wx:for="{{conflictResult.conflictAppointments}}" wx:key="id">
+          <view class="conflict-time">{{item.date}} {{item.startTime}}-{{item.endTime}}</view>
+          <view class="conflict-patient">患者：{{item.patientName}}</view>
+          <view class="conflict-service">服务：{{item.serviceType}}</view>
+        </view>
+      </view>
+
+      <!-- 建议解决方案 -->
+      <view class="suggestions" wx:if="{{conflictResult.suggestions.length > 0}}">
+        <view class="section-title">
+          <text class="title-icon">💡</text>
+          <text class="title-text">建议解决方案</text>
+        </view>
+        <view class="suggestion-list">
+          <view class="suggestion-item" wx:for="{{conflictResult.suggestions}}" wx:key="index">
+            <view class="suggestion-title">{{item.title}}</view>
+            <view class="suggestion-desc">{{item.description}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 第三步：确认调整 -->
+    <view class="step-content" wx:if="{{modalState.step === 3 || (modalState.step === 2 && !conflictResult.hasConflict)}}">
+      <view class="confirm-info">
+        <view class="section-title">
+          <text class="title-icon">✅</text>
+          <text class="title-text">确认调整信息</text>
+        </view>
+        
+        <!-- 调整对比 -->
+        <view class="time-comparison">
+          <view class="comparison-row">
+            <view class="label">原时间：</view>
+            <view class="original-time">
+              {{originalTime.date}} {{originalTime.startTime}}-{{originalTime.endTime}}
+            </view>
+          </view>
+          <view class="arrow">⬇️</view>
+          <view class="comparison-row">
+            <view class="label">新时间：</view>
+            <view class="new-time">
+              {{newTime.date}} {{newTime.startTime}}-{{newTime.endTime}}
+            </view>
+          </view>
+        </view>
+
+        <!-- 调整原因 -->
+        <view class="reason-display">
+          <view class="label">调整原因：</view>
+          <view class="reason-text">{{adjustReason}}</view>
+        </view>
+
+        <!-- 影响提醒 -->
+        <view class="impact-notice">
+          <text class="notice-icon">ℹ️</text>
+          <text class="notice-text">调整后将自动通知相关人员，请确认信息无误后提交。</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部操作按钮 -->
+    <view class="modal-footer">
+      <!-- 取消按钮 -->
+      <button 
+        class="cancel-btn" 
+        bind:tap="onCancel"
+        disabled="{{modalState.submitting}}">
+        取消
+      </button>
+      
+      <!-- 上一步按钮 -->
+      <button 
+        class="prev-btn" 
+        bind:tap="onPrevStep"
+        wx:if="{{modalState.step > 1}}"
+        disabled="{{modalState.submitting}}">
+        上一步
+      </button>
+      
+      <!-- 下一步按钮 -->
+      <button 
+        class="next-btn" 
+        bind:tap="onNextStep"
+        wx:if="{{modalState.step < 3 && (modalState.step !== 2 || conflictResult.hasConflict)}}"
+        disabled="{{modalState.loading}}">
+        下一步
+      </button>
+      
+      <!-- 确认调整按钮 -->
+      <button 
+        class="confirm-btn" 
+        bind:tap="onSubmit"
+        wx:if="{{modalState.step === 3 || (modalState.step === 2 && !conflictResult.hasConflict)}}"
+        loading="{{modalState.submitting}}"
+        disabled="{{modalState.submitting}}">
+        {{modalState.submitting ? '调整中...' : '确认调整'}}
+      </button>
+    </view>
+  </view>
+</modal>

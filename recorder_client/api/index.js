@@ -1,5 +1,6 @@
 // API接口管理
 const { http } = require('../services/http.service.js');
+import NotificationAPI from './notification-api.js';
 
 // 用户认证相关API
 const AuthAPI = {
@@ -71,24 +72,123 @@ const ScheduleAPI = {
     return http.get('/schedule/list', params);
   },
   
+  // 获取日程统计信息
+  getScheduleStatistics: (params = {}) => {
+    return http.get('/schedule/statistics', params);
+  },
+  
+  // 获取详细统计信息
+  getDetailedStatistics: (timeRange = 'today') => {
+    return http.get('/schedule/statistics/detailed', { timeRange });
+  },
+  
+  // 获取统计趋势数据
+  getStatisticsTrend: (days = 7) => {
+    return http.get('/schedule/statistics/trend', { days });
+  },
+  
   // 获取日程详情
   getScheduleDetail: (id) => {
     return http.get(`/schedule/detail/${id}`);
   },
   
   // 更新日程状态
-  updateScheduleStatus: (id, status) => {
-    return http.put(`/schedule/status/${id}`, { status });
+  updateScheduleStatus: (id, status, reason = '') => {
+    return http.put(`/schedule/status/${id}`, { status, reason });
   },
   
   // 调整预约时间
-  rescheduleAppointment: (id, newTime) => {
-    return http.put(`/schedule/reschedule/${id}`, { newTime });
+  rescheduleAppointment: (id, newStartTime, newEndTime, reason = '') => {
+    return http.put(`/schedule/reschedule/${id}`, { 
+      newStartTime, 
+      newEndTime, 
+      reason 
+    });
   },
   
   // 批量时间调整
-  batchReschedule: (scheduleIds, newTime) => {
-    return http.put('/schedule/batch-reschedule', { scheduleIds, newTime });
+  batchReschedule: (scheduleIds, newStartTime, newEndTime, reason = '') => {
+    return http.put('/schedule/batch-reschedule', { 
+      scheduleIds, 
+      newStartTime, 
+      newEndTime, 
+      reason 
+    });
+  },
+  
+  // 批量更新状态
+  batchUpdateStatus: (scheduleIds, status, reason = '') => {
+    return http.put('/schedule/batch-status', { 
+      scheduleIds, 
+      status, 
+      reason 
+    });
+  },
+  
+  // 检查时间冲突
+  checkTimeConflict: (startTime, endTime, excludeIds = []) => {
+    return http.post('/schedule/check-conflict', {
+      startTime,
+      endTime,
+      excludeIds
+    });
+  },
+  
+  // 处理患者不在家情况
+  handlePatientNotHome: (scheduleId, reason, nextAction) => {
+    return http.post(`/schedule/no-show/${scheduleId}`, {
+      reason,
+      nextAction // 'reschedule', 'cancel', 'wait'
+    });
+  },
+  
+  // 开始服务
+  startService: (scheduleId, location) => {
+    return http.post(`/schedule/start/${scheduleId}`, {
+      startTime: new Date().toISOString(),
+      location
+    });
+  },
+  
+  // 完成服务
+  completeService: (scheduleId, endTime, summary) => {
+    return http.post(`/schedule/complete/${scheduleId}`, {
+      endTime,
+      summary
+    });
+  },
+  
+  // 取消服务
+  cancelService: (scheduleId, reason) => {
+    return http.post(`/schedule/cancel/${scheduleId}`, {
+      reason,
+      cancelTime: new Date().toISOString()
+    });
+  },
+  
+  // 获取推荐时间段
+  getRecommendedTimeSlots: (date, duration = 60) => {
+    return http.get('/schedule/recommended-slots', {
+      date,
+      duration
+    });
+  },
+  
+  // 同步日程数据
+  syncScheduleData: (lastSyncTime) => {
+    return http.post('/schedule/sync', {
+      lastSyncTime
+    });
+  },
+  
+  // 获取日稌提醒
+  getScheduleReminders: () => {
+    return http.get('/schedule/reminders');
+  },
+  
+  // 标记提醒已读
+  markReminderRead: (reminderId) => {
+    return http.put(`/schedule/reminder/${reminderId}/read`);
   }
 };
 
@@ -254,5 +354,6 @@ module.exports = {
   RecordAPI,
   PaymentAPI,
   AppointmentAPI,
-  CollaborationAPI
+  CollaborationAPI,
+  NotificationAPI
 };

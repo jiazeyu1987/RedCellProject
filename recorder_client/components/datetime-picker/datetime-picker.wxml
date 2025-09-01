@@ -1,0 +1,89 @@
+<view class="datetime-picker {{customClass}}">
+  <!-- 输入框显示区域 -->
+  <view class="picker-input {{disabled ? 'disabled' : ''}}" bindtap="showPicker">
+    <text class="input-text {{!displayText || displayText === placeholder ? 'placeholder' : ''}}">
+      {{displayText || placeholder}}
+    </text>
+    <text class="input-icon">📅</text>
+  </view>
+
+  <!-- 选择器弹窗 -->
+  <view wx:if="{{pickerVisible}}" class="picker-modal">
+    <view class="modal-mask" bindtap="hidePicker"></view>
+    
+    <view class="picker-container">
+      <!-- 弹窗头部 -->
+      <view class="picker-header">
+        <view class="header-btn cancel-btn" bindtap="onCancel">取消</view>
+        <view class="header-title">选择时间</view>
+        <view class="header-btn confirm-btn" bindtap="onConfirm">确定</view>
+      </view>
+
+      <!-- 选择器内容 -->
+      <view class="picker-content">
+        <!-- 日期选择器 -->
+        <view wx:if="{{type === 'date' || type === 'datetime'}}" class="date-picker-section">
+          <view class="section-title">日期</view>
+          <picker-view 
+            class="date-picker"
+            value="{{datePickerValue}}"
+            bindchange="onDatePickerChange">
+            
+            <!-- 年份列 -->
+            <picker-view-column>
+              <view wx:for="{{datePickerRange[0]}}" wx:key="*this" class="picker-item">
+                {{item}}
+              </view>
+            </picker-view-column>
+            
+            <!-- 月份列 -->
+            <picker-view-column>
+              <view wx:for="{{datePickerRange[1]}}" wx:key="*this" class="picker-item">
+                {{item}}
+              </view>
+            </picker-view-column>
+            
+            <!-- 日期列 -->
+            <picker-view-column>
+              <view wx:for="{{datePickerRange[2]}}" wx:key="*this" class="picker-item">
+                {{item}}
+              </view>
+            </picker-view-column>
+          </picker-view>
+        </view>
+
+        <!-- 时间选择器 -->
+        <view wx:if="{{type === 'time' || type === 'datetime'}}" class="time-picker-section">
+          <view class="section-title">时间</view>
+          <picker-view 
+            class="time-picker"
+            value="{{timePickerValue}}"
+            bindchange="onTimePickerChange">
+            
+            <!-- 小时列 -->
+            <picker-view-column>
+              <view wx:for="{{timePickerRange[0]}}" wx:key="*this" class="picker-item">
+                {{item}}
+              </view>
+            </picker-view-column>
+            
+            <!-- 分钟列 -->
+            <picker-view-column>
+              <view wx:for="{{timePickerRange[1]}}" wx:key="*this" class="picker-item">
+                {{item}}
+              </view>
+            </picker-view-column>
+          </picker-view>
+        </view>
+      </view>
+
+      <!-- 快捷选择 -->
+      <view class="quick-select">
+        <view class="quick-btn" bindtap="onClear">清空</view>
+        <view class="quick-btn" data-type="now" bindtap="selectQuickTime">现在</view>
+        <view class="quick-btn" data-type="tomorrow" bindtap="selectQuickTime">明天</view>
+        <view class="quick-btn" data-type="next_week" bindtap="selectQuickTime">下周</view>
+      </view>
+    </view>
+  </view>
+</view>

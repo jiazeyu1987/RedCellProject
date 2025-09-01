@@ -1,0 +1,439 @@
+/* 日程筛选器组件样式 */
+
+.schedule-filter {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* 遮罩层 */
+.filter-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* 筛选器容器 */
+.filter-container {
+  width: 100%;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  animation: slideUp 0.3s ease;
+  position: relative;
+  z-index: 2001;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* 头部 */
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.reset-btn {
+  color: #007aff;
+  font-size: 16px;
+  padding: 4px 8px;
+}
+
+.reset-btn:active {
+  opacity: 0.7;
+}
+
+.close-btn {
+  color: #666;
+  font-size: 20px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:active {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* 快速筛选 */
+.quick-filters {
+  padding: 16px 20px;
+  background: #f8f9fa;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.quick-filter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quick-filter-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  transition: all 0.2s;
+}
+
+.quick-filter-item:active {
+  background: #007aff;
+  border-color: #007aff;
+  transform: scale(0.95);
+}
+
+.quick-filter-item:active .quick-text {
+  color: #fff;
+}
+
+.quick-icon {
+  font-size: 12px;
+}
+
+.quick-text {
+  font-size: 12px;
+  color: #333;
+}
+
+/* 搜索栏 */
+.search-section {
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.search-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  padding-right: 40px;
+}
+
+.clear-search {
+  position: absolute;
+  right: 12px;
+  color: #999;
+  font-size: 16px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-search:active {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* 筛选选项 */
+.filter-sections {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 20px;
+}
+
+.filter-section {
+  border-bottom: 1px solid #eee;
+}
+
+.filter-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0;
+  position: relative;
+}
+
+.filter-tab.active {
+  background: rgba(0, 122, 255, 0.05);
+  margin: 0 -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.tab-icon {
+  font-size: 16px;
+}
+
+.tab-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.tab-value {
+  font-size: 14px;
+  color: #666;
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+.tab-arrow {
+  font-size: 12px;
+  color: #999;
+}
+
+/* 筛选选项列表 */
+.filter-options {
+  padding-bottom: 12px;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  margin-left: 24px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.filter-option.selected {
+  color: #007aff;
+}
+
+.filter-option:active {
+  background: rgba(0, 122, 255, 0.05);
+  margin: 0 -20px;
+  padding-left: 44px;
+  padding-right: 20px;
+}
+
+.option-icon {
+  font-size: 14px;
+  width: 20px;
+}
+
+.option-text {
+  flex: 1;
+  font-size: 14px;
+}
+
+.option-check {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* 自定义日期范围 */
+.custom-date-range {
+  margin-left: 24px;
+  padding: 12px 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.date-range-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.date-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-input {
+  flex: 1;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  text-align: center;
+  color: #333;
+}
+
+.date-separator {
+  font-size: 12px;
+  color: #666;
+}
+
+/* 底部应用按钮 */
+.filter-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #eee;
+  background: #fff;
+  position: sticky;
+  bottom: 0;
+}
+
+.apply-btn {
+  width: 100%;
+  background: #007aff;
+  color: #fff;
+  text-align: center;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.apply-btn:active {
+  background: #0066cc;
+  transform: scale(0.98);
+}
+
+/* 暗色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .filter-container {
+    background: #1c1c1e;
+  }
+  
+  .filter-header {
+    background: #1c1c1e;
+    border-bottom-color: #38383a;
+  }
+  
+  .header-title {
+    color: #fff;
+  }
+  
+  .reset-btn {
+    color: #0a84ff;
+  }
+  
+  .close-btn {
+    color: #8e8e93;
+  }
+  
+  .close-btn:active {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .quick-filters {
+    background: #2c2c2e;
+  }
+  
+  .section-title {
+    color: #8e8e93;
+  }
+  
+  .quick-filter-item {
+    background: #3a3a3c;
+    border-color: #48484a;
+  }
+  
+  .quick-text {
+    color: #fff;
+  }
+  
+  .search-section {
+    border-bottom-color: #38383a;
+  }
+  
+  .search-input {
+    background: #2c2c2e;
+    border-color: #38383a;
+    color: #fff;
+  }
+  
+  .filter-section {
+    border-bottom-color: #38383a;
+  }
+  
+  .tab-text {
+    color: #fff;
+  }
+  
+  .tab-value {
+    color: #8e8e93;
+  }
+  
+  .tab-arrow {
+    color: #8e8e93;
+  }
+  
+  .filter-option {
+    border-bottom-color: #2c2c2e;
+  }
+  
+  .option-text {
+    color: #fff;
+  }
+  
+  .date-range-title {
+    color: #fff;
+  }
+  
+  .date-input {
+    background: #2c2c2e;
+    border-color: #38383a;
+    color: #fff;
+  }
+  
+  .filter-footer {
+    background: #1c1c1e;
+    border-top-color: #38383a;
+  }
+}

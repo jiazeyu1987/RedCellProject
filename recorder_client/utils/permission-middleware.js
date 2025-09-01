@@ -1,6 +1,6 @@
 // 权限检查中间件
-const { RolePermissionManager, PERMISSIONS } = require('./role-permission.js');
 const CONFIG = require('../constants/config.js');
+const { RolePermissionManager, PERMISSIONS } = require('./role-permission.js');
 
 class PermissionMiddleware {
   /**

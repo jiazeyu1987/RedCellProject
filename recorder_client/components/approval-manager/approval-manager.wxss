@@ -1,0 +1,618 @@
+/* 审批管理组件样式 */
+.approval-manager {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #f5f5f5;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 头部样式 */
+.approval-header {
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  padding: 20rpx 30rpx;
+}
+
+.header-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  border-radius: 50%;
+}
+
+.icon {
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 统计信息 */
+.statistics {
+  display: flex;
+  justify-content: space-around;
+  padding: 20rpx 0;
+}
+
+.stat-item {
+  text-align: center;
+  flex: 1;
+}
+
+.stat-number {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1890ff;
+}
+
+.stat-item.pending .stat-number {
+  color: #faad14;
+}
+
+.stat-item.urgent .stat-number {
+  color: #f5222d;
+}
+
+.stat-item.overdue .stat-number {
+  color: #8c8c8c;
+}
+
+.stat-label {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 8rpx;
+}
+
+/* 筛选栏 */
+.filter-bar {
+  background: #fff;
+  padding: 20rpx 30rpx;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.filter-tabs {
+  display: flex;
+  margin-bottom: 20rpx;
+}
+
+.tab-item {
+  padding: 12rpx 24rpx;
+  margin-right: 20rpx;
+  background: #f0f0f0;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  color: #666;
+  transition: all 0.3s;
+}
+
+.tab-item.active {
+  background: #1890ff;
+  color: #fff;
+}
+
+.sort-options {
+  display: flex;
+  align-items: center;
+}
+
+.sort-label {
+  font-size: 28rpx;
+  color: #666;
+  margin-right: 20rpx;
+}
+
+.sort-item {
+  padding: 8rpx 16rpx;
+  margin-right: 16rpx;
+  border: 1px solid #d9d9d9;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  color: #666;
+  transition: all 0.3s;
+}
+
+.sort-item.active {
+  border-color: #1890ff;
+  color: #1890ff;
+  background: #e6f7ff;
+}
+
+/* 任务列表 */
+.approval-list {
+  flex: 1;
+  overflow: hidden;
+}
+
+.task-list {
+  height: 100%;
+  padding: 20rpx 30rpx;
+}
+
+.task-item {
+  margin-bottom: 20rpx;
+}
+
+.task-content {
+  padding: 30rpx;
+}
+
+/* 任务头部 */
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.task-info {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.applicant-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.task-priority {
+  text-align: center;
+}
+
+.priority-score {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.priority-label {
+  display: block;
+  font-size: 20rpx;
+  margin-top: 4rpx;
+}
+
+/* 调整信息 */
+.adjust-info {
+  margin-bottom: 20rpx;
+}
+
+.time-change {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+  font-size: 28rpx;
+}
+
+.original-time {
+  color: #666;
+}
+
+.arrow {
+  margin: 0 16rpx;
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.new-time {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.reason {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* 进度信息 */
+.progress-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8rpx;
+  background: #f0f0f0;
+  border-radius: 4rpx;
+  overflow: hidden;
+  margin-right: 20rpx;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #1890ff;
+  transition: width 0.3s;
+}
+
+.progress-text {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 任务操作 */
+.task-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.created-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 16rpx;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 100rpx 0;
+}
+
+.empty-icon {
+  display: block;
+  font-size: 120rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 加载状态 */
+.loading-state {
+  text-align: center;
+  padding: 100rpx 0;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 详情模式样式 */
+.approval-detail {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20rpx 30rpx;
+}
+
+.detail-section {
+  margin-bottom: 30rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.detail-content {
+  padding: 30rpx;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 20rpx;
+  min-height: 48rpx;
+  align-items: center;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  width: 180rpx;
+  font-size: 28rpx;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.value {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.reason-text {
+  line-height: 1.4;
+}
+
+.impact-score {
+  font-weight: 600;
+}
+
+/* 工作流步骤 */
+.workflow-steps {
+  padding: 30rpx;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+  position: relative;
+}
+
+.step-item:last-child {
+  margin-bottom: 0;
+}
+
+.step-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 30rpx;
+  top: 60rpx;
+  width: 2rpx;
+  height: 50rpx;
+  background: #e8e8e8;
+}
+
+.step-item.completed::after {
+  background: #52c41a;
+}
+
+.step-item.current::after {
+  background: #1890ff;
+}
+
+.step-indicator {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  background: #e8e8e8;
+  color: #999;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.step-item.completed .step-indicator {
+  background: #52c41a;
+  color: #fff;
+}
+
+.step-item.current .step-indicator {
+  background: #1890ff;
+  color: #fff;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-name {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 600;
+}
+
+.step-role {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 4rpx;
+}
+
+/* 审批历史 */
+.history-list {
+  padding: 30rpx;
+}
+
+.history-item {
+  border-left: 4rpx solid #e8e8e8;
+  padding-left: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.history-item:last-child {
+  margin-bottom: 0;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.approver-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.history-comment {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.4;
+  margin-bottom: 10rpx;
+}
+
+.history-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 审批表单 */
+.approval-form {
+  padding: 30rpx;
+}
+
+.decision-options {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+}
+
+.option-item {
+  flex: 1;
+  text-align: center;
+  padding: 30rpx 20rpx;
+  border: 2rpx solid #e8e8e8;
+  border-radius: 12rpx;
+  transition: all 0.3s;
+}
+
+.option-item.selected {
+  border-color: #1890ff;
+  background: #e6f7ff;
+}
+
+.option-icon {
+  display: block;
+  font-size: 40rpx;
+  margin-bottom: 10rpx;
+  color: #666;
+}
+
+.option-item.selected .option-icon {
+  color: #1890ff;
+}
+
+.option-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.comment-section {
+  margin-bottom: 30rpx;
+}
+
+.comment-label {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.comment-input {
+  width: 100%;
+  min-height: 120rpx;
+  padding: 20rpx;
+  border: 1px solid #d9d9d9;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  line-height: 1.4;
+  background: #fff;
+}
+
+.submit-section {
+  text-align: center;
+}
+
+/* 刷新按钮 */
+.refresh-button {
+  position: fixed;
+  right: 30rpx;
+  bottom: 30rpx;
+  width: 100rpx;
+  height: 100rpx;
+  background: #1890ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.3);
+  z-index: 100;
+}
+
+.refresh-icon {
+  font-size: 36rpx;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* 响应式适配 */
+@media (max-width: 750rpx) {
+  .statistics {
+    flex-wrap: wrap;
+  }
+  
+  .stat-item {
+    width: 50%;
+    margin-bottom: 20rpx;
+  }
+  
+  .decision-options {
+    flex-direction: column;
+  }
+  
+  .option-item {
+    margin-bottom: 16rpx;
+  }
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .approval-manager {
+    background: #1a1a1a;
+  }
+  
+  .approval-header {
+    background: #2a2a2a;
+    border-bottom-color: #404040;
+  }
+  
+  .title {
+    color: #fff;
+  }
+  
+  .close-btn {
+    background: #404040;
+  }
+  
+  .icon {
+    color: #ccc;
+  }
+  
+  .filter-bar {
+    background: #2a2a2a;
+    border-bottom-color: #404040;
+  }
+  
+  .tab-item {
+    background: #404040;
+    color: #ccc;
+  }
+  
+  .tab-item.active {
+    background: #1890ff;
+    color: #fff;
+  }
+}"

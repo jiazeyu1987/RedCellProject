@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "navigation-bar": "../../components/navigation-bar/navigation-bar",
+    "schedule-card": "../../components/schedule-card/schedule-card",
+    "schedule-filter": "../../components/schedule-filter/schedule-filter",
+    "modal": "../../components/modal/modal",
+    "time-adjust-modal": "../../components/time-adjust-modal/time-adjust-modal",
+    "adjustment-history": "../../components/adjustment-history/adjustment-history",
+    "approval-manager": "../../components/approval-manager/approval-manager"
+  }
+}

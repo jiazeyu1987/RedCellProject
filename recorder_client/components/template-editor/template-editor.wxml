@@ -1,0 +1,342 @@
+<!--components/template-editor/template-editor.wxml-->
+<view class="template-editor">
+  <!-- 头部操作栏 -->
+  <view class="editor-header">
+    <view class="header-title">{{isEdit ? '编辑模板' : '创建模板'}}</view>
+    <view class="header-actions">
+      <button class="btn-secondary" bind:tap="onPreview" disabled="{{!canPreview}}">预览</button>
+      <button class="btn-primary" bind:tap="onSave" disabled="{{!canSave}}">保存</button>
+    </view>
+  </view>
+
+  <!-- 模板基本信息 -->
+  <view class="template-form">
+    <view class="form-section">
+      <view class="section-title">基本信息</view>
+      
+      <view class="form-item">
+        <view class="form-label required">模板名称</view>
+        <input class="form-input" 
+               value="{{templateData.name}}" 
+               placeholder="请输入模板名称"
+               bind:input="onInputChange"
+               data-field="name" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">模板描述</view>
+        <textarea class="form-textarea" 
+                  value="{{templateData.description}}" 
+                  placeholder="请输入模板描述"
+                  bind:input="onInputChange"
+                  data-field="description" />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label required">模板类型</view>
+        <picker class="form-picker" 
+                range="{{typeOptions}}" 
+                range-key="label"
+                value="{{templateData.typeIndex}}"
+                bind:change="onTypeChange">
+          <view class="picker-text">{{templateData.typeText || '请选择模板类型'}}</view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label required">消息格式</view>
+        <picker class="form-picker" 
+                range="{{formatOptions}}" 
+                range-key="label"
+                value="{{templateData.formatIndex}}"
+                bind:change="onFormatChange">
+          <view class="picker-text">{{templateData.formatText || '请选择消息格式'}}</view>
+        </picker>
+        <view class="form-hint" wx:if="{{currentFormatConfig.description}}">{{currentFormatConfig.description}}</view>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label required">通知渠道</view>
+        <view class="channel-selector">
+          <view class="channel-item" 
+                wx:for="{{channelOptions}}" 
+                wx:key="value"
+                class="{{templateData.channels.includes(item.value) ? 'selected' : ''}}"
+                bind:tap="onChannelToggle"
+                data-value="{{item.value}}">
+            <icon class="channel-icon" type="{{item.icon}}" />
+            <text class="channel-text">{{item.label}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 模板内容编辑 -->
+    <view class="form-section">
+      <view class="section-title">
+        模板内容
+        <view class="section-subtitle">支持变量：{{variableHint}}</view>
+      </view>
+
+      <!-- 标题编辑 -->
+      <view class="form-item" wx:if="{{showTitleEditor}}">
+        <view class="form-label">标题</view>
+        <input class="form-input" 
+               value="{{templateData.title}}" 
+               placeholder="请输入通知标题"
+               bind:input="onInputChange"
+               data-field="title" />
+      </view>
+
+      <!-- 内容编辑 -->
+      <view class="form-item">
+        <view class="form-label required">内容</view>
+        <textarea class="content-editor" 
+                  value="{{templateData.content}}" 
+                  placeholder="请输入通知内容，可使用变量如：{patientName}"
+                  bind:input="onInputChange"
+                  data-field="content" />
+        
+        <!-- 变量插入按钮 -->
+        <view class="variable-toolbar">
+          <view class="variable-item" 
+                wx:for="{{commonVariables}}" 
+                wx:key="key"
+                bind:tap="onInsertVariable"
+                data-variable="{{item.key}}">
+            <text class="variable-key">{{{item.key}}}</text>
+            <text class="variable-desc">{{item.label}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 链接设置 -->
+      <view class="form-item" wx:if="{{showLinkEditor}}">
+        <view class="form-label">跳转链接</view>
+        <input class="form-input" 
+               value="{{templateData.link}}" 
+               placeholder="请输入跳转链接"
+               bind:input="onInputChange"
+               data-field="link" />
+      </view>
+
+      <!-- 图片设置 (卡片和图文消息) -->
+      <view class="form-item" wx:if="{{showImageEditor}}">
+        <view class="form-label">图片</view>
+        <view class="image-uploader">
+          <view class="image-preview" wx:if="{{templateData.imageUrl}}">
+            <image class="preview-image" src="{{templateData.imageUrl}}" mode="aspectFit" />
+            <view class="image-actions">
+              <button class="btn-icon" bind:tap="onRemoveImage">删除</button>
+            </view>
+          </view>
+          <button class="btn-upload" wx:else bind:tap="onChooseImage">选择图片</button>
+        </view>
+      </view>
+
+      <!-- 卡片操作设置 (仅卡片消息) -->
+      <view class="form-item" wx:if="{{showCardActionsEditor}}">
+        <view class="form-label">卡片操作</view>
+        <view class="card-actions-editor">
+          <view class="action-item" wx:for="{{templateData.cardActions}}" wx:key="id">
+            <input class="action-text" 
+                   value="{{item.text}}" 
+                   placeholder="按钮文本"
+                   bind:input="onCardActionChange"
+                   data-index="{{index}}"
+                   data-field="text" />
+            <input class="action-url" 
+                   value="{{item.url}}" 
+                   placeholder="跳转链接"
+                   bind:input="onCardActionChange"
+                   data-index="{{index}}"
+                   data-field="url" />
+            <button class="btn-remove" bind:tap="onRemoveCardAction" data-index="{{index}}">删除</button>
+          </view>
+          <button class="btn-add" bind:tap="onAddCardAction">添加操作</button>
+        </view>
+      </view>
+
+      <!-- 富文本样式设置 (仅富文本消息) -->
+      <view class="form-item" wx:if="{{showRichTextEditor}}">
+        <view class="form-label">样式设置</view>
+        <view class="rich-text-styles">
+          <view class="style-item">
+            <view class="style-label">字体大小</view>
+            <input class="style-input" 
+                   type="number" 
+                   value="{{templateData.styles.fontSize || 14}}" 
+                   placeholder="14"
+                   bind:input="onRichTextStyleChange"
+                   data-field="fontSize" />
+            <text class="style-unit">px</text>
+          </view>
+          <view class="style-item">
+            <view class="style-label">字体颜色</view>
+            <input class="style-input" 
+                   value="{{templateData.styles.color || '#333333'}}" 
+                   placeholder="#333333"
+                   bind:input="onRichTextStyleChange"
+                   data-field="color" />
+          </view>
+        </view>
+      </view>
+
+      <!-- 自定义数据设置 (仅自定义消息) -->
+      <view class="form-item" wx:if="{{showCustomDataEditor}}">
+        <view class="form-label">自定义数据</view>
+        <textarea class="form-textarea" 
+                  value="{{templateData.customData.config}}" 
+                  placeholder="请输入自定义配置 JSON"
+                  bind:input="onCustomDataChange"
+                  data-field="config" />
+      </view>
+    </view>
+
+    <!-- 高级设置 -->
+    <view class="form-section">
+      <view class="section-title">高级设置</view>
+      
+      <view class="form-item">
+        <view class="form-label">优先级</view>
+        <picker class="form-picker" 
+                range="{{priorityOptions}}" 
+                range-key="label"
+                value="{{templateData.priorityIndex}}"
+                bind:change="onPriorityChange">
+          <view class="picker-text">{{templateData.priorityText || '普通'}}</view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">发送时机</view>
+        <picker class="form-picker" 
+                range="{{timingOptions}}" 
+                range-key="label"
+                value="{{templateData.timingIndex}}"
+                bind:change="onTimingChange">
+          <view class="picker-text">{{templateData.timingText || '立即发送'}}</view>
+        </picker>
+      </view>
+
+      <view class="form-item" wx:if="{{showDelaySettings}}">
+        <view class="form-label">延迟时间</view>
+        <view class="delay-input">
+          <input class="form-input delay-value" 
+                 type="number" 
+                 value="{{templateData.delayValue}}"
+                 bind:input="onInputChange"
+                 data-field="delayValue" />
+          <picker class="delay-unit" 
+                  range="{{delayUnits}}" 
+                  range-key="label"
+                  value="{{templateData.delayUnitIndex}}"
+                  bind:change="onDelayUnitChange">
+            <view class="picker-text">{{templateData.delayUnitText || '分钟'}}</view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <view class="form-switch">
+          <switch checked="{{templateData.enabled}}" 
+                  bind:change="onSwitchChange" 
+                  data-field="enabled" />
+          <text class="switch-label">启用模板</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预览弹窗 -->
+  <modal show="{{showPreview}}" 
+         title="模板预览" 
+         bind:confirm="onPreviewConfirm"
+         bind:cancel="onPreviewCancel">
+    <view class="preview-content">
+      <!-- 纯文本预览 -->
+      <block wx:if="{{previewData.renderType === 'text'}}">
+        <view class="preview-title" wx:if="{{previewData.title}}">{{previewData.title}}</view>
+        <view class="preview-text">{{previewData.content}}</view>
+      </block>
+      
+      <!-- 卡片消息预览 -->
+      <block wx:elif="{{previewData.renderType === 'card'}}">
+        <view class="preview-card">
+          <image class="card-image" wx:if="{{previewData.imageUrl}}" src="{{previewData.imageUrl}}" mode="aspectFit" />
+          <view class="card-content">
+            <view class="card-title">{{previewData.title}}</view>
+            <view class="card-text">{{previewData.content}}</view>
+            <view class="card-actions" wx:if="{{previewData.actions.length > 0}}">
+              <view class="card-action" wx:for="{{previewData.actions}}" wx:key="id">
+                {{item.text}}
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+      
+      <!-- 图文消息预览 -->
+      <block wx:elif="{{previewData.renderType === 'image_text'}}">
+        <view class="preview-image-text">
+          <image class="image-text-image" wx:if="{{previewData.imageUrl}}" src="{{previewData.imageUrl}}" mode="aspectFit" />
+          <view class="image-text-content">
+            <view class="image-text-title">{{previewData.title}}</view>
+            <view class="image-text-text">{{previewData.content}}</view>
+          </view>
+        </view>
+      </block>
+      
+      <!-- 富文本消息预览 -->
+      <block wx:elif="{{previewData.renderType === 'rich_text'}}">
+        <view class="preview-rich-text">
+          <view class="rich-text-title">{{previewData.title}}</view>
+          <rich-text class="rich-text-content" nodes="{{previewData.processedContent}}"></rich-text>
+        </view>
+      </block>
+      
+      <!-- 自定义消息预览 -->
+      <block wx:elif="{{previewData.renderType === 'custom'}}">
+        <view class="preview-custom">
+          <view class="custom-title">{{previewData.title}}</view>
+          <view class="custom-content">{{previewData.content}}</view>
+          <view class="custom-data" wx:if="{{previewData.customData}}">
+            <text class="custom-label">自定义数据：</text>
+            <text class="custom-value">{{previewData.customData.config || 'JSON 配置'}}</text>
+          </view>
+        </view>
+      </block>
+      
+      <!-- 默认预览 -->
+      <block wx:else>
+        <view class="preview-title" wx:if="{{previewData.title}}">{{previewData.title}}</view>
+        <view class="preview-text">{{previewData.content}}</view>
+      </block>
+      
+      <view class="preview-link" wx:if="{{previewData.linkUrl}}">
+        跳转链接：{{previewData.linkUrl}}
+      </view>
+      <view class="preview-meta">
+        <text class="meta-item">类型：{{previewData.type}}</text>
+        <text class="meta-item">格式：{{previewData.format}}</text>
+        <text class="meta-item">渠道：{{previewData.channels}}</text>
+        <text class="meta-item">优先级：{{previewData.priority}}</text>
+      </view>
+    </view>
+  </modal>
+
+  <!-- 变量帮助弹窗 -->
+  <modal show="{{showVariableHelp}}" 
+         title="可用变量" 
+         bind:cancel="onVariableHelpCancel">
+    <view class="variable-help">
+      <view class="help-section" wx:for="{{variableCategories}}" wx:key="name">
+        <view class="help-title">{{item.name}}</view>
+        <view class="help-item" wx:for="{{item.variables}}" wx:key="key" wx:for-item="variable">
+          <text class="help-key">{{{variable.key}}}</text>
+          <text class="help-desc">{{variable.label}}</text>
+        </view>
+      </view>
+    </view>
+  </modal>
+</view>

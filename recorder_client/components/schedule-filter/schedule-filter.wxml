@@ -1,0 +1,200 @@
+<view wx:if="{{visible}}" class="schedule-filter {{customClass}}">
+  <!-- 遮罩层 -->
+  <view class="filter-mask" bindtap="hide"></view>
+  
+  <!-- 筛选器主体 -->
+  <view class="filter-container">
+    <!-- 头部 -->
+    <view class="filter-header">
+      <view class="header-title">筛选条件</view>
+      <view class="header-actions">
+        <text class="reset-btn" bindtap="resetFilters">重置</text>
+        <text class="close-btn" bindtap="hide">✕</text>
+      </view>
+    </view>
+
+    <!-- 快速筛选 -->
+    <view class="quick-filters">
+      <view class="section-title">快速筛选</view>
+      <view class="quick-filter-list">
+        <view class="quick-filter-item" data-type="today_pending" bindtap="quickFilter">
+          <text class="quick-icon">📍</text>
+          <text class="quick-text">今日待服务</text>
+        </view>
+        <view class="quick-filter-item" data-type="urgent_all" bindtap="quickFilter">
+          <text class="quick-icon">🔥</text>
+          <text class="quick-text">紧急服务</text>
+        </view>
+        <view class="quick-filter-item" data-type="overdue" bindtap="quickFilter">
+          <text class="quick-icon">⚠️</text>
+          <text class="quick-text">已过期</text>
+        </view>
+        <view class="quick-filter-item" data-type="emergency" bindtap="quickFilter">
+          <text class="quick-icon">🚨</text>
+          <text class="quick-text">紧急类型</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 搜索栏 -->
+    <view class="search-section">
+      <view class="section-title">搜索</view>
+      <view class="search-input-container">
+        <input 
+          class="search-input"
+          placeholder="搜索患者姓名、地址、备注..."
+          value="{{searchKeyword}}"
+          bindinput="onSearchInput"
+          bindconfirm="onSearchConfirm"
+        />
+        <view wx:if="{{searchKeyword}}" class="clear-search" bindtap="clearSearch">✕</view>
+      </view>
+    </view>
+
+    <!-- 筛选选项 -->
+    <view class="filter-sections">
+      
+      <!-- 时间筛选 -->
+      <view class="filter-section">
+        <view class="filter-tab {{activePanel === 'time' ? 'active' : ''}}" 
+              data-panel="time" bindtap="togglePanel">
+          <text class="tab-icon">📅</text>
+          <text class="tab-text">时间</text>
+          <text class="tab-value">{{activeFilters.time === 'all' ? '全部' : activeFilters.time}}</text>
+          <text class="tab-arrow">{{activePanel === 'time' ? '▼' : '▶'}}</text>
+        </view>
+        
+        <view wx:if="{{activePanel === 'time'}}" class="filter-options">
+          <view wx:for="{{filterOptions.timeFilters}}" wx:key="key"
+                class="filter-option {{activeFilters.time === item.key ? 'selected' : ''}}"
+                data-type="time" data-value="{{item.key}}"
+                bindtap="selectFilter">
+            <text class="option-icon">{{item.icon}}</text>
+            <text class="option-text">{{item.label}}</text>
+            <text wx:if="{{activeFilters.time === item.key}}" class="option-check">✓</text>
+          </view>
+          
+          <!-- 自定义日期范围 -->
+          <view class="custom-date-range">
+            <view class="date-range-title">自定义日期范围</view>
+            <view class="date-range-inputs">
+              <picker mode="date" 
+                      value="{{customDateRange.startDate}}"
+                      data-type="startDate"
+                      bindchange="onCustomDateChange">
+                <view class="date-input">
+                  {{customDateRange.startDate || '开始日期'}}
+                </view>
+              </picker>
+              <text class="date-separator">至</text>
+              <picker mode="date" 
+                      value="{{customDateRange.endDate}}"
+                      data-type="endDate"
+                      bindchange="onCustomDateChange">
+                <view class="date-input">
+                  {{customDateRange.endDate || '结束日期'}}
+                </view>
+              </picker>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 状态筛选 -->
+      <view class="filter-section">
+        <view class="filter-tab {{activePanel === 'status' ? 'active' : ''}}" 
+              data-panel="status" bindtap="togglePanel">
+          <text class="tab-icon">🔄</text>
+          <text class="tab-text">状态</text>
+          <text class="tab-value">{{activeFilters.status === 'all' ? '全部' : activeFilters.status}}</text>
+          <text class="tab-arrow">{{activePanel === 'status' ? '▼' : '▶'}}</text>
+        </view>
+        
+        <view wx:if="{{activePanel === 'status'}}" class="filter-options">
+          <view wx:for="{{filterOptions.statusFilters}}" wx:key="key"
+                class="filter-option {{activeFilters.status === item.key ? 'selected' : ''}}"
+                data-type="status" data-value="{{item.key}}"
+                bindtap="selectFilter">
+            <text class="option-icon">{{item.icon}}</text>
+            <text class="option-text">{{item.label}}</text>
+            <text wx:if="{{activeFilters.status === item.key}}" class="option-check">✓</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 类型筛选 -->
+      <view class="filter-section">
+        <view class="filter-tab {{activePanel === 'type' ? 'active' : ''}}" 
+              data-panel="type" bindtap="togglePanel">
+          <text class="tab-icon">📋</text>
+          <text class="tab-text">类型</text>
+          <text class="tab-value">{{activeFilters.type === 'all' ? '全部' : activeFilters.type}}</text>
+          <text class="tab-arrow">{{activePanel === 'type' ? '▼' : '▶'}}</text>
+        </view>
+        
+        <view wx:if="{{activePanel === 'type'}}" class="filter-options">
+          <view wx:for="{{filterOptions.typeFilters}}" wx:key="key"
+                class="filter-option {{activeFilters.type === item.key ? 'selected' : ''}}"
+                data-type="type" data-value="{{item.key}}"
+                bindtap="selectFilter">
+            <text class="option-icon">{{item.icon}}</text>
+            <text class="option-text">{{item.label}}</text>
+            <text wx:if="{{activeFilters.type === item.key}}" class="option-check">✓</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 优先级筛选 -->
+      <view class="filter-section">
+        <view class="filter-tab {{activePanel === 'priority' ? 'active' : ''}}" 
+              data-panel="priority" bindtap="togglePanel">
+          <text class="tab-icon">⚖️</text>
+          <text class="tab-text">优先级</text>
+          <text class="tab-value">{{activeFilters.priority === 'all' ? '全部' : activeFilters.priority}}</text>
+          <text class="tab-arrow">{{activePanel === 'priority' ? '▼' : '▶'}}</text>
+        </view>
+        
+        <view wx:if="{{activePanel === 'priority'}}" class="filter-options">
+          <view wx:for="{{filterOptions.priorityFilters}}" wx:key="key"
+                class="filter-option {{activeFilters.priority === item.key ? 'selected' : ''}}"
+                data-type="priority" data-value="{{item.key}}"
+                bindtap="selectFilter">
+            <text class="option-icon">{{item.icon}}</text>
+            <text class="option-text">{{item.label}}</text>
+            <text wx:if="{{activeFilters.priority === item.key}}" class="option-check">✓</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 排序选项 -->
+      <view class="filter-section">
+        <view class="filter-tab {{activePanel === 'sort' ? 'active' : ''}}" 
+              data-panel="sort" bindtap="togglePanel">
+          <text class="tab-icon">🔀</text>
+          <text class="tab-text">排序</text>
+          <text class="tab-value">{{activeFilters.sort}}</text>
+          <text class="tab-arrow">{{activePanel === 'sort' ? '▼' : '▶'}}</text>
+        </view>
+        
+        <view wx:if="{{activePanel === 'sort'}}" class="filter-options">
+          <view wx:for="{{filterOptions.sortOptions}}" wx:key="key"
+                class="filter-option {{activeFilters.sort === item.key ? 'selected' : ''}}"
+                data-type="sort" data-value="{{item.key}}"
+                bindtap="selectFilter">
+            <text class="option-icon">{{item.icon}}</text>
+            <text class="option-text">{{item.label}}</text>
+            <text wx:if="{{activeFilters.sort === item.key}}" class="option-check">✓</text>
+          </view>
+        </view>
+      </view>
+
+    </view>
+
+    <!-- 应用按钮 -->
+    <view class="filter-footer">
+      <view class="apply-btn" bindtap="applyFilters">
+        应用筛选条件
+      </view>
+    </view>
+  </view>
+</view>

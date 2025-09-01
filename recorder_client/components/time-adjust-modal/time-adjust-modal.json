@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "modal": "../modal/modal",
+    "form-item": "../form-item/form-item"
+  }
+}

@@ -1,0 +1,333 @@
+<view class="schedule-page">
+  <!-- 导航栏 -->
+  <navigation-bar 
+    title="日程管理"
+    show-back="{{false}}"
+    background="#fff">
+    <view slot="right" class="nav-actions">
+      <!-- 审批管理按钮 -->
+      <view wx:if="{{approvalManagement.hasApprovalPermission}}" 
+            class="nav-btn approval-btn" 
+            bindtap="openApprovalManager">
+        <text class="nav-icon">📋</text>
+        <view wx:if="{{approvalManagement.pendingCount > 0}}" class="approval-badge">{{approvalManagement.pendingCount}}</view>
+      </view>
+      
+      <!-- 筛选按钮 -->
+      <view class="nav-btn" bindtap="showFilter">
+        <text class="nav-icon">🔍</text>
+        <text wx:if="{{currentFilters.keyword || currentFilters.status !== 'all'}}" class="filter-dot"></text>
+      </view>
+    </view>
+  </navigation-bar>
+
+  <!-- 页面内容 -->
+  <view class="page-content">
+    
+    <!-- 统计概览 -->
+    <view class="statistics-section">
+      <!-- 主要统计 -->
+      <view class="stats-main-grid">
+        <view class="stat-item main-stat" bindtap="onStatItemTap" data-type="total">
+          <view class="stat-content">
+            <text class="stat-number animated">{{statistics.total}}</text>
+            <view class="stat-info">
+              <text class="stat-label">总日程</text>
+              <view wx:if="{{statistics.trend.percentage > 0}}" class="stat-trend {{statistics.trend.direction}}">
+                <text class="trend-icon">{{statistics.trend.direction === 'up' ? '↑' : statistics.trend.direction === 'down' ? '↓' : '→'}}</text>
+                <text class="trend-text">{{statistics.trend.percentage}}%</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <view class="stat-item" bindtap="onStatItemTap" data-type="today">
+          <text class="stat-number today-number animated">{{statistics.today}}</text>
+          <text class="stat-label">今日</text>
+          <view wx:if="{{statistics.today > 0}}" class="stat-badge today-badge">有安排</view>
+        </view>
+        
+        <view class="stat-item" bindtap="onStatItemTap" data-type="pending">
+          <text class="stat-number pending-number animated">{{statistics.pending}}</text>
+          <text class="stat-label">待服务</text>
+          <view wx:if="{{statistics.pending > 0}}" class="stat-badge pending-badge">急需处理</view>
+        </view>
+        
+        <view class="stat-item" bindtap="onStatItemTap" data-type="overdue">
+          <text class="stat-number overdue-number animated">{{statistics.overdue}}</text>
+          <text class="stat-label">已过期</text>
+          <view wx:if="{{statistics.overdue > 0}}" class="stat-badge overdue-badge">需关注</view>
+        </view>
+      </view>
+      
+      <!-- 详细统计 -->
+      <view class="stats-detail-section">
+        <view class="stats-detail-grid">
+          <view class="detail-stat-item">
+            <text class="detail-stat-number">{{statistics.completionRate}}%</text>
+            <text class="detail-stat-label">完成率</text>
+            <view class="progress-bar">
+              <view class="progress-fill" style="width: {{statistics.completionRate}}%"></view>
+            </view>
+          </view>
+          
+          <view class="detail-stat-item">
+            <text class="detail-stat-number">{{statistics.avgDuration}}</text>
+            <text class="detail-stat-label">平均时长(分)</text>
+          </view>
+          
+          <view class="detail-stat-item">
+            <text class="detail-stat-number">{{statistics.thisWeek}}</text>
+            <text class="detail-stat-label">本周总数</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 快捷筛选 -->
+    <view class="quick-filters-section">
+      <scroll-view class="quick-filters-scroll" scroll-x="{{true}}" show-scrollbar="{{false}}">
+        <view class="quick-filters-list">
+          <view wx:for="{{quickFilters}}" wx:key="key"
+                class="quick-filter-item {{
+                  (item.key === 'today' && currentFilters.time === 'today') ||
+                  (item.key === 'pending' && currentFilters.status === 'pending') ||
+                  (item.key === 'urgent' && currentFilters.priority === 'urgent') ||
+                  (item.key === 'overdue' && currentFilters.time === 'overdue')
+                  ? 'active' : ''
+                }}"
+                data-key="{{item.key}}"
+                bindtap="onQuickFilter">
+            <text class="filter-icon">{{item.icon}}</text>
+            <text class="filter-label">{{item.label}}</text>
+            <view wx:if="{{item.count > 0}}" 
+                  class="filter-count {{item.countChanged ? 'animate-in' : ''}}">{{item.count}}</view>
+          </view>
+          
+          <!-- 清除筛选按钮 -->
+          <view wx:if="{{currentFilters.time !== 'all' || currentFilters.status !== 'all' || currentFilters.priority !== 'all' || currentFilters.keyword}}"
+                class="quick-filter-item clear-filter"
+                bindtap="clearFilters">
+            <text class="filter-icon">❌</text>
+            <text class="filter-label">清除</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 日程列表 -->
+    <view class="schedule-list-section">
+      <!-- 列表头部操作 -->
+      <view class="list-header">
+        <view class="list-info">
+          <text class="list-count">共 {{filteredScheduleList.length}} 条日程</text>
+          <text wx:if="{{currentFilters.sort !== 'time_asc'}}" class="sort-info">
+            按{{currentFilters.sort === 'time_desc' ? '时间降序' : currentFilters.sort === 'priority_desc' ? '优先级' : '状态'}}排序
+          </text>
+        </view>
+        
+        <view class="list-actions">
+          <view class="action-btn" bindtap="toggleBatchMode">
+            <text class="action-icon">{{batchMode ? '✓' : '☑️'}}</text>
+            <text class="action-text">{{batchMode ? '完成' : '批量'}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 批量选择操作栏 -->
+      <view wx:if="{{batchMode}}" class="batch-selection-bar">
+        <view class="selection-info">
+          <text class="selected-count">已选择 {{selectedSchedules.length}} / {{filteredScheduleList.length}}</text>
+        </view>
+        <view class="selection-actions">
+          <view class="selection-btn" bindtap="selectAll">
+            <text class="selection-icon">✅</text>
+            <text class="selection-text">全选</text>
+          </view>
+          <view class="selection-btn" bindtap="selectInverse">
+            <text class="selection-icon">🔄</text>
+            <text class="selection-text">反选</text>
+          </view>
+          <view class="selection-btn" bindtap="clearSelection">
+            <text class="selection-icon">❌</text>
+            <text class="selection-text">清空</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 日程卡片列表 -->
+      <view class="schedule-cards">
+        <!-- 骨架屏加载 -->
+        <view wx:if="{{loading && !refreshing}}" class="skeleton-container">
+          <view wx:for="{{[1,2,3,4,5]}}" wx:key="*this" class="skeleton-card">
+            <view class="skeleton-header">
+              <view class="skeleton-avatar"></view>
+              <view class="skeleton-info">
+                <view class="skeleton-line skeleton-title"></view>
+                <view class="skeleton-line skeleton-subtitle"></view>
+              </view>
+              <view class="skeleton-status"></view>
+            </view>
+            <view class="skeleton-content">
+              <view class="skeleton-line skeleton-text"></view>
+              <view class="skeleton-line skeleton-text short"></view>
+            </view>
+            <view class="skeleton-footer">
+              <view class="skeleton-tag"></view>
+              <view class="skeleton-tag"></view>
+              <view class="skeleton-actions">
+                <view class="skeleton-btn"></view>
+                <view class="skeleton-btn"></view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <block wx:elif="{{filteredScheduleList.length > 0}}">
+          <schedule-card 
+            wx:for="{{filteredScheduleList}}" 
+            wx:key="id"
+            schedule="{{item}}"
+            selectable="{{batchMode}}"
+            selected="{{selectedSchedules.indexOf(item.id) > -1}}"
+            show-actions="{{!batchMode}}"
+            card-type="default"
+            bind:tap="onScheduleCardTap"
+            bind:longpress="onScheduleCardLongPress"
+            bind:action="onScheduleCardAction"
+            bind:select="onScheduleSelect">
+          </schedule-card>
+        </block>
+
+        <!-- 空状态 -->
+        <view wx:elif="{{!loading}}" class="empty-state">
+          <text class="empty-icon">📅</text>
+          <text class="empty-title">暂无日程安排</text>
+          <text class="empty-subtitle">
+            {{currentFilters.time !== 'all' || currentFilters.status !== 'all' ? '当前筛选条件下没有找到日程' : '您还没有任何日程安排'}}
+          </text>
+          <view wx:if="{{currentFilters.time !== 'all' || currentFilters.status !== 'all'}}" 
+                class="empty-action"
+                bindtap="clearFilters">
+            <text class="empty-action-text">清除筛选条件</text>
+          </view>
+        </view>
+        
+        <!-- 错误状态 -->
+        <view wx:if="{{errorState.hasError}}" class="error-state">
+          <text class="error-icon">⚠️</text>
+          <text class="error-title">加载失败</text>
+          <text class="error-message">{{errorState.errorMessage}}</text>
+          <view class="error-actions">
+            <view wx:if="{{errorState.canRetry && errorState.retryCount < errorState.maxRetry}}" 
+                  class="error-btn retry-btn"
+                  bindtap="retryLastOperation">
+              <text class="error-btn-text">重试</text>
+            </view>
+            <view class="error-btn close-btn" bindtap="clearError">
+              <text class="error-btn-text">关闭</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 加载更多 -->
+        <view wx:if="{{loadingMore}}" class="loading-more">
+          <view class="loading-spinner small"></view>
+          <text class="loading-text">加载更多...</text>
+        </view>
+
+        <!-- 无更多数据 -->
+        <view wx:elif="{{!hasMore && filteredScheduleList.length > 0}}" class="no-more">
+          <text class="no-more-text">没有更多日程了</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 批量操作面板 -->
+    <view wx:if="{{batchMode && selectedSchedules.length > 0}}" class="batch-actions-panel">
+      <view class="batch-info">
+        <text class="batch-count">已选择 {{selectedSchedules.length}} 项</text>
+      </view>
+      <view class="batch-actions">
+        <view class="batch-btn" data-action="reschedule" bindtap="onBatchAction">
+          <text class="batch-icon">📅</text>
+          <text class="batch-text">批量调整</text>
+        </view>
+        <view class="batch-btn" data-action="cancel" bindtap="onBatchAction">
+          <text class="batch-icon">❌</text>
+          <text class="batch-text">批量取消</text>
+        </view>
+        <view class="batch-btn" data-action="confirm" bindtap="onBatchAction">
+          <text class="batch-icon">✅</text>
+          <text class="batch-text">批量确认</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 筛选器组件 -->
+  <schedule-filter 
+    visible="{{showFilter}}"
+    filters="{{currentFilters}}"
+    bind:filter="onFilterChange">
+  </schedule-filter>
+
+  <!-- 操作弹窗 -->
+  <modal
+    visible="{{showActionModal}}"
+    title="选择操作"
+    bind:close="onActionModalClose">
+    <view slot="content" class="action-modal-content">
+      <view wx:for="{{actionModalActions}}" wx:key="key"
+            class="action-modal-item"
+            data-action="{{item.key}}"
+            bindtap="onScheduleAction">
+        <text class="action-modal-icon">{{item.icon}}</text>
+        <text class="action-modal-text">{{item.label}}</text>
+      </view>
+    </view>
+  </modal>
+
+  <!-- 浮动操作按钮 -->
+  <view class="fab-container">
+    <view class="fab-btn" bindtap="addSchedule">
+      <text class="fab-icon">+</text>
+    </view>
+  </view>
+  
+  <!-- 时间调整弹窗 -->
+  <time-adjust-modal
+    visible="{{timeAdjustment.modalVisible}}"
+    appointmentInfo="{{timeAdjustment.currentAppointment}}"
+    isBatch="{{timeAdjustment.isBatch}}"
+    batchAppointments="{{timeAdjustment.batchAppointments}}"
+    availableSlots="{{timeAdjustment.availableSlots}}"
+    bind:success="onTimeAdjustSuccess"
+    bind:cancel="onTimeAdjustCancel"
+    bind:close="hideTimeAdjustModal">
+  </time-adjust-modal>
+  
+  <!-- 调整历史弹窗 -->
+  <modal
+    visible="{{timeAdjustment.adjustmentHistory.modalVisible}}"
+    title="调整历史"
+    type="fullscreen"
+    bind:close="onCloseAdjustmentHistory">
+    <adjustment-history
+      appointmentId="{{timeAdjustment.adjustmentHistory.appointmentId}}"
+      recorderId="{{timeAdjustment.adjustmentHistory.recorderId}}"
+      bind:reapply="onReapplyAdjustment">
+    </adjustment-history>
+  </modal>
+  
+  <!-- 审批管理组件 -->
+  <approval-manager
+    show="{{approvalManagement.modalVisible}}"
+    mode="{{approvalManagement.mode}}"
+    request-id="{{approvalManagement.currentRequestId}}"
+    user-role="{{approvalManagement.userRole}}"
+    bind:view-detail="viewApprovalDetail"
+    bind:approval-complete="onApprovalComplete"
+    bind:close="closeApprovalManager">
+  </approval-manager>
+</view>

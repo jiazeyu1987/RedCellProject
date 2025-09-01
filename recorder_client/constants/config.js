@@ -39,13 +39,16 @@ const CONFIG = {
     USER_INFO: 'userInfo',
     TOKEN: 'token',
     ROLE: 'userRole',
-    SETTINGS: 'appSettings'
+    SETTINGS: 'appSettings',
+    USER_ADJUSTMENTS: 'userAdjustments'
   },
   
   // 用户角色
   USER_ROLES: {
-    RECORDER: 'recorder',  // 记录员
-    ADMIN: 'admin'         // 管理员
+    RECORDER: 'recorder',        // 普通记录员
+    SENIOR_RECORDER: 'senior_recorder', // 高级记录员
+    SUPERVISOR: 'supervisor',    // 主管
+    ADMIN: 'admin'              // 管理员
   },
   
   // 服务状态

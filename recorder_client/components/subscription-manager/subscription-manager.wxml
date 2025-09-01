@@ -1,0 +1,108 @@
+<!--components/subscription-manager/subscription-manager.wxml-->
+<modal
+  visible="{{visible}}"
+  title="消息订阅管理"
+  show-close-button="{{true}}"
+  bind:close="close"
+  custom-class="subscription-manager-modal"
+>
+  <view class="subscription-manager">
+    <!-- 订阅统计 -->
+    <view class="stats-section">
+      <view class="stats-item">
+        <view class="stats-number">{{subscriptions.length}}</view>
+        <view class="stats-label">总消息类型</view>
+      </view>
+      <view class="stats-item">
+        <view class="stats-number subscribed">
+          {{subscriptions.filter(sub => sub.subscribed).length}}
+        </view>
+        <view class="stats-label">已订阅</view>
+      </view>
+      <view class="stats-item">
+        <view class="stats-number required">
+          {{subscriptions.filter(sub => sub.required).length}}
+        </view>
+        <view class="stats-label">重要消息</view>
+      </view>
+    </view>
+
+    <!-- 快捷操作 -->
+    <view class="actions-section">
+      <button 
+        class="batch-subscribe-btn"
+        bind:tap="batchSubscribe"
+        loading="{{loading}}"
+        type="primary"
+        size="default"
+      >
+        一键订阅全部
+      </button>
+      <button 
+        class="refresh-btn"
+        bind:tap="refresh"
+        type="default"
+        size="default"
+      >
+        刷新状态
+      </button>
+    </view>
+
+    <!-- 订阅列表 -->
+    <view class="subscription-list">
+      <view 
+        class="subscription-item {{item.subscribed ? 'subscribed' : 'unsubscribed'}}"
+        wx:for="{{subscriptions}}"
+        wx:key="type"
+      >
+        <view class="subscription-info" bind:tap="showSubscriptionDetail" data-subscription="{{item}}">
+          <view class="subscription-header">
+            <view class="subscription-name">
+              {{item.name}}
+              <text class="required-tag" wx:if="{{item.required}}">必需</text>
+            </view>
+            <view class="subscription-status {{item.subscribed ? 'active' : 'inactive'}}">
+              {{item.subscribed ? '已订阅' : '未订阅'}}
+            </view>
+          </view>
+          <view class="subscription-description">{{item.description}}</view>
+          <view class="subscription-meta" wx:if="{{item.subscribed && item.subscribedAt}}">
+            <text class="subscribe-time">
+              订阅时间：{{new Date(item.subscribedAt).toLocaleDateString()}}
+            </text>
+          </view>
+        </view>
+        
+        <view class="subscription-action">
+          <button
+            class="toggle-btn {{item.subscribed ? 'unsubscribe' : 'subscribe'}}"
+            bind:tap="toggleSubscription"
+            data-subscription="{{item}}"
+            loading="{{loading}}"
+            size="mini"
+            type="{{item.subscribed ? 'warn' : 'primary'}}"
+          >
+            {{item.subscribed ? '取消' : '订阅'}}
+          </button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{subscriptions.length === 0}}">
+      <view class="empty-icon">📝</view>
+      <view class="empty-text">暂无可订阅的消息类型</view>
+    </view>
+
+    <!-- 说明信息 -->
+    <view class="notice-section">
+      <view class="notice-title">📢 订阅说明</view>
+      <view class="notice-content">
+        <view class="notice-item">• 订阅后可及时接收重要服务通知</view>
+        <view class="notice-item">• 标记为"必需"的消息建议订阅</view>
+        <view class="notice-item">• 可随时取消不需要的订阅</view>
+        <view class="notice-item">• 订阅有效期为一年，到期需重新订阅</view>
+      </view>
+    </view>
+  </view>
+</modal>

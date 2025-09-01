@@ -1,0 +1,120 @@
+<view class="schedule-card {{customClass}} {{cardType}} {{selected ? 'selected' : ''}} {{processedSchedule.timeStatus}}"
+      bindtap="onCardTap">
+  
+  <!-- 选择状态指示器 -->
+  <view wx:if="{{selectable}}" class="select-indicator {{selected ? 'selected' : ''}}">
+    <text class="select-icon">{{selected ? '✓' : ''}}</text>
+  </view>
+
+  <!-- 卡片头部 -->
+  <view class="card-header">
+    <!-- 左侧时间信息 -->
+    <view class="time-info">
+      <view class="date">{{processedSchedule.timeDisplay.date}}</view>
+      <view class="time">{{processedSchedule.timeDisplay.time}}</view>
+      <view wx:if="{{processedSchedule.isToday}}" class="today-badge">今日</view>
+    </view>
+    
+    <!-- 右侧状态和优先级 -->
+    <view class="status-info">
+      <status-tag 
+        status="{{schedule.status}}"
+        type="{{schedule.type}}"
+        size="small"
+        custom-class="schedule-status-tag">
+      </status-tag>
+      
+      <view wx:if="{{schedule.priority !== 'normal'}}" class="priority-tag">
+        <text class="priority-icon">{{processedSchedule.priorityIcon}}</text>
+        <text class="priority-text">{{processedSchedule.priorityText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 卡片主体 -->
+  <view class="card-body">
+    <!-- 患者信息 -->
+    <view class="patient-info">
+      <view class="patient-name">
+        <text class="name">{{schedule.patient.name}}</text>
+        <text wx:if="{{schedule.patient.age}}" class="age">{{schedule.patient.age}}岁</text>
+        <text wx:if="{{schedule.patient.gender}}" class="gender">{{schedule.patient.gender === 'male' ? '男' : '女'}}</text>
+      </view>
+      
+      <view wx:if="{{schedule.patient.phone}}" class="patient-contact">
+        <text class="phone">{{schedule.patient.phone}}</text>
+      </view>
+    </view>
+
+    <!-- 服务信息 -->
+    <view class="service-info">
+      <view class="service-type">
+        <text class="type-text">{{processedSchedule.typeText}}</text>
+        <text wx:if="{{schedule.serviceItems && schedule.serviceItems.length > 0}}" class="service-count">
+          ({{schedule.serviceItems.length}}项服务)
+        </text>
+      </view>
+      
+      <view wx:if="{{schedule.description}}" class="service-description">
+        {{schedule.description}}
+      </view>
+    </view>
+
+    <!-- 地址信息 -->
+    <view wx:if="{{schedule.address}}" class="address-info">
+      <text class="address-icon">📍</text>
+      <text class="address-text">{{schedule.address.detail || schedule.address.name}}</text>
+    </view>
+
+    <!-- 特殊提醒 -->
+    <view wx:if="{{schedule.notes || processedSchedule.isOverdue}}" class="special-notes">
+      <view wx:if="{{processedSchedule.isOverdue}}" class="overdue-notice">
+        ⚠️ 已过期
+      </view>
+      <view wx:if="{{schedule.notes}}" class="notes">
+        💡 {{schedule.notes}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 卡片底部操作区 -->
+  <view wx:if="{{showActions && !selectable}}" class="card-actions">
+    <!-- 快捷操作按钮 -->
+    <view class="quick-actions">
+      <!-- 联系患者 -->
+      <view wx:if="{{schedule.patient.phone}}" 
+            class="action-btn contact-btn"
+            bindtap="onContactPatient">
+        <text class="action-icon">📞</text>
+        <text class="action-text">联系</text>
+      </view>
+      
+      <!-- 导航 -->
+      <view wx:if="{{schedule.address && schedule.address.latitude}}" 
+            class="action-btn navigate-btn"
+            bindtap="onNavigateToPatient">
+        <text class="action-icon">🧭</text>
+        <text class="action-text">导航</text>
+      </view>
+      
+      <!-- 开始服务（仅在特定状态下显示） -->
+      <view wx:if="{{schedule.status === 'confirmed' || schedule.status === 'pending'}}" 
+            class="action-btn start-btn"
+            bindtap="onStartService">
+        <text class="action-icon">▶️</text>
+        <text class="action-text">开始</text>
+      </view>
+      
+      <!-- 更多操作 -->
+      <view class="action-btn more-btn"
+            data-action="more"
+            bindtap="onActionTap">
+        <text class="action-icon">⋯</text>
+        <text class="action-text">更多</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 时间状态指示条 -->
+  <view class="time-status-bar {{processedSchedule.timeStatus}}"></view>
+</view>

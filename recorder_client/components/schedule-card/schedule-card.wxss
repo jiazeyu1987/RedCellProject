@@ -1,0 +1,375 @@
+/* 日程卡片组件样式 */
+
+.schedule-card {
+  background: #fff;
+  border-radius: 12px;
+  margin: 8px 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.schedule-card.selected {
+  border: 2px solid #007aff;
+  background: #f0f8ff;
+}
+
+.schedule-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 选择状态指示器 */
+.select-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  z-index: 10;
+}
+
+.select-indicator.selected {
+  background: #007aff;
+  border-color: #007aff;
+}
+
+.select-icon {
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* 卡片头部 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.time-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.date {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 2px;
+}
+
+.time {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.today-badge {
+  background: #ff9500;
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  margin-top: 4px;
+}
+
+.status-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.priority-tag {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(255, 149, 0, 0.1);
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.priority-icon {
+  font-size: 12px;
+}
+
+.priority-text {
+  font-size: 10px;
+  color: #ff9500;
+}
+
+/* 卡片主体 */
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 患者信息 */
+.patient-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.patient-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.age, .gender {
+  font-size: 12px;
+  color: #666;
+  background: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.patient-contact {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.phone {
+  font-size: 14px;
+  color: #007aff;
+}
+
+/* 服务信息 */
+.service-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.service-type {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.type-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.service-count {
+  font-size: 12px;
+  color: #666;
+}
+
+.service-description {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* 地址信息 */
+.address-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  background: #f8f9fa;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.address-icon {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.address-text {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+  flex: 1;
+}
+
+/* 特殊提醒 */
+.special-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.overdue-notice {
+  color: #ff3b30;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.notes {
+  color: #666;
+  font-size: 12px;
+  background: #fff3cd;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border-left: 3px solid #ffc107;
+}
+
+/* 卡片操作区 */
+.card-actions {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.quick-actions {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  min-width: 60px;
+  transition: background-color 0.2s;
+}
+
+.action-btn:active {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.action-icon {
+  font-size: 16px;
+}
+
+.action-text {
+  font-size: 10px;
+  color: #666;
+}
+
+.contact-btn {
+  background: rgba(0, 122, 255, 0.1);
+}
+
+.contact-btn .action-text {
+  color: #007aff;
+}
+
+.navigate-btn {
+  background: rgba(52, 199, 89, 0.1);
+}
+
+.navigate-btn .action-text {
+  color: #34c759;
+}
+
+.start-btn {
+  background: rgba(255, 149, 0, 0.1);
+}
+
+.start-btn .action-text {
+  color: #ff9500;
+}
+
+/* 时间状态指示条 */
+.time-status-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+}
+
+.schedule-card.ongoing .time-status-bar {
+  background: linear-gradient(90deg, #34c759, #30d158);
+}
+
+.schedule-card.soon .time-status-bar {
+  background: linear-gradient(90deg, #ff9500, #ffad33);
+}
+
+.schedule-card.overdue .time-status-bar {
+  background: linear-gradient(90deg, #ff3b30, #ff6b6b);
+}
+
+.schedule-card.completed .time-status-bar {
+  background: linear-gradient(90deg, #28a745, #34c759);
+}
+
+.schedule-card.cancelled .time-status-bar {
+  background: linear-gradient(90deg, #6c757d, #8e8e93);
+}
+
+/* 卡片类型变体 */
+.schedule-card.compact {
+  padding: 12px;
+  margin: 4px 16px;
+}
+
+.schedule-card.compact .card-body {
+  gap: 6px;
+}
+
+.schedule-card.compact .card-actions {
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.schedule-card.detailed {
+  padding: 20px;
+}
+
+.schedule-card.detailed .card-body {
+  gap: 14px;
+}
+
+/* 暗色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .schedule-card {
+    background: #1c1c1e;
+    color: #fff;
+  }
+  
+  .schedule-card.selected {
+    background: #0a1a2a;
+    border-color: #0066cc;
+  }
+  
+  .date, .service-count, .address-text, .service-description {
+    color: #8e8e93;
+  }
+  
+  .name, .type-text {
+    color: #fff;
+  }
+  
+  .address-info {
+    background: #2c2c2e;
+  }
+  
+  .notes {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+  }
+  
+  .action-btn:active {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}

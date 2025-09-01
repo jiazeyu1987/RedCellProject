@@ -55,7 +55,7 @@ Component({
    * 组件的初始数据
    */
   data: {
-
+    cardClass: 'card'
   },
 
   /**
@@ -82,6 +82,28 @@ Component({
         title: this.properties.title,
         subtitle: this.properties.subtitle
       });
+    },
+
+    /**
+     * 更新卡片样式类
+     */
+    updateCardClass() {
+      let cardClass = 'card';
+      const type = this.properties.type;
+      
+      if (type === 'bordered') {
+        cardClass += ' card-bordered';
+      } else if (type === 'shadow-none') {
+        cardClass += ' card-shadow-none';
+      }
+
+      if (this.properties.clickable) {
+        cardClass += ' card-hover';
+      }
+
+      this.setData({
+        cardClass: cardClass
+      });
     }
   },
 
@@ -102,27 +124,6 @@ Component({
     'type': function(newType) {
       this.updateCardClass();
     }
-  },
-
-  /**
-   * 更新卡片样式类
-   */
-  updateCardClass() {
-    let cardClass = 'card';
-    const type = this.properties.type;
-    
-    if (type === 'bordered') {
-      cardClass += ' card-bordered';
-    } else if (type === 'shadow-none') {
-      cardClass += ' card-shadow-none';
-    }
-
-    if (this.properties.clickable) {
-      cardClass += ' card-hover';
-    }
-
-    this.setData({
-      cardClass: cardClass
-    });
   }
+
 });

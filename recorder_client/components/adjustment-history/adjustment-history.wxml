@@ -1,0 +1,295 @@
+<!--components/adjustment-history/adjustment-history.wxml-->
+<view class="adjustment-history-container">
+  
+  <!-- 头部统计信息 -->
+  <view class="statistics-header">
+    <view class="stat-item">
+      <text class="stat-number">{{statistics.totalAdjustments}}</text>
+      <text class="stat-label">总调整次数</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">{{statistics.approvedCount}}</text>
+      <text class="stat-label">已批准</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">{{statistics.pendingCount}}</text>
+      <text class="stat-label">待确认</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">{{statistics.rejectedCount}}</text>
+      <text class="stat-label">已拒绝</text>
+    </view>
+  </view>
+
+  <!-- 筛选器 -->
+  <view class="filter-bar" wx:if="{{showFilter}}">
+    <view class="filter-item" bind:tap="showFilterPanel">
+      <text class="filter-icon">🔍</text>
+      <text class="filter-text">筛选</text>
+    </view>
+    <view class="display-mode-toggle">
+      <view 
+        class="mode-item {{displayMode === 'list' ? 'active' : ''}}"
+        data-mode="list"
+        bind:tap="onDisplayModeChange">
+        列表
+      </view>
+      <view 
+        class="mode-item {{displayMode === 'timeline' ? 'active' : ''}}"
+        data-mode="timeline"
+        bind:tap="onDisplayModeChange">
+        时间轴
+      </view>
+    </view>
+  </view>
+
+  <!-- 历史记录列表 -->
+  <scroll-view 
+    class="history-list"
+    scroll-y="{{true}}"
+    refresher-enabled="{{true}}"
+    refresher-triggered="{{loading}}"
+    bind:refresherrefresh="onPullDownRefresh"
+    bind:scrolltolower="onLoadMore">
+    
+    <!-- 列表模式 -->
+    <view wx:if="{{displayMode === 'list'}}">
+      <view 
+        class="history-item"
+        wx:for="{{historyList}}"
+        wx:key="id"
+        data-record="{{item}}"
+        bind:tap="onViewDetail">
+        
+        <view class="item-header">
+          <view class="adjustment-info">
+            <text class="patient-name">{{item.patientName}}</text>
+            <view class="status-tag status-{{item.status}}">
+              {{item.status === 'approved' ? '已批准' : 
+                item.status === 'rejected' ? '已拒绝' : 
+                item.status === 'pending' ? '待确认' : '已完成'}}
+            </view>
+          </view>
+          <text class="adjust-time">{{item.adjustTime}}</text>
+        </view>
+        
+        <view class="time-comparison">
+          <view class="time-row">
+            <text class="time-label">原时间：</text>
+            <text class="original-time">{{item.originalTime}}</text>
+          </view>
+          <view class="time-row">
+            <text class="time-label">新时间：</text>
+            <text class="new-time">{{item.newTime}}</text>
+          </view>
+        </view>
+        
+        <view class="adjustment-reason">
+          <text class="reason-label">调整原因：</text>
+          <text class="reason-text">{{item.reason}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 时间轴模式 -->
+    <view class="timeline-container" wx:if="{{displayMode === 'timeline'}}">
+      <view 
+        class="timeline-item"
+        wx:for="{{historyList}}"
+        wx:key="id"
+        data-record="{{item}}"
+        bind:tap="onViewDetail">
+        
+        <view class="timeline-dot status-{{item.status}}"></view>
+        <view class="timeline-content">
+          <view class="timeline-header">
+            <text class="timeline-title">{{item.patientName}} - 时间调整</text>
+            <text class="timeline-time">{{item.adjustTime}}</text>
+          </view>
+          <view class="timeline-details">
+            <text class="timeline-change">{{item.originalTime}} → {{item.newTime}}</text>
+            <text class="timeline-reason">原因：{{item.reason}}</text>
+          </view>
+          <view class="timeline-status status-{{item.status}}">
+            {{item.status === 'approved' ? '已批准' : 
+              item.status === 'rejected' ? '已拒绝' : 
+              item.status === 'pending' ? '待确认' : '已完成'}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{hasMore && historyList.length > 0}}">
+      <text wx:if="{{loading}}">加载中...</text>
+      <text wx:else>上拉加载更多</text>
+    </view>
+    
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loading && historyList.length === 0}}">
+      <image class="empty-icon" src="/images/empty-history.png" mode="aspectFit"></image>
+      <text class="empty-text">暂无调整历史</text>
+    </view>
+  </scroll-view>
+
+  <!-- 筛选面板 -->
+  <view class="filter-panel {{filterPanelVisible ? 'visible' : ''}}" wx:if="{{showFilter}}">
+    <view class="panel-header">
+      <text class="panel-title">筛选条件</text>
+      <view class="panel-close" bind:tap="closeFilterPanel">✕</view>
+    </view>
+    
+    <view class="filter-content">
+      <!-- 时间范围筛选 -->
+      <view class="filter-section">
+        <text class="section-title">时间范围</text>
+        <picker 
+          mode="date"
+          value="{{filters.startDate}}"
+          bind:change="onStartDateChange">
+          <view class="date-picker">
+            <text>{{filters.startDate || '开始日期'}}</text>
+          </view>
+        </picker>
+        <picker 
+          mode="date"
+          value="{{filters.endDate}}"
+          bind:change="onEndDateChange">
+          <view class="date-picker">
+            <text>{{filters.endDate || '结束日期'}}</text>
+          </view>
+        </picker>
+      </view>
+      
+      <!-- 状态筛选 -->
+      <view class="filter-section">
+        <text class="section-title">调整状态</text>
+        <view class="status-options">
+          <view 
+            class="status-option {{filters.status === item.key ? 'selected' : ''}}"
+            wx:for="{{filterOptions.statuses}}"
+            wx:key="key"
+            data-status="{{item.key}}"
+            bind:tap="onStatusFilterChange">
+            {{item.label}}
+          </view>
+        </view>
+      </view>
+      
+      <!-- 原因筛选 -->
+      <view class="filter-section">
+        <text class="section-title">调整原因</text>
+        <view class="reason-options">
+          <view 
+            class="reason-option {{filters.reason === item ? 'selected' : ''}}"
+            wx:for="{{filterOptions.reasons}}"
+            wx:key="*this"
+            data-reason="{{item}}"
+            bind:tap="onReasonFilterChange">
+            {{item}}
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="panel-footer">
+      <button class="reset-btn" bind:tap="onResetFilter">重置</button>
+      <button class="apply-btn" bind:tap="onApplyFilter">应用</button>
+    </view>
+  </view>
+
+  <!-- 详情弹窗 -->
+  <modal
+    visible="{{detailModalVisible}}"
+    title="调整详情"
+    type="fullscreen"
+    bind:close="closeDetailModal">
+    
+    <view class="detail-content" wx:if="{{selectedRecord}}">
+      <!-- 基本信息 -->
+      <view class="detail-section">
+        <view class="section-header">
+          <text class="section-icon">📋</text>
+          <text class="section-title">基本信息</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">患者姓名：</text>
+          <text class="info-value">{{selectedRecord.patientName}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">预约ID：</text>
+          <text class="info-value">{{selectedRecord.appointmentId}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">调整时间：</text>
+          <text class="info-value">{{selectedRecord.adjustTime}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">当前状态：</text>
+          <view class="status-tag status-{{selectedRecord.status}}">
+            {{selectedRecord.status === 'approved' ? '已批准' : 
+              selectedRecord.status === 'rejected' ? '已拒绝' : 
+              selectedRecord.status === 'pending' ? '待确认' : '已完成'}}
+          </view>
+        </view>
+      </view>
+      
+      <!-- 时间变更信息 -->
+      <view class="detail-section">
+        <view class="section-header">
+          <text class="section-icon">🕒</text>
+          <text class="section-title">时间变更</text>
+        </view>
+        <view class="time-change-display">
+          <view class="change-row">
+            <text class="change-label">原时间：</text>
+            <text class="original-time-detail">{{selectedRecord.originalTime}}</text>
+          </view>
+          <view class="change-arrow">⬇️</view>
+          <view class="change-row">
+            <text class="change-label">新时间：</text>
+            <text class="new-time-detail">{{selectedRecord.newTime}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 调整原因 -->
+      <view class="detail-section">
+        <view class="section-header">
+          <text class="section-icon">📝</text>
+          <text class="section-title">调整原因</text>
+        </view>
+        <text class="reason-detail">{{selectedRecord.reason}}</text>
+      </view>
+      
+      <!-- 操作记录 -->
+      <view class="detail-section" wx:if="{{selectedRecord.operations}}">
+        <view class="section-header">
+          <text class="section-icon">📊</text>
+          <text class="section-title">操作记录</text>
+        </view>
+        <view class="operation-list">
+          <view 
+            class="operation-item"
+            wx:for="{{selectedRecord.operations}}"
+            wx:key="id">
+            <view class="operation-time">{{item.time}}</view>
+            <view class="operation-desc">{{item.description}}</view>
+            <view class="operation-user">操作人：{{item.operator}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 底部操作按钮 -->
+    <view class="detail-footer" slot="footer">
+      <button class="close-btn" bind:tap="closeDetailModal">关闭</button>
+      <button 
+        class="reapply-btn" 
+        wx:if="{{selectedRecord.status === 'rejected'}}"
+        bind:tap="onReapplyAdjustment">
+        重新申请
+      </button>
+    </view>
+  </modal>
+</view>
