@@ -1,8 +1,8 @@
 {
   "pages": [
-    "pages/picker-test/picker-test",
-    "pages/index/index",
     "pages/login/login",
+    "pages/index/index",
+    "pages/picker-test/picker-test",
     "pages/forgot-password/forgot-password",
     "pages/bind-phone/bind-phone",
     "pages/health-archive/health-archive",
