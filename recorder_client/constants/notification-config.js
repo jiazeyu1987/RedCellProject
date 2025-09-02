@@ -4,7 +4,7 @@
  */
 
 // 通知类型枚举
-export const NOTIFICATION_TYPES = {
+const NOTIFICATION_TYPES = {
   // 预约相关通知
   APPOINTMENT_CONFIRM: 'appointment_confirm',      // 预约确认
   APPOINTMENT_REMINDER: 'appointment_reminder',   // 预约提醒
@@ -50,7 +50,7 @@ export const NOTIFICATION_TYPES = {
 };
 
 // 通知优先级
-export const NOTIFICATION_PRIORITY = {
+const NOTIFICATION_PRIORITY = {
   LOW: 1,       // 低优先级
   NORMAL: 2,    // 普通优先级
   HIGH: 3,      // 高优先级
@@ -59,7 +59,7 @@ export const NOTIFICATION_PRIORITY = {
 };
 
 // 通知状态
-export const NOTIFICATION_STATUS = {
+const NOTIFICATION_STATUS = {
   PENDING: 'pending',       // 待发送
   SENDING: 'sending',       // 发送中
   SENT: 'sent',            // 已发送
@@ -70,7 +70,7 @@ export const NOTIFICATION_STATUS = {
 };
 
 // 通知渠道
-export const NOTIFICATION_CHANNELS = {
+const NOTIFICATION_CHANNELS = {
   WECHAT_TEMPLATE: 'wechat_template',     // 微信模板消息
   WECHAT_SUBSCRIBE: 'wechat_subscribe',   // 微信订阅消息
   WECHAT_SERVICE: 'wechat_service',       // 微信服务号
@@ -81,7 +81,7 @@ export const NOTIFICATION_CHANNELS = {
 };
 
 // 通知频率限制
-export const NOTIFICATION_RATE_LIMITS = {
+const NOTIFICATION_RATE_LIMITS = {
   [NOTIFICATION_TYPES.HEALTH_REMINDER]: {
     maxPerDay: 3,
     minInterval: 2 * 60 * 60 * 1000  // 2小时
@@ -118,7 +118,7 @@ export const NOTIFICATION_RATE_LIMITS = {
 };
 
 // 通知时间窗口（不打扰时间）
-export const NOTIFICATION_TIME_WINDOW = {
+const NOTIFICATION_TIME_WINDOW = {
   DEFAULT: {
     startTime: '08:00',
     endTime: '22:00'
@@ -134,7 +134,7 @@ export const NOTIFICATION_TIME_WINDOW = {
 };
 
 // 通知模板配置
-export const NOTIFICATION_TEMPLATES = {
+const NOTIFICATION_TEMPLATES = {
   [NOTIFICATION_TYPES.APPOINTMENT_CONFIRM]: {
     wechat: 'appointment_confirm_wechat',
     sms: 'appointment_confirm_sms',
@@ -190,7 +190,7 @@ export const NOTIFICATION_TEMPLATES = {
 };
 
 // 用户角色通知权限配置
-export const ROLE_NOTIFICATION_PERMISSIONS = {
+const ROLE_NOTIFICATION_PERMISSIONS = {
   patient: {
     allowedTypes: [
       NOTIFICATION_TYPES.APPOINTMENT_CONFIRM,
@@ -216,7 +216,7 @@ export const ROLE_NOTIFICATION_PERMISSIONS = {
 };
 
 // 通知重试配置
-export const NOTIFICATION_RETRY_CONFIG = {
+const NOTIFICATION_RETRY_CONFIG = {
   maxRetries: 3,
   retryIntervals: [1000, 5000, 30000], // 1秒, 5秒, 30秒
   backoffMultiplier: 2,
@@ -224,7 +224,7 @@ export const NOTIFICATION_RETRY_CONFIG = {
 };
 
 // 通知队列配置
-export const NOTIFICATION_QUEUE_CONFIG = {
+const NOTIFICATION_QUEUE_CONFIG = {
   maxQueueSize: 1000,
   batchSize: 50,
   processingInterval: 5000, // 5秒
@@ -238,7 +238,7 @@ export const NOTIFICATION_QUEUE_CONFIG = {
 };
 
 // 通知数据模型结构
-export const NOTIFICATION_DATA_MODEL = {
+const NOTIFICATION_DATA_MODEL = {
   id: 'string',                    // 通知ID
   type: 'string',                  // 通知类型
   title: 'string',                 // 通知标题
@@ -260,7 +260,7 @@ export const NOTIFICATION_DATA_MODEL = {
 };
 
 // 默认配置
-export const DEFAULT_NOTIFICATION_CONFIG = {
+const DEFAULT_NOTIFICATION_CONFIG = {
   enabled: true,
   defaultChannel: NOTIFICATION_CHANNELS.IN_APP,
   defaultPriority: NOTIFICATION_PRIORITY.NORMAL,
@@ -269,7 +269,7 @@ export const DEFAULT_NOTIFICATION_CONFIG = {
   rateLimit: NOTIFICATION_RATE_LIMITS.DEFAULT
 };
 
-export default {
+module.exports = {
   NOTIFICATION_TYPES,
   NOTIFICATION_PRIORITY,
   NOTIFICATION_STATUS,

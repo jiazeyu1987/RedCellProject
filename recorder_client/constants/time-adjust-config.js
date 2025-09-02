@@ -3,7 +3,7 @@
  * 统一管理时间调整相关的配置项
  */
 
-export const TIME_ADJUST_CONFIG = {
+const TIME_ADJUST_CONFIG = {
   // 调整权限配置 - 增强版
   permissions: {
     normal: {
@@ -213,7 +213,7 @@ export const TIME_ADJUST_CONFIG = {
 };
 
 // 调整原因预设
-export const ADJUST_REASONS = [
+const ADJUST_REASONS = [
   {
     key: 'patient_emergency',
     label: '患者临时有事',
@@ -265,7 +265,7 @@ export const ADJUST_REASONS = [
 ];
 
 // 时间段预设
-export const TIME_SLOTS = {
+const TIME_SLOTS = {
   morning: {
     label: '上午',
     start: '08:00',
@@ -294,7 +294,7 @@ export const TIME_SLOTS = {
 };
 
 // 状态映射
-export const ADJUST_STATUS = {
+const ADJUST_STATUS = {
   pending: {
     label: '待确认',
     color: '#ffc107',
@@ -323,7 +323,7 @@ export const ADJUST_STATUS = {
 };
 
 // 工具函数
-export const TimeAdjustUtils = {
+const TimeAdjustUtils = {
   /**
    * 获取用户权限级别
    */
@@ -879,4 +879,12 @@ export const TimeAdjustUtils = {
     
     return validation;
   }
+};
+
+module.exports = {
+  TIME_ADJUST_CONFIG,
+  ADJUST_REASONS,
+  TIME_SLOTS,
+  ADJUST_STATUS,
+  TimeAdjustUtils
 };

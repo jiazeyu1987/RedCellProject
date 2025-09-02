@@ -3,7 +3,7 @@
  * 专门处理批量调整中的时间冲突检测和解决
  */
 
-import { TIME_ADJUST_CONFIG } from '../constants/time-adjust-config.js';
+const { TIME_ADJUST_CONFIG } = require('../constants/time-adjust-config.js');
 
 class BatchConflictDetectionService {
   constructor() {
@@ -87,7 +87,9 @@ class BatchConflictDetectionService {
         batchItems, 
         { progressCallback, phase: 'internal' }
       );
-      result.conflicts.push(...internalConflicts);
+      for (let i = 0; i < internalConflicts.length; i++) {
+        result.conflicts.push(internalConflicts[i]);
+      }
       result.statistics.internalConflicts = internalConflicts.length;
 
       // 阶段2: 外部冲突检测(如果启用)
@@ -96,7 +98,9 @@ class BatchConflictDetectionService {
           batchItems,
           { progressCallback, phase: 'external' }
         );
-        result.conflicts.push(...externalConflicts);
+        for (let i = 0; i < externalConflicts.length; i++) {
+          result.conflicts.push(externalConflicts[i]);
+        }
         result.statistics.externalConflicts = externalConflicts.length;
       }
 
@@ -500,4 +504,4 @@ class BatchConflictDetectionService {
   }
 }
 
-export default BatchConflictDetectionService;
+module.exports = BatchConflictDetectionService;

@@ -1,6 +1,6 @@
 // API接口管理
 const { http } = require('../services/http.service.js');
-import NotificationAPI from './notification-api.js';
+const NotificationAPI = require('./notification-api.js');
 
 // 用户认证相关API
 const AuthAPI = {

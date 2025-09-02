@@ -4,7 +4,7 @@
  */
 
 // 模板类型枚举
-export const TEMPLATE_TYPES = {
+const TEMPLATE_TYPES = {
   // 预约相关
   APPOINTMENT_CONFIRM: 'appointment_confirm',
   APPOINTMENT_REMINDER: 'appointment_reminder',
@@ -51,7 +51,7 @@ export const TEMPLATE_TYPES = {
 };
 
 // 消息格式类型
-export const MESSAGE_FORMATS = {
+const MESSAGE_FORMATS = {
   TEXT: 'text',           // 纯文本消息
   CARD: 'card',           // 卡片消息
   IMAGE_TEXT: 'image_text', // 图文消息
@@ -60,7 +60,7 @@ export const MESSAGE_FORMATS = {
 };
 
 // 通知渠道类型
-export const NOTIFICATION_CHANNELS = {
+const NOTIFICATION_CHANNELS = {
   WECHAT_TEMPLATE: 'wechat_template',     // 微信模板消息
   WECHAT_SUBSCRIBE: 'wechat_subscribe',   // 微信订阅消息
   SMS: 'sms',                             // 短信
@@ -70,7 +70,7 @@ export const NOTIFICATION_CHANNELS = {
 };
 
 // 模板类型配置
-export const TEMPLATE_TYPE_CONFIGS = {
+const TEMPLATE_TYPE_CONFIGS = {
   [TEMPLATE_TYPES.APPOINTMENT_CONFIRM]: {
     name: '预约确认通知',
     description: '患者预约成功后的确认通知',
@@ -1028,7 +1028,7 @@ export const TEMPLATE_TYPE_CONFIGS = {
 };
 
 // 模板格式配置
-export const FORMAT_CONFIGS = {
+const FORMAT_CONFIGS = {
   [MESSAGE_FORMATS.TEXT]: {
     name: '纯文本',
     description: '简单的文本消息',
@@ -1094,7 +1094,7 @@ export const FORMAT_CONFIGS = {
 };
 
 // 渠道配置
-export const CHANNEL_CONFIGS = {
+const CHANNEL_CONFIGS = {
   [NOTIFICATION_CHANNELS.WECHAT_TEMPLATE]: {
     name: '微信模板消息',
     description: '微信公众号模板消息',
@@ -1173,71 +1173,71 @@ export const CHANNEL_CONFIGS = {
 };
 
 // 获取模板类型配置
-export function getTemplateTypeConfig(type) {
+function getTemplateTypeConfig(type) {
   return TEMPLATE_TYPE_CONFIGS[type] || null;
 }
 
 // 获取格式配置
-export function getFormatConfig(format) {
+function getFormatConfig(format) {
   return FORMAT_CONFIGS[format] || null;
 }
 
 // 获取渠道配置
-export function getChannelConfig(channel) {
+function getChannelConfig(channel) {
   return CHANNEL_CONFIGS[channel] || null;
 }
 
 // 获取支持的格式
-export function getSupportedFormats(type) {
+function getSupportedFormats(type) {
   const config = getTemplateTypeConfig(type);
   return config ? config.supportedFormats : [];
 }
 
 // 获取支持的渠道
-export function getSupportedChannels(type) {
+function getSupportedChannels(type) {
   const config = getTemplateTypeConfig(type);
   return config ? config.supportedChannels : [];
 }
 
 // 验证模板类型和格式兼容性
-export function validateTypeFormatCompatibility(type, format) {
+function validateTypeFormatCompatibility(type, format) {
   const supportedFormats = getSupportedFormats(type);
   return supportedFormats.includes(format);
 }
 
 // 验证模板类型和渠道兼容性
-export function validateTypeChannelCompatibility(type, channel) {
+function validateTypeChannelCompatibility(type, channel) {
   const supportedChannels = getSupportedChannels(type);
   return supportedChannels.includes(channel);
 }
 
 // 获取默认模板
-export function getDefaultTemplate(type) {
+function getDefaultTemplate(type) {
   const config = getTemplateTypeConfig(type);
   return config ? config.defaultTemplate : null;
 }
 
 // 获取必需变量
-export function getRequiredVariables(type) {
+function getRequiredVariables(type) {
   const config = getTemplateTypeConfig(type);
   return config ? config.requiredVariables : [];
 }
 
 // 获取可选变量
-export function getOptionalVariables(type) {
+function getOptionalVariables(type) {
   const config = getTemplateTypeConfig(type);
   return config ? config.optionalVariables : [];
 }
 
 // 获取所有变量
-export function getAllVariables(type) {
+function getAllVariables(type) {
   const required = getRequiredVariables(type);
   const optional = getOptionalVariables(type);
   return [...required, ...optional];
 }
 
 // 按分类获取模板类型
-export function getTemplateTypesByCategory() {
+function getTemplateTypesByCategory() {
   const categories = {};
   
   Object.entries(TEMPLATE_TYPE_CONFIGS).forEach(([type, config]) => {
@@ -1255,7 +1255,7 @@ export function getTemplateTypesByCategory() {
 }
 
 // 获取分类信息
-export function getCategoryInfo() {
+function getCategoryInfo() {
   return {
     appointment: {
       name: '预约管理',
@@ -1301,3 +1301,25 @@ export function getCategoryInfo() {
     }
   };
 }
+
+module.exports = {
+  TEMPLATE_TYPES,
+  MESSAGE_FORMATS,
+  NOTIFICATION_CHANNELS,
+  TEMPLATE_TYPE_CONFIGS,
+  FORMAT_CONFIGS,
+  CHANNEL_CONFIGS,
+  getTemplateTypeConfig,
+  getFormatConfig,
+  getChannelConfig,
+  getSupportedFormats,
+  getSupportedChannels,
+  validateTypeFormatCompatibility,
+  validateTypeChannelCompatibility,
+  getDefaultTemplate,
+  getRequiredVariables,
+  getOptionalVariables,
+  getAllVariables,
+  getTemplateTypesByCategory,
+  getCategoryInfo
+};

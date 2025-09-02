@@ -7,7 +7,7 @@
  */
 
 // 付款状态枚举
-export const PAYMENT_STATUS = {
+const PAYMENT_STATUS = {
   PENDING: 'pending',           // 待付款
   PROCESSING: 'processing',     // 处理中
   COMPLETED: 'completed',       // 已完成
@@ -20,7 +20,7 @@ export const PAYMENT_STATUS = {
 };
 
 // 付款状态显示文本
-export const PAYMENT_STATUS_TEXT = {
+const PAYMENT_STATUS_TEXT = {
   [PAYMENT_STATUS.PENDING]: '待付款',
   [PAYMENT_STATUS.PROCESSING]: '处理中',
   [PAYMENT_STATUS.COMPLETED]: '已完成',
@@ -33,7 +33,7 @@ export const PAYMENT_STATUS_TEXT = {
 };
 
 // 付款状态颜色配置
-export const PAYMENT_STATUS_COLORS = {
+const PAYMENT_STATUS_COLORS = {
   [PAYMENT_STATUS.PENDING]: '#FF9500',
   [PAYMENT_STATUS.PROCESSING]: '#007AFF',
   [PAYMENT_STATUS.COMPLETED]: '#34C759',
@@ -46,7 +46,7 @@ export const PAYMENT_STATUS_COLORS = {
 };
 
 // 支付方式枚举
-export const PAYMENT_METHODS = {
+const PAYMENT_METHODS = {
   WECHAT: 'wechat',            // 微信支付
   ALIPAY: 'alipay',           // 支付宝
   BANK_CARD: 'bank_card',      // 银行卡
@@ -56,7 +56,7 @@ export const PAYMENT_METHODS = {
 };
 
 // 支付方式显示文本
-export const PAYMENT_METHOD_TEXT = {
+const PAYMENT_METHOD_TEXT = {
   [PAYMENT_METHODS.WECHAT]: '微信支付',
   [PAYMENT_METHODS.ALIPAY]: '支付宝',
   [PAYMENT_METHODS.BANK_CARD]: '银行卡',
@@ -66,7 +66,7 @@ export const PAYMENT_METHOD_TEXT = {
 };
 
 // 交易类型枚举
-export const TRANSACTION_TYPES = {
+const TRANSACTION_TYPES = {
   SERVICE_FEE: 'service_fee',        // 服务费
   SUBSCRIPTION: 'subscription',       // 订阅费
   CONSULTATION: 'consultation',       // 咨询费
@@ -77,7 +77,7 @@ export const TRANSACTION_TYPES = {
 };
 
 // 交易类型显示文本
-export const TRANSACTION_TYPE_TEXT = {
+const TRANSACTION_TYPE_TEXT = {
   [TRANSACTION_TYPES.SERVICE_FEE]: '服务费',
   [TRANSACTION_TYPES.SUBSCRIPTION]: '订阅费',
   [TRANSACTION_TYPES.CONSULTATION]: '咨询费',
@@ -88,7 +88,7 @@ export const TRANSACTION_TYPE_TEXT = {
 };
 
 // 退款类型枚举
-export const REFUND_TYPES = {
+const REFUND_TYPES = {
   FULL: 'full',                // 全额退款
   PARTIAL: 'partial',          // 部分退款
   SERVICE_CANCEL: 'service_cancel',  // 服务取消退款
@@ -97,7 +97,7 @@ export const REFUND_TYPES = {
 };
 
 // 退款类型显示文本
-export const REFUND_TYPE_TEXT = {
+const REFUND_TYPE_TEXT = {
   [REFUND_TYPES.FULL]: '全额退款',
   [REFUND_TYPES.PARTIAL]: '部分退款',
   [REFUND_TYPES.SERVICE_CANCEL]: '服务取消退款',
@@ -106,7 +106,7 @@ export const REFUND_TYPE_TEXT = {
 };
 
 // 催缴类型枚举
-export const REMINDER_TYPES = {
+const REMINDER_TYPES = {
   SMS: 'sms',                  // 短信催缴
   WECHAT: 'wechat',           // 微信催缴
   PHONE: 'phone',             // 电话催缴
@@ -115,7 +115,7 @@ export const REMINDER_TYPES = {
 };
 
 // 催缴类型显示文本
-export const REMINDER_TYPE_TEXT = {
+const REMINDER_TYPE_TEXT = {
   [REMINDER_TYPES.SMS]: '短信催缴',
   [REMINDER_TYPES.WECHAT]: '微信催缴',
   [REMINDER_TYPES.PHONE]: '电话催缴',
@@ -124,7 +124,7 @@ export const REMINDER_TYPE_TEXT = {
 };
 
 // 付款异常类型
-export const PAYMENT_EXCEPTION_TYPES = {
+const PAYMENT_EXCEPTION_TYPES = {
   NETWORK_ERROR: 'network_error',      // 网络错误
   TIMEOUT: 'timeout',                  // 超时
   INSUFFICIENT_BALANCE: 'insufficient_balance',  // 余额不足
@@ -135,7 +135,7 @@ export const PAYMENT_EXCEPTION_TYPES = {
 };
 
 // 付款异常类型显示文本
-export const PAYMENT_EXCEPTION_TEXT = {
+const PAYMENT_EXCEPTION_TEXT = {
   [PAYMENT_EXCEPTION_TYPES.NETWORK_ERROR]: '网络错误',
   [PAYMENT_EXCEPTION_TYPES.TIMEOUT]: '支付超时',
   [PAYMENT_EXCEPTION_TYPES.INSUFFICIENT_BALANCE]: '余额不足',
@@ -146,7 +146,7 @@ export const PAYMENT_EXCEPTION_TEXT = {
 };
 
 // 状态流转规则
-export const STATUS_FLOW_RULES = {
+const STATUS_FLOW_RULES = {
   [PAYMENT_STATUS.PENDING]: [
     PAYMENT_STATUS.PROCESSING,
     PAYMENT_STATUS.CANCELLED,
@@ -179,7 +179,7 @@ export const STATUS_FLOW_RULES = {
 };
 
 // 默认配置
-export const PAYMENT_CONFIG = {
+const PAYMENT_CONFIG = {
   // 超时设置
   PAYMENT_TIMEOUT: 15 * 60 * 1000,     // 15分钟
   
@@ -198,4 +198,22 @@ export const PAYMENT_CONFIG = {
   // 金额范围
   MIN_AMOUNT: 0.01,                    // 最小金额
   MAX_AMOUNT: 99999.99                 // 最大金额
+};
+
+module.exports = {
+  PAYMENT_STATUS,
+  PAYMENT_STATUS_TEXT,
+  PAYMENT_STATUS_COLORS,
+  PAYMENT_METHODS,
+  PAYMENT_METHOD_TEXT,
+  TRANSACTION_TYPES,
+  TRANSACTION_TYPE_TEXT,
+  REFUND_TYPES,
+  REFUND_TYPE_TEXT,
+  REMINDER_TYPES,
+  REMINDER_TYPE_TEXT,
+  PAYMENT_EXCEPTION_TYPES,
+  PAYMENT_EXCEPTION_TEXT,
+  STATUS_FLOW_RULES,
+  PAYMENT_CONFIG
 };

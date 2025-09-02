@@ -3,7 +3,7 @@
  * 用于调整预约时间的专门弹窗界面
  */
 
-import TimeAdjustNotificationService from '../../services/time-adjust-notification.service.js';
+const TimeAdjustNotificationService = require('../../services/time-adjust-notification.service.js');
 
 Component({
   properties: {

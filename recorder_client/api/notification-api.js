@@ -3,7 +3,7 @@
  * 提供与服务器通信的通知相关接口
  */
 
-import httpService from '../services/http.service.js';
+const httpService = require('../services/http.service.js');
 
 class NotificationAPI {
   /**
@@ -521,4 +521,4 @@ class NotificationAPI {
   }
 }
 
-export default new NotificationAPI();
+module.exports = new NotificationAPI();
