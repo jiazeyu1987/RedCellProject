@@ -771,5 +771,91 @@ Page({
         }, '获取用户信息');
       }
     })
+  },
+
+  // 快捷操作导航方法
+  
+  // 跳转到患者管理页面
+  goToPatients() {
+    console.log('跳转到患者管理页面');
+    wx.navigateTo({
+      url: '/pages/family-members/family-members',
+      fail: (err) => {
+        console.error('跳转到患者管理页面失败:', err);
+        wx.showToast({
+          title: '页面跳转失败',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
+  // 跳转到日程管理页面
+  goToSchedule() {
+    console.log('跳转到日程管理页面');
+    wx.navigateTo({
+      url: '/pages/schedule/schedule',
+      fail: (err) => {
+        console.error('跳转到日程管理页面失败:', err);
+        wx.showToast({
+          title: '页面跳转失败',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
+  // 跳转到设置页面
+  goToSettings() {
+    console.log('跳转到设置页面');
+    wx.navigateTo({
+      url: '/pages/user-settings/user-settings',
+      fail: (err) => {
+        console.error('跳转到设置页面失败:', err);
+        wx.showToast({
+          title: '页面跳转失败',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
+  // 跳转到通知页面
+  goToNotifications() {
+    console.log('跳转到通知页面');
+    // 清除未读计数
+    this.setData({
+      unreadCount: 0
+    });
+    
+    // TODO: 创建通知页面后更新路径
+    wx.showToast({
+      title: '通知功能开发中',
+      icon: 'none'
+    });
+  },
+
+  // 跳转到任务详情页面
+  goToTaskDetail(e) {
+    const taskId = e.currentTarget.dataset.id;
+    console.log('跳转到任务详情页面:', taskId);
+    
+    // TODO: 创建任务详情页面后更新路径
+    wx.showToast({
+      title: '任务详情功能开发中',
+      icon: 'none'
+    });
+  },
+
+  // 跳转到通知详情页面
+  goToNoticeDetail(e) {
+    const noticeId = e.currentTarget.dataset.id;
+    console.log('跳转到通知详情页面:', noticeId);
+    
+    // TODO: 创建通知详情页面后更新路径
+    wx.showToast({
+      title: '通知详情功能开发中',
+      icon: 'none'
+    });
   }
 })

@@ -1,6 +1,5 @@
 const familyArchiveService = require('../../services/family-archive.service.js');
 const { PatientAPI } = require('../../api/index.js');
-const familyArchiveService = require('../../services/family-archive.service.js');
 
 Page({
   /**
