@@ -1,0 +1,93 @@
+.button-test-page {
+  padding: 40rpx;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* 在测试页面中强制移除所有button的默认样式 */
+.button-test-page button {
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.button-test-page button::after {
+  display: none !important;
+  border: 0 !important;
+  background: none !important;
+  content: none !important;
+}
+
+.button-test-page button::before {
+  display: none !important;
+  border: 0 !important;
+  background: none !important;
+  content: none !important;
+}
+
+.test-section {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 40rpx;
+  margin-bottom: 40rpx;
+}
+
+.section-title {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 40rpx;
+  text-align: center;
+}
+
+.button-group {
+  margin-bottom: 60rpx;
+}
+
+.button-group:last-child {
+  margin-bottom: 0;
+}
+
+.group-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #666666;
+  margin-bottom: 30rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx solid #e6e6e6;
+}
+
+.test-button {
+  margin: 16rpx 20rpx 16rpx 0;
+  display: inline-block;
+}
+
+/* 为原生按钮添加显示样式 */
+.native-button {
+  background-color: #007AFF !important;
+  color: white !important;
+  padding: 20rpx 40rpx !important;
+  border-radius: 8rpx !important;
+  font-size: 28rpx !important;
+}
+
+.native-button[type="default"] {
+  background-color: #f8f9fa !important;
+  color: #333 !important;
+}
+
+.native-button[plain] {
+  background-color: transparent !important;
+  color: #007AFF !important;
+}
+
+.native-button[size="mini"] {
+  padding: 12rpx 24rpx !important;
+  font-size: 24rpx !important;
+}

@@ -1,0 +1,246 @@
+/* =================================
+   按钮蓝色遮罩完全移除样式文件
+   解决微信小程序、WeUI、第三方组件库的样式冲突
+   ================================= */
+
+/* 1. 微信小程序原生button组件重置 */
+button,
+button[type="primary"],
+button[type="default"],
+button[type="warn"] {
+  background: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  user-select: none !important;
+}
+
+/* 2. 伪元素完全移除 */
+button::before,
+button::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 0 !important;
+  height: 0 !important;
+  z-index: -9999 !important;
+  pointer-events: none !important;
+}
+
+/* 3. 所有状态的样式重置 */
+button:hover,
+button:focus,
+button:active,
+button:visited,
+button:link,
+button:target,
+button:enabled,
+button:disabled,
+button[plain],
+button[plain="true"],
+button[disabled],
+button[disabled="true"] {
+  background: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* 4. WeUI相关样式重置 */
+button.weui-btn,
+button.weui-btn::after,
+button.weui-btn::before,
+button.weui-btn:active,
+button.weui-btn:focus,
+button.weui-btn:hover,
+.weui-btn,
+.weui-btn::after,
+.weui-btn::before,
+.weui-btn:active,
+.weui-btn:focus,
+.weui-btn:hover {
+  background: none !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 5. WeUI active状态重置 */
+.weui-active,
+button.weui-active,
+.weui-btn_active,
+button.weui-btn_active {
+  background: none !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  opacity: 1 !important;
+  transform: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 6. 第三方组件库样式重置 */
+/* Vant Weapp */
+.van-button,
+.van-button::after,
+.van-button::before,
+.van-button--active,
+.van-button:active,
+.van-button:focus,
+.van-button:hover {
+  background: none !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* ColorUI */
+.cu-btn,
+.cu-btn::after,
+.cu-btn::before,
+.cu-btn:active,
+.cu-btn:focus,
+.cu-btn:hover {
+  background: none !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 7. 通用hover类重置 */
+.button-hover,
+.btn-hover,
+.hover-class,
+.active,
+.pressed,
+.touched {
+  background: none !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 8. 自定义安全的hover效果（可选） */
+.safe-hover {
+  opacity: 0.8 !important;
+  transform: scale(0.98) !important;
+  transition: all 0.2s ease !important;
+  background: none !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+/* 9. 强制移除任何可能的蓝色背景 */
+*[style*="background"],
+*[style*="background-color"],
+*[class*="blue"],
+*[class*="primary"],
+*[class*="active"] {
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 10. 调试辅助样式（开发时使用） */
+.debug-button-styles button {
+  border: 2rpx dashed #ff0000 !important;
+  background: rgba(255, 0, 0, 0.1) !important;
+}
+
+.debug-button-styles button::after {
+  content: "DEBUG" !important;
+  display: block !important;
+  color: #ff0000 !important;
+  font-size: 20rpx !important;
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  background: #ffff00 !important;
+  padding: 4rpx !important;
+}
+
+/* 11. 系统级样式重置 */
+@media (prefers-color-scheme: dark) {
+  button,
+  button:active,
+  button:focus,
+  button:hover {
+    background: none !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    outline: 0 !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+}
+
+/* 12. 兼容性重置 */
+button {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* 13. 最后的兜底样式 */
+* {
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+[class*="button"],
+[class*="btn"] {
+  -webkit-tap-highlight-color: transparent !important;
+  outline: none !important;
+}

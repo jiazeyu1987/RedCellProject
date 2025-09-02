@@ -1,0 +1,265 @@
+/* 调试页面样式 */
+.debug-page {
+  padding: 32rpx;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.debug-section {
+  margin-bottom: 48rpx;
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.section-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 32rpx;
+  border-bottom: 2rpx solid #e9ecef;
+  padding-bottom: 16rpx;
+}
+
+/* 系统信息卡片 */
+.info-card {
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 24rpx;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #666666;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 600;
+}
+
+.debug-on {
+  color: #28a745 !important;
+}
+
+.debug-off {
+  color: #6c757d !important;
+}
+
+/* 测试组 */
+.test-group {
+  margin-bottom: 40rpx;
+}
+
+.test-group:last-child {
+  margin-bottom: 0;
+}
+
+.group-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 24rpx;
+  padding: 12rpx 16rpx;
+  background: #e9ecef;
+  border-radius: 8rpx;
+}
+
+/* 测试按钮样式 */
+.test-btn {
+  display: block;
+  width: 100%;
+  margin-bottom: 20rpx;
+  padding: 24rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  text-align: center;
+  border: 2rpx solid #dee2e6;
+  background: #ffffff;
+  color: #495057;
+  transition: all 0.3s ease;
+}
+
+.test-btn:last-child {
+  margin-bottom: 0;
+}
+
+/* 原生按钮特定样式 */
+.native-btn-1 {
+  background: #007bff !important;
+  color: #ffffff !important;
+  border-color: #007bff !important;
+}
+
+.native-btn-2 {
+  background: #28a745 !important;
+  color: #ffffff !important;
+  border-color: #28a745 !important;
+}
+
+.native-btn-3 {
+  background: #ffc107 !important;
+  color: #212529 !important;
+  border-color: #ffc107 !important;
+}
+
+/* 自定义hover效果 */
+.custom-hover {
+  opacity: 0.7 !important;
+  transform: scale(0.95) !important;
+  background-color: rgba(0, 123, 255, 0.1) !important;
+}
+
+/* View和Text按钮样式 */
+.view-btn {
+  background: #6f42c1 !important;
+  color: #ffffff !important;
+  border-color: #6f42c1 !important;
+}
+
+.view-btn-no-hover {
+  background: #6c757d !important;
+  color: #ffffff !important;
+  border-color: #6c757d !important;
+}
+
+.text-btn {
+  background: #fd7e14 !important;
+  color: #ffffff !important;
+  border-color: #fd7e14 !important;
+}
+
+.view-hover {
+  opacity: 0.8 !important;
+  background-color: rgba(111, 66, 193, 0.8) !important;
+}
+
+/* 测试结果 */
+.results-card {
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 24rpx;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+  padding: 12rpx;
+  border-radius: 8rpx;
+  transition: all 0.3s ease;
+}
+
+.result-row:last-child {
+  margin-bottom: 0;
+}
+
+.result-row.clicked {
+  background: #d4edda;
+  border: 1rpx solid #c3e6cb;
+}
+
+.result-label {
+  font-size: 28rpx;
+  color: #495057;
+  font-weight: 500;
+}
+
+.result-status {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+/* 调试说明 */
+.instructions {
+  background: #fff3cd;
+  border: 1rpx solid #ffeaa7;
+  border-radius: 12rpx;
+  padding: 24rpx;
+}
+
+.instruction-item {
+  display: block;
+  font-size: 26rpx;
+  color: #856404;
+  line-height: 1.6;
+  margin-bottom: 12rpx;
+}
+
+.instruction-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  gap: 24rpx;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 24rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  text-align: center;
+  border: none;
+}
+
+.copy-btn {
+  background: #007bff;
+  color: #ffffff;
+}
+
+.clear-btn {
+  background: #dc3545;
+  color: #ffffff;
+}
+
+.action-btn:active {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+/* 强制移除所有可能的蓝色遮罩 */
+.test-btn,
+.test-btn:active,
+.test-btn:focus,
+.test-btn:hover {
+  -webkit-tap-highlight-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 特别针对原生button的重置 */
+button.test-btn {
+  border: 2rpx solid #dee2e6 !important;
+  background: #ffffff !important;
+  color: #495057 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+button.test-btn::after,
+button.test-btn::before {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  border: none !important;
+}

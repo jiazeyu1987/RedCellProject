@@ -1,0 +1,150 @@
+<view class="debug-page">
+  <!-- 系统信息 -->
+  <view class="debug-section">
+    <view class="section-title">🔧 系统信息</view>
+    <view class="info-card">
+      <view class="info-row">
+        <text class="info-label">平台:</text>
+        <text class="info-value">{{debugInfo.platform}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">版本:</text>
+        <text class="info-value">{{debugInfo.version}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">基础库:</text>
+        <text class="info-value">{{debugInfo.SDKVersion}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">调试模式:</text>
+        <text class="info-value {{debugInfo.debugMode ? 'debug-on' : 'debug-off'}}">
+          {{debugInfo.debugMode ? '是（开发者工具）' : '否（真机）'}}
+        </text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 测试按钮区域 -->
+  <view class="debug-section">
+    <view class="section-title">🧪 按钮测试（长按观察是否有蓝色遮罩）</view>
+    
+    <!-- 原生按钮测试 -->
+    <view class="test-group">
+      <text class="group-title">原生 Button（可能有问题）</text>
+      <button 
+        class="test-btn native-btn-1" 
+        bindtap="onNativeButtonTap"
+        data-test="native-default">
+        原生按钮 - 默认状态
+      </button>
+      <button 
+        class="test-btn native-btn-2" 
+        hover-class="none"
+        bindtap="onNativeButtonTap"
+        data-test="native-hover-none">
+        原生按钮 - hover-class="none"
+      </button>
+      <button 
+        class="test-btn native-btn-3" 
+        hover-class="custom-hover"
+        bindtap="onNativeButtonTap"
+        data-test="native-custom-hover">
+        原生按钮 - 自定义hover
+      </button>
+    </view>
+
+    <!-- 自定义按钮测试 -->
+    <view class="test-group">
+      <text class="group-title">自定义 Button 组件</text>
+      <custom-button 
+        text="自定义按钮 - 默认设置" 
+        type="primary" 
+        class="test-btn"
+        bind:click="onCustomButtonTap">
+      </custom-button>
+      <custom-button 
+        text="自定义按钮 - 强制禁用hover" 
+        type="success" 
+        disable-hover="{{true}}"
+        class="test-btn"
+        bind:click="onCustomButtonTap">
+      </custom-button>
+      <custom-button 
+        text="自定义按钮 - 启用hover" 
+        type="warning" 
+        disable-hover="{{false}}"
+        class="test-btn"
+        bind:click="onCustomButtonTap">
+      </custom-button>
+    </view>
+
+    <!-- 其他元素测试 -->
+    <view class="test-group">
+      <text class="group-title">其他可点击元素</text>
+      <view 
+        class="test-btn view-btn" 
+        bindtap="onViewTap"
+        hover-class="view-hover">
+        View元素 - 有hover效果
+      </view>
+      <view 
+        class="test-btn view-btn-no-hover" 
+        bindtap="onViewTap"
+        hover-class="none">
+        View元素 - 无hover效果
+      </view>
+      <text 
+        class="test-btn text-btn" 
+        bindtap="onTextTap">
+        Text元素 - 可点击
+      </text>
+    </view>
+  </view>
+
+  <!-- 测试结果 -->
+  <view class="debug-section">
+    <view class="section-title">📊 点击测试结果</view>
+    <view class="results-card">
+      <view class="result-row {{testResults.nativeButton ? 'clicked' : ''}}">
+        <text class="result-label">原生按钮:</text>
+        <text class="result-status">{{testResults.nativeButton ? '✅ 已点击' : '⭕ 未点击'}}</text>
+      </view>
+      <view class="result-row {{testResults.customButton ? 'clicked' : ''}}">
+        <text class="result-label">自定义按钮:</text>
+        <text class="result-status">{{testResults.customButton ? '✅ 已点击' : '⭕ 未点击'}}</text>
+      </view>
+      <view class="result-row {{testResults.viewElement ? 'clicked' : ''}}">
+        <text class="result-label">View元素:</text>
+        <text class="result-status">{{testResults.viewElement ? '✅ 已点击' : '⭕ 未点击'}}</text>
+      </view>
+      <view class="result-row {{testResults.textElement ? 'clicked' : ''}}">
+        <text class="result-label">Text元素:</text>
+        <text class="result-status">{{testResults.textElement ? '✅ 已点击' : '⭕ 未点击'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 调试说明 -->
+  <view class="debug-section">
+    <view class="section-title">📖 调试说明</view>
+    <view class="instructions">
+      <text class="instruction-item">1. 长按或点击上面的按钮，观察是否出现蓝色遮罩</text>
+      <text class="instruction-item">2. 在微信开发者工具中，可以右键检查元素查看具体样式</text>
+      <text class="instruction-item">3. 对比不同按钮的表现，找出问题源头</text>
+      <text class="instruction-item">4. 如果在真机上测试，可能与开发工具表现不同</text>
+      <text class="instruction-item">5. 点击下方按钮复制调试信息给开发者</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="debug-section">
+    <view class="action-buttons">
+      <button class="action-btn copy-btn" bindtap="copyDebugInfo">
+        📋 复制调试信息
+      </button>
+      <button class="action-btn clear-btn" bindtap="clearTestResults">
+        🗑️ 清除测试结果
+      </button>
+    </view>
+  </view>
+</view>

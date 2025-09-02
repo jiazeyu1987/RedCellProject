@@ -98,8 +98,8 @@
 
 /* 主要按钮 */
 .custom-button.button-primary {
-  background: #007AFF;
-  color: #ffffff;
+  background: transparent;
+  color: #007AFF;
 }
 
 .custom-button.button-primary:not([disabled]):active {
@@ -191,16 +191,16 @@
 
 /* 大尺寸 */
 .custom-button.button-large {
-  padding: 32rpx 48rpx;
+  padding: 3rpx 4rpx;
   font-size: 36rpx;
   border-radius: 12rpx;
 }
 
 /* 中等尺寸（默认） */
 .custom-button.button-medium {
-  padding: 24rpx 32rpx;
-  font-size: 32rpx;
-  border-radius: 8rpx;
+  padding: 24rpx 0rpx;
+  font-size: 28rpx;
+  border-radius: 4rpx;
 }
 
 /* 小尺寸 */
@@ -287,19 +287,19 @@
 
 /* 渐变按钮 */
 .custom-button.button-gradient {
-  background: #007AFF;
+  background: linear-gradient(45deg, #007AFF, #5AC8FA);
   color: #ffffff;
 }
 
 .custom-button.button-gradient:not([disabled]):active {
-  background: #0056CC;
+  background: linear-gradient(45deg, #0056CC, #32A3F5);
 }
 
 /* 阴影按钮 */
 .custom-button.button-shadow {
-  box-shadow: 0 2rpx 8rpx rgba(0, 122, 255, 0.3);
+  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
 }
 
 .custom-button.button-shadow:not([disabled]):active {
-  box-shadow: 0 1rpx 4rpx rgba(0, 122, 255, 0.4);
+  box-shadow: 0 2rpx 8rpx rgba(0, 122, 255, 0.4);
 }

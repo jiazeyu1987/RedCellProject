@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "按钮样式测试",
+  "backgroundColor": "#f8f9fa",
+  "usingComponents": {
+    "button": "/components/button/button"
+  }
+}

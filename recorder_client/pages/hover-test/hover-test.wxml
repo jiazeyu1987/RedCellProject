@@ -1,0 +1,48 @@
+<view class="hover-test-page">
+  <view class="test-section">
+    <view class="section-title">Hover效果对比测试</view>
+    
+    <view class="demo-group">
+      <text class="group-title">微信原生按钮（有蓝色遮罩）</text>
+      <button type="primary" class="demo-button">原生按钮 - 有蓝色遮罩</button>
+      <button type="primary" hover-class="none" class="demo-button">原生按钮 - 禁用hover</button>
+    </view>
+
+    <view class="demo-group">
+      <text class="group-title">自定义按钮组件（默认禁用蓝色遮罩）</text>
+      <custom-button text="自定义按钮 - 无遮罩" type="primary" class="demo-button"></custom-button>
+      <custom-button text="自定义按钮 - 启用hover" type="primary" disable-hover="{{false}}" class="demo-button"></custom-button>
+    </view>
+
+    <view class="demo-group">
+      <text class="group-title">动态控制hover效果</text>
+      <view class="control-bar">
+        <text>当前hover状态：{{showHover ? '启用' : '禁用'}}</text>
+        <button bindtap="toggleHover" class="toggle-btn">切换</button>
+      </view>
+      <custom-button 
+        text="动态控制hover效果" 
+        type="success" 
+        disable-hover="{{!showHover}}" 
+        class="demo-button">
+      </custom-button>
+    </view>
+
+    <view class="demo-group">
+      <text class="group-title">不同类型按钮对比</text>
+      <custom-button text="主要按钮" type="primary" class="demo-button"></custom-button>
+      <custom-button text="次要按钮" type="secondary" class="demo-button"></custom-button>
+      <custom-button text="成功按钮" type="success" class="demo-button"></custom-button>
+      <custom-button text="警告按钮" type="warning" class="demo-button"></custom-button>
+      <custom-button text="危险按钮" type="danger" class="demo-button"></custom-button>
+    </view>
+
+    <view class="instructions">
+      <text class="instruction-title">使用说明：</text>
+      <text class="instruction-text">1. 默认情况下，自定义按钮组件已禁用微信原生的蓝色hover遮罩</text>
+      <text class="instruction-text">2. 如需启用hover效果，可设置 disable-hover="{{false}}"</text>
+      <text class="instruction-text">3. 自定义hover效果为透明度和缩放变化，不会覆盖背景色</text>
+      <text class="instruction-text">4. 长按上面的按钮可以看到效果对比</text>
+    </view>
+  </view>
+</view>

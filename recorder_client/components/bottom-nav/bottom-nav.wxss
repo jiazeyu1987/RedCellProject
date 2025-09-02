@@ -54,7 +54,7 @@
 }
 
 .nav-icon-text-active {
-  color: #007AFF;
+  color: #0F7AFF;
 }
 
 /* 文字样式 */
@@ -67,13 +67,13 @@
 }
 
 .nav-text-active {
-  color: #007AFF;
+  color: #0F7AFF;
   font-weight: 500;
 }
 
 /* 激活状态 */
 .nav-item-active {
-  color: #007AFF;
+  color: #0F7AFF;
 }
 
 /* 角标样式 */
@@ -110,7 +110,7 @@
 .bottom-nav.theme-primary .nav-text-active,
 .bottom-nav.theme-primary .nav-icon-text-active,
 .bottom-nav.theme-primary .nav-item-active {
-  color: #007AFF;
+  color: #0F7AFF;
 }
 
 .bottom-nav.theme-success .nav-text-active,
@@ -142,5 +142,5 @@
 .bottom-nav.theme-dark .nav-text-active,
 .bottom-nav.theme-dark .nav-icon-text-active,
 .bottom-nav.theme-dark .nav-item-active {
-  color: #007AFF;
+  color: #0F7AFF;
 }

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "Hover问题调试工具",
+  "backgroundColor": "#f8f9fa",
+  "usingComponents": {
+    "custom-button": "/components/button/button"
+  }
+}
