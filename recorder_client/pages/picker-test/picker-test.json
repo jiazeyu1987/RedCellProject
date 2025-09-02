@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "选择器测试",
+  "usingComponents": {
+    "modal-picker": "/components/modal-picker/modal-picker"
+  }
+}

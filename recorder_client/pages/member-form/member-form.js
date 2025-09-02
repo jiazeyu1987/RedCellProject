@@ -31,6 +31,10 @@ Page({
       notes: ''
     },
     
+    // 计算显示用的索引
+    healthStatusIndex: 0,
+    serviceFrequencyIndex: 2,
+    
     // 表单验证错误
     errors: {},
     
@@ -91,6 +95,19 @@ Page({
   },
 
   /**
+   * 更新选择器索引
+   */
+  updatePickerIndexes() {
+    const healthStatusIndex = this.getPickerIndex('healthStatus', this.data.formData.healthStatus);
+    const serviceFrequencyIndex = this.getPickerIndex('serviceFrequency', this.data.formData.serviceFrequency);
+    
+    this.setData({
+      healthStatusIndex,
+      serviceFrequencyIndex
+    });
+  },
+
+  /**
    * 生命周期函数--监听页面加载
    */
   onLoad(options) {
@@ -102,6 +119,7 @@ Page({
     });
     
     this.initPage();
+    this.updatePickerIndexes();
   },
 
   /**
@@ -159,6 +177,9 @@ Page({
         formData,
         loading: false
       });
+      
+      // 更新选择器索引
+      this.updatePickerIndexes();
       
     } catch (error) {
       console.error('加载成员数据失败:', error);
@@ -570,6 +591,7 @@ Page({
    * 显示健康状态选择器
    */
   showHealthStatusPicker() {
+    console.log('显示健康状态选择器');
     this.setData({ healthStatusPickerVisible: true });
   },
 
@@ -577,12 +599,18 @@ Page({
    * 健康状态选择确认
    */
   onHealthStatusConfirm(e) {
+    console.log('健康状态选择确认', e.detail);
     const { value } = e.detail;
     this.setData({
       'formData.healthStatus': value,
       'errors.healthStatus': null,
       healthStatusPickerVisible: false
     });
+    
+    // 更新选择器索引
+    this.updatePickerIndexes();
+    
+    console.log('健康状态已更新:', value, '当前formData:', this.data.formData);
   },
 
   /**
@@ -596,6 +624,7 @@ Page({
    * 显示服务频率选择器
    */
   showServiceFrequencyPicker() {
+    console.log('显示服务频率选择器');
     this.setData({ serviceFrequencyPickerVisible: true });
   },
 
@@ -603,12 +632,18 @@ Page({
    * 服务频率选择确认
    */
   onServiceFrequencyConfirm(e) {
+    console.log('服务频率选择确认', e.detail);
     const { value } = e.detail;
     this.setData({
       'formData.serviceFrequency': value,
       'errors.serviceFrequency': null,
       serviceFrequencyPickerVisible: false
     });
+    
+    // 更新选择器索引
+    this.updatePickerIndexes();
+    
+    console.log('服务频率已更新:', value, '当前formData:', this.data.formData);
   },
 
   /**

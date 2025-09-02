@@ -135,8 +135,8 @@
               <text class="label-text">健康状态</text>
             </view>
             <view class="health-status-picker" bindtap="showHealthStatusPicker">
-              <view class="health-status-indicator" style="background-color: {{healthStatusOptions[getPickerIndex('healthStatus', formData.healthStatus)].color}}"></view>
-              <text class="health-status-text">{{healthStatusOptions[getPickerIndex('healthStatus', formData.healthStatus)].label}}</text>
+              <view class="health-status-indicator" style="background-color: {{healthStatusOptions[healthStatusIndex].color}}"></view>
+              <text class="health-status-text">{{healthStatusOptions[healthStatusIndex].label}}</text>
               <text class="picker-arrow">></text>
             </view>
           </view>
@@ -147,8 +147,8 @@
               <text class="label-text">服务频率</text>
             </view>
             <view class="service-frequency-picker" bindtap="showServiceFrequencyPicker">
-              <view class="service-frequency-indicator" style="background-color: {{serviceFrequencyOptions[getPickerIndex('serviceFrequency', formData.serviceFrequency)].color}}"></view>
-              <text class="service-frequency-text">{{serviceFrequencyOptions[getPickerIndex('serviceFrequency', formData.serviceFrequency)].label}}</text>
+              <view class="service-frequency-indicator" style="background-color: {{serviceFrequencyOptions[serviceFrequencyIndex].color}}"></view>
+              <text class="service-frequency-text">{{serviceFrequencyOptions[serviceFrequencyIndex].label}}</text>
               <text class="picker-arrow">></text>
             </view>
           </view>

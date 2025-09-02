@@ -79,18 +79,25 @@ Component({
      * 确认选择
      */
     onConfirm() {
+      console.log('modal-picker onConfirm 被调用');
       const { options } = this.properties;
       const { tempSelectedIndex } = this.data;
+      
+      console.log('options:', options);
+      console.log('tempSelectedIndex:', tempSelectedIndex);
       
       if (options && options[tempSelectedIndex]) {
         const selectedOption = options[tempSelectedIndex];
         
+        console.log('触发 confirm 事件，选中的选项:', selectedOption);
         // 触发选择事件
         this.triggerEvent('confirm', {
           value: selectedOption.value,
           option: selectedOption,
           index: tempSelectedIndex
         });
+      } else {
+        console.log('未找到有效选项');
       }
       
       this.hide();

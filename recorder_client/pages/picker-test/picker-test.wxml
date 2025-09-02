@@ -1,0 +1,45 @@
+<view class="picker-test-page">
+  <view class="header">
+    <text class="title">选择器测试页面</text>
+  </view>
+  
+  <view class="content">
+    <!-- 健康状态测试 -->
+    <view class="test-section">
+      <text class="section-title">健康状态测试</text>
+      <view class="current-value">
+        <text>当前值: {{selectedHealthStatus}}</text>
+      </view>
+      <button class="test-btn" bindtap="showHealthStatusPicker">选择健康状态</button>
+    </view>
+    
+    <!-- 服务频率测试 -->
+    <view class="test-section">
+      <text class="section-title">服务频率测试</text>
+      <view class="current-value">
+        <text>当前值: {{selectedServiceFrequency}}</text>
+      </view>
+      <button class="test-btn" bindtap="showServiceFrequencyPicker">选择服务频率</button>
+    </view>
+  </view>
+</view>
+
+<!-- 健康状态选择器 -->
+<modal-picker
+  visible="{{healthStatusPickerVisible}}"
+  title="选择健康状态"
+  options="{{healthStatusOptions}}"
+  value="{{selectedHealthStatus}}"
+  bind:confirm="onHealthStatusConfirm"
+  bind:cancel="onHealthStatusCancel"
+/>
+
+<!-- 服务频率选择器 -->
+<modal-picker
+  visible="{{serviceFrequencyPickerVisible}}"
+  title="选择服务频率"
+  options="{{serviceFrequencyOptions}}"
+  value="{{selectedServiceFrequency}}"
+  bind:confirm="onServiceFrequencyConfirm"
+  bind:cancel="onServiceFrequencyCancel"
+/>
