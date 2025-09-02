@@ -748,7 +748,7 @@ class FamilyArchiveService {
    * @private
    */
   validateMemberData(data, isCreate = true) {
-    const required = isCreate ? ['name', 'age', 'gender', 'phone'] : [];
+    const required = isCreate ? ['name', 'age', 'gender'] : [];
     
     for (const field of required) {
       if (!data[field]) {

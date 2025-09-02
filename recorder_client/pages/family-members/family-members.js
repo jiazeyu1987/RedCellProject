@@ -401,17 +401,25 @@ Page({
       
       switch (this.data.sortBy) {
         case 'name':
-          compareValue = a.name.localeCompare(b.name);
+          const nameA = (a.name || '').toString();
+          const nameB = (b.name || '').toString();
+          compareValue = nameA.localeCompare(nameB);
           break;
         case 'age':
-          compareValue = a.age - b.age;
+          const ageA = Number(a.age) || 0;
+          const ageB = Number(b.age) || 0;
+          compareValue = ageA - ageB;
           break;
         case 'lastService':
-          compareValue = new Date(a.lastServiceTime) - new Date(b.lastServiceTime);
+          const timeA = a.lastServiceTime ? new Date(a.lastServiceTime) : new Date(0);
+          const timeB = b.lastServiceTime ? new Date(b.lastServiceTime) : new Date(0);
+          compareValue = timeA - timeB;
           break;
         case 'frequency':
           const frequencyOrder = { 'daily': 3, 'weekly': 2, 'monthly': 1 };
-          compareValue = (frequencyOrder[b.serviceFrequency] || 0) - (frequencyOrder[a.serviceFrequency] || 0);
+          const freqA = frequencyOrder[a.serviceFrequency] || 0;
+          const freqB = frequencyOrder[b.serviceFrequency] || 0;
+          compareValue = freqB - freqA;
           break;
       }
       

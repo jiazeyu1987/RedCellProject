@@ -492,18 +492,25 @@ Page({
           title: '添加成功',
           icon: 'success'
         });
+        
+        // 添加成功后跳转到家庭成员列表页面
+        setTimeout(() => {
+          wx.redirectTo({
+            url: '/pages/family-members/family-members'
+          });
+        }, 1500);
       } else {
         await familyArchiveService.updateFamilyMember(memberId, submitData);
         wx.showToast({
           title: '更新成功',
           icon: 'success'
         });
+        
+        // 编辑成功后返回上一页
+        setTimeout(() => {
+          wx.navigateBack();
+        }, 1500);
       }
-      
-      // 返回上一页
-      setTimeout(() => {
-        wx.navigateBack();
-      }, 1500);
       
     } catch (error) {
       console.error('提交失败:', error);

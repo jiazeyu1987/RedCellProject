@@ -175,6 +175,72 @@ Component({
         disabled: disabled
       });
       this.updateTagClass();
+    },
+
+    /**
+     * 更新标签样式类
+     */
+    updateTagClass() {
+      let tagClass = 'status-tag';
+      
+      // 类型或状态样式
+      if (this.properties.status) {
+        tagClass += ` tag-${this.properties.status}`;
+      } else if (this.properties.type) {
+        tagClass += ` tag-${this.properties.type}`;
+      }
+      
+      // 尺寸样式
+      if (this.properties.size) {
+        tagClass += ` tag-${this.properties.size}`;
+      }
+      
+      // 形状样式
+      if (this.properties.shape && this.properties.shape !== 'default') {
+        tagClass += ` tag-${this.properties.shape}`;
+      }
+      
+      // 变体样式
+      if (this.properties.variant && this.properties.variant !== 'default') {
+        tagClass += ` tag-${this.properties.variant}`;
+      }
+      
+      // 可点击样式
+      if (this.properties.clickable) {
+        tagClass += ' tag-clickable';
+      }
+      
+      // 禁用样式
+      if (this.properties.disabled) {
+        tagClass += ' tag-disabled';
+      }
+
+      this.setData({
+        tagClass: tagClass
+      });
+    },
+
+    /**
+     * 更新自定义样式
+     */
+    updateCustomStyle() {
+      let customStyle = this.properties.extraStyle || '';
+      
+      if (this.properties.color) {
+        customStyle += `color: ${this.properties.color};`;
+      }
+      
+      if (this.properties.backgroundColor) {
+        customStyle += `background-color: ${this.properties.backgroundColor};`;
+      }
+      
+      if (this.properties.borderColor) {
+        customStyle += `border-color: ${this.properties.borderColor};`;
+      }
+
+      this.setData({
+        extraStyle: customStyle
+      });
     }
   },
 
@@ -198,71 +264,5 @@ Component({
     'color, backgroundColor, borderColor': function() {
       this.updateCustomStyle();
     }
-  },
-
-  /**
-   * 更新标签样式类
-   */
-  updateTagClass() {
-    let tagClass = 'status-tag';
-    
-    // 类型或状态样式
-    if (this.properties.status) {
-      tagClass += ` tag-${this.properties.status}`;
-    } else if (this.properties.type) {
-      tagClass += ` tag-${this.properties.type}`;
-    }
-    
-    // 尺寸样式
-    if (this.properties.size) {
-      tagClass += ` tag-${this.properties.size}`;
-    }
-    
-    // 形状样式
-    if (this.properties.shape && this.properties.shape !== 'default') {
-      tagClass += ` tag-${this.properties.shape}`;
-    }
-    
-    // 变体样式
-    if (this.properties.variant && this.properties.variant !== 'default') {
-      tagClass += ` tag-${this.properties.variant}`;
-    }
-    
-    // 可点击样式
-    if (this.properties.clickable) {
-      tagClass += ' tag-clickable';
-    }
-    
-    // 禁用样式
-    if (this.properties.disabled) {
-      tagClass += ' tag-disabled';
-    }
-
-    this.setData({
-      tagClass: tagClass
-    });
-  },
-
-  /**
-   * 更新自定义样式
-   */
-  updateCustomStyle() {
-    let customStyle = this.properties.extraStyle || '';
-    
-    if (this.properties.color) {
-      customStyle += `color: ${this.properties.color};`;
-    }
-    
-    if (this.properties.backgroundColor) {
-      customStyle += `background-color: ${this.properties.backgroundColor};`;
-    }
-    
-    if (this.properties.borderColor) {
-      customStyle += `border-color: ${this.properties.borderColor};`;
-    }
-
-    this.setData({
-      extraStyle: customStyle
-    });
   }
 });
