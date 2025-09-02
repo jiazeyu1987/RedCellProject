@@ -1,12 +1,17 @@
 {
   "navigationBarTitleText": "日程管理",
   "enablePullDownRefresh": true,
-  "onReachBottomDistance": 50,
+  "backgroundColor": "#f8f9fa",
+  "backgroundTextStyle": "dark",
+  "onReachBottomDistance": 100,
+  "backgroundColorTop": "#ffffff",
+  "backgroundColorBottom": "#ffffff",
   "usingComponents": {
-    "schedule-filter": "../../components/schedule-filter/schedule-filter",
-    "modal": "../../components/modal/modal",
-    "time-adjust-modal": "../../components/time-adjust-modal/time-adjust-modal",
-    "adjustment-history": "../../components/adjustment-history/adjustment-history",
-    "approval-manager": "../../components/approval-manager/approval-manager"
+    "schedule-card": "/components/schedule-card/schedule-card",
+    "schedule-filter": "/components/schedule-filter/schedule-filter",
+    "empty-state": "/components/empty-state/empty-state",
+    "loading-skeleton": "/components/loading-skeleton/loading-skeleton",
+    "modal": "/components/modal/modal",
+    "button": "/components/button/button"
   }
 }
