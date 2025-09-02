@@ -1,5 +1,6 @@
 const { ScheduleAPI } = require('../../api/index');
 const CONSTANTS = require('../../constants/constants');
+const { scheduleDebugHelper } = require('../../utils/schedule-debug-helper');
 // 临时注释掉登录装饰器以便调试
 // const { LoginPageDecorator } = require('../../utils/login-page-decorator');
 // const BatchConflictDetectionService = require('../../services/batch-conflict-detection.service.js');
@@ -251,8 +252,12 @@ Page({
     // 先加载模拟统计数据，保证页面显示
     this.setMockStatistics();
     
-    // 尝试加载真实数据
-    this.loadScheduleList(true);
+    // 延迟加载真实数据，避免与onShow冲突
+    setTimeout(() => {
+      console.log('开始加载真实数据...');
+      this.loadScheduleList(true);
+    }, 100);
+    
     this.loadFilterHistory(); // 加载筛选历史
     
     // 初始化排序缓存
@@ -269,7 +274,16 @@ Page({
    * 页面显示
    */
   onShow() {
-    this.refreshData();
+    // 检查并修复加载状态
+    this.checkAndFixLoadingState();
+    
+    // 只有当页面数据为空时才刷新，避免重复加载
+    if (this.data.scheduleList.length === 0 && !this.data.loading) {
+      console.log('页面显示：数据为空，开始加载');
+      this.refreshData();
+    } else {
+      console.log('页面显示：数据已存在，跳过加载');
+    }
   },
 
   /**
@@ -309,10 +323,12 @@ Page({
         patient: 'all',
         sort: CONSTANTS.SORT_TYPES.TIME_ASC,
         keyword: ''
-      }
+      },
+      loading: false,  // 确保初始加载状态为 false
+      'errorState.hasError': false  // 清除错误状态
     });
     
-    // 初始化时加载模拟数据作为默认显示
+    // 初始化时加载模拟数据作为默认显示，但不设置加载状态
     console.log('初始化页面，加载基础数据');
     this.loadMockScheduleData();
   },
@@ -321,6 +337,12 @@ Page({
    * 刷新数据
    */
   async refreshData() {
+    // 防止重复刷新
+    if (this.data.refreshing || this.data.loading) {
+      console.log('正在刷新或加载中，跳过此次刷新');
+      return;
+    }
+    
     this.setData({
       refreshing: true,
       'pagination.page': 1
@@ -346,10 +368,16 @@ Page({
    * 加载日程列表
    */
   async loadScheduleList(reset = false) {
-    if (this.data.loading) return;
+    if (this.data.loading) {
+      scheduleDebugHelper.logLoadingState('blocked', '重复调用被阻止');
+      return;
+    }
     
+    scheduleDebugHelper.logLoadingState(true, `开始加载 - reset: ${reset}`);
+    
+    // 确保显示加载状态
     this.setData({
-      loading: reset
+      loading: true  // 统一设置为true，确保显示加载状态
     });
     
     try {
@@ -362,7 +390,11 @@ Page({
         ...this.buildApiFilters()
       };
       
+      scheduleDebugHelper.logApiCall('/schedule/list', 'GET', params);
+      
       const result = await ScheduleAPI.getScheduleList(params);
+      
+      scheduleDebugHelper.logApiCall('/schedule/list', 'GET', params, result);
       
       let scheduleList = [];
       if (reset) {
@@ -374,19 +406,36 @@ Page({
       // 处理日程数据
       const processedList = scheduleList.map(schedule => this.processScheduleItem(schedule));
       
+      // 记录数据变化
+      scheduleDebugHelper.logDataChange('scheduleList', this.data.scheduleList, processedList, '加载完成');
+      
       this.setData({
         scheduleList: processedList,
         originalScheduleList: processedList,
         'pagination.page': currentPage + 1,
         'pagination.total': result.data.total || 0,
-        hasMore: processedList.length < (result.data.total || 0)
+        hasMore: processedList.length < (result.data.total || 0),
+        loading: false,  // 确保加载状态被清除
+        'errorState.hasError': false  // 清除错误状态
       });
+      
+      scheduleDebugHelper.logLoadingState(false, '加载成功完成');
       
       // 应用本地筛选
       this.applyLocalFilters();
       
     } catch (error) {
       console.error('加载日程列表失败:', error);
+      
+      scheduleDebugHelper.logError(error, '加载日程列表失败');
+      scheduleDebugHelper.logApiCall('/schedule/list', 'GET', {}, null, error);
+      
+      // 确保加载状态被清除
+      this.setData({
+        loading: false
+      });
+      
+      scheduleDebugHelper.logLoadingState(false, '加载失败');
       
       // 如果是重置加载且当前列表为空，使用模拟数据
       if (reset && this.data.scheduleList.length === 0) {
@@ -395,10 +444,6 @@ Page({
       } else {
         this.handleError(error, '加载日程列表失败');
       }
-    } finally {
-      this.setData({
-        loading: false
-      });
     }
   },
 
@@ -562,6 +607,8 @@ Page({
    * 加载模拟日程数据（用于开发测试和错误回退）
    */
   loadMockScheduleData() {
+    console.log('[Mock] 开始加载模拟日程数据');
+    
     const mockScheduleList = [
       {
         id: 'mock_001',
@@ -654,6 +701,8 @@ Page({
     // 处理模拟数据
     const processedList = mockScheduleList.map(schedule => this.processScheduleItem(schedule));
     
+    console.log('[Mock] 模拟数据处理完成，共', processedList.length, '条记录');
+    
     this.setData({
       scheduleList: processedList,
       originalScheduleList: processedList,
@@ -665,6 +714,8 @@ Page({
     // 应用本地筛选
     this.applyLocalFilters();
     
+    console.log('[Mock] 模拟数据加载完成');
+    
     // 显示提示信息
     wx.showToast({
       title: '已加载模拟数据',
@@ -674,18 +725,79 @@ Page({
   },
 
   /**
-   * 处理日程项数据
+   * 处理日程项数据 - 增强版
    */
   processScheduleItem(schedule) {
-    return {
+    const processedItem = {
       ...schedule,
-      // 添加一些计算属性用于显示
+      // 添加格式化时间显示
+      startTimeFormatted: this.formatScheduleTime(schedule.startTime),
+      endTimeFormatted: schedule.endTime ? this.formatScheduleTime(schedule.endTime) : null,
+      // 添加状态文本
+      statusText: this.getStatusText(schedule.status),
+      // 添加计算属性用于显示
       isToday: this.isToday(schedule.startTime),
       isOverdue: this.isOverdue(schedule.startTime),
       timeUntilStart: this.getTimeUntilStart(schedule.startTime),
       statusColor: this.getStatusColor(schedule.status),
-      priorityLevel: schedule.priority || CONSTANTS.PRIORITY_LEVELS.NORMAL
+      priorityLevel: schedule.priority || CONSTANTS.PRIORITY_LEVELS?.NORMAL || 'normal'
     };
+    
+    return processedItem;
+  },
+  
+  /**
+   * 格式化日程时间显示
+   */
+  formatScheduleTime(timeString) {
+    if (!timeString) return '';
+    
+    try {
+      const date = new Date(timeString);
+      const now = new Date();
+      
+      // 检查是否是今天
+      if (this.isToday(timeString)) {
+        return `今天 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+      }
+      
+      // 检查是否是明天
+      const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+      if (date.toDateString() === tomorrow.toDateString()) {
+        return `明天 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+      }
+      
+      // 检查是否是本周
+      const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+      const diffDays = Math.floor((date.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
+      if (diffDays >= 0 && diffDays < 7) {
+        return `${weekDays[date.getDay()]} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+      }
+      
+      // 其他情况显示完整日期
+      return `${(date.getMonth() + 1)}月${date.getDate()}日 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+      
+    } catch (error) {
+      console.warn('时间格式化失败:', error, timeString);
+      return timeString;
+    }
+  },
+  
+  /**
+   * 获取状态显示文本
+   */
+  getStatusText(status) {
+    const statusMap = {
+      'pending': '待服务',
+      'in-progress': '进行中',
+      'completed': '已完成',
+      'cancelled': '已取消',
+      'overdue': '已过期',
+      'confirmed': '已确认',
+      'rescheduled': '已调整'
+    };
+    
+    return statusMap[status] || status || '未知状态';
   },
 
   /**
@@ -852,19 +964,21 @@ Page({
       console.log('排序后数据长度:', filteredList.length);
       
       this.setData({
-        filteredScheduleList: filteredList
+        filteredScheduleList: filteredList,
+        loading: false  // 确保清除加载状态
       });
       
       console.log('数据设置成功，filteredScheduleList长度:', filteredList.length);
       
-      // 更新筛选条件标签
-      this.updateFilterTags();
+      // 更新筛选条件标签 - 使用安全的方式调用
+      this.safeUpdateFilterTags();
       
     } catch (error) {
       console.error('筛选排序失败:', error);
-      // 出错时直接使用原始数据
+      // 出错时直接使用原始数据并清除加载状态
       this.setData({
-        filteredScheduleList: filteredList
+        filteredScheduleList: filteredList,
+        loading: false
       });
     }
   },
@@ -1240,6 +1354,251 @@ Page({
       title: '已清除筛选',
       icon: 'success',
       duration: 1500
+    });
+  },
+  
+  /**
+   * 强制停止加载状态 - 修复一直转圈问题
+   */
+  forceStopLoading() {
+    console.log('强制停止所有加载状态');
+    this.setData({
+      loading: false,
+      refreshing: false,
+      loadingMore: false,
+      'errorState.hasError': false
+    });
+  },
+  
+  /**
+   * 检查并修复加载状态
+   */
+  checkAndFixLoadingState() {
+    // 如果加载状态持续时间过长，自动修复
+    if (this.data.loading) {
+      const currentTime = Date.now();
+      if (!this.loadingStartTime) {
+        this.loadingStartTime = currentTime;
+      } else if (currentTime - this.loadingStartTime > 10000) { // 10秒超时
+        console.warn('检测到加载状态异常，自动修复');
+        this.forceStopLoading();
+        this.loadingStartTime = null;
+      }
+    } else {
+      this.loadingStartTime = null;
+    }
+  },
+  
+  /**
+   * 日程卡片点击事件
+   */
+  onScheduleItemTap(event) {
+    const scheduleId = event.currentTarget.dataset.id;
+    const schedule = this.data.filteredScheduleList.find(item => item.id === scheduleId);
+    
+    if (!schedule) {
+      console.warn('未找到日程项:', scheduleId);
+      return;
+    }
+    
+    // 如果是批量选择模式，切换选择状态
+    if (this.data.batchMode) {
+      this.onToggleSelection(event);
+      return;
+    }
+    
+    // 显示日程详情或操作菜单
+    this.showScheduleActions(schedule);
+  },
+  
+  /**
+   * 日程卡片长按事件
+   */
+  onScheduleItemLongPress(event) {
+    const scheduleId = event.currentTarget.dataset.id;
+    const schedule = this.data.filteredScheduleList.find(item => item.id === scheduleId);
+    
+    if (!schedule) return;
+    
+    // 进入批量选择模式并选中当前项
+    this.setData({
+      batchMode: true,
+      selectedSchedules: [scheduleId]
+    });
+    
+    // 触觉反馈
+    wx.vibrateShort({
+      type: 'medium'
+    });
+    
+    wx.showToast({
+      title: '已选择1项，可继续选择其他项',
+      icon: 'none',
+      duration: 2000
+    });
+  },
+  
+  /**
+   * 切换选择状态
+   */
+  onToggleSelection(event) {
+    const scheduleId = event.currentTarget.dataset.id;
+    let selectedSchedules = [...this.data.selectedSchedules];
+    
+    const index = selectedSchedules.indexOf(scheduleId);
+    if (index > -1) {
+      selectedSchedules.splice(index, 1);
+    } else {
+      selectedSchedules.push(scheduleId);
+    }
+    
+    this.setData({
+      selectedSchedules
+    });
+    
+    // 如果没有选中项，退出批量模式
+    if (selectedSchedules.length === 0) {
+      this.setData({
+        batchMode: false
+      });
+    }
+  },
+  
+  /**
+   * 显示日程操作菜单
+   */
+  showScheduleActions(schedule) {
+    const actions = [
+      {
+        key: 'view_detail',
+        label: '查看详情',
+        icon: '👁️'
+      },
+      {
+        key: 'start_service',
+        label: '开始服务',
+        icon: '▶️',
+        show: schedule.status === 'pending'
+      },
+      {
+        key: 'reschedule',
+        label: '调整时间',
+        icon: '📅'
+      },
+      {
+        key: 'cancel',
+        label: '取消预约',
+        icon: '❌',
+        show: schedule.status !== 'cancelled' && schedule.status !== 'completed'
+      },
+      {
+        key: 'complete',
+        label: '标记完成',
+        icon: '✅',
+        show: schedule.status === 'in-progress'
+      }
+    ].filter(action => action.show !== false);
+    
+    this.setData({
+      showActionModal: true,
+      selectedSchedule: schedule,
+      actionModalActions: actions
+    });
+  },
+  
+  /**
+   * 开始服务
+   */
+  onStartService(event) {
+    const scheduleId = event.currentTarget.dataset.id;
+    const schedule = this.data.filteredScheduleList.find(item => item.id === scheduleId);
+    
+    if (!schedule || schedule.status !== 'pending') {
+      wx.showToast({
+        title: '当前状态无法开始服务',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    wx.showModal({
+      title: '开始服务',
+      content: `确定要开始为 ${schedule.patientName} 提供服务吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          this.updateScheduleStatus(scheduleId, 'in-progress');
+          wx.showToast({
+            title: '服务已开始',
+            icon: 'success'
+          });
+        }
+      }
+    });
+  },
+  
+  /**
+   * 显示更多操作
+   */
+  onShowMoreActions(event) {
+    const scheduleId = event.currentTarget.dataset.id;
+    const schedule = this.data.filteredScheduleList.find(item => item.id === scheduleId);
+    
+    if (!schedule) return;
+    
+    this.showScheduleActions(schedule);
+  },
+  
+  /**
+   * 更新日程状态
+   */
+  updateScheduleStatus(scheduleId, newStatus) {
+    const scheduleList = this.data.scheduleList.map(item => {
+      if (item.id === scheduleId) {
+        return {
+          ...item,
+          status: newStatus,
+          statusText: this.getStatusText(newStatus)
+        };
+      }
+      return item;
+    });
+    
+    this.setData({
+      scheduleList,
+      originalScheduleList: scheduleList
+    });
+    
+    this.applyLocalFilters();
+  },
+  
+  /**
+   * 筛选按钮点击
+   */
+  onFilterTap() {
+    this.setData({
+      showFilter: !this.data.showFilter
+    });
+  },
+  
+  /**
+   * 排序按钮点击
+   */
+  onSortTap() {
+    const currentSort = this.data.currentFilters.sort;
+    const newSort = currentSort === CONSTANTS.SORT_TYPES?.TIME_ASC ? 
+      CONSTANTS.SORT_TYPES?.TIME_DESC || 'time_desc' : 
+      CONSTANTS.SORT_TYPES?.TIME_ASC || 'time_asc';
+    
+    this.setData({
+      'currentFilters.sort': newSort
+    });
+    
+    this.applyLocalFilters();
+    
+    wx.showToast({
+      title: newSort.includes('desc') ? '按时间倒序' : '按时间正序',
+      icon: 'none',
+      duration: 1000
     });
   },
 
@@ -8306,6 +8665,20 @@ Page({
   },
   
   /**
+   * 安全更新筛选条件标签（避免阻塞主流程）
+   */
+  safeUpdateFilterTags() {
+    try {
+      // 使用 setTimeout 避免阻塞主线程
+      setTimeout(() => {
+        this.updateFilterTags();
+      }, 0);
+    } catch (error) {
+      console.error('安全更新筛选标签失败:', error);
+    }
+  },
+  
+  /**
    * 移除筛选标签
    */
   removeFilterTag(e) {
@@ -9565,6 +9938,78 @@ Page({
       'errorState.errorMessage': '',
       'errorState.errorType': '',
       'errorState.canRetry': true
+    });
+  },
+  
+  /**
+   * 强制清除加载状态（用于解决一直转圈的问题）
+   */
+  forceStopLoading() {
+    console.log('强制清除加载状态');
+    this.setData({
+      loading: false,
+      refreshing: false,
+      loadingMore: false
+    });
+  },
+  
+  /**
+   * 检查并修复加载状态
+   */
+  checkAndFixLoadingState() {
+    const { loading, refreshing, loadingMore } = this.data;
+    
+    console.log(`[Debug] 当前加载状态 - loading: ${loading}, refreshing: ${refreshing}, loadingMore: ${loadingMore}`);
+    
+    // 如果加载状态异常（超过10秒），强制清除
+    if (loading || refreshing || loadingMore) {
+      if (!this.loadingStartTime) {
+        this.loadingStartTime = Date.now();
+        console.log('[Debug] 记录加载开始时间');
+      } else if (Date.now() - this.loadingStartTime > 10000) {
+        console.warn('检测到加载状态异常，强制清除');
+        scheduleDebugHelper.logLoadingState('timeout', '加载超时强制清除');
+        this.forceStopLoading();
+        this.loadingStartTime = null;
+        
+        // 显示提示
+        wx.showToast({
+          title: '加载超时，已重置',
+          icon: 'none',
+          duration: 2000
+        });
+      }
+    } else {
+      this.loadingStartTime = null;
+    }
+  },
+  
+  /**
+   * 获取调试报告（开发者工具）
+   */
+  getDebugReport() {
+    const report = scheduleDebugHelper.generateReport();
+    const currentState = scheduleDebugHelper.checkCurrentState(this.data);
+    const diagnosis = scheduleDebugHelper.diagnoseCommonIssues();
+    
+    console.group('🐞 日程页面调试信息');
+    console.log('📊 当前状态检查:', currentState);
+    console.log('📝 调试报告:', report);
+    console.log('🔍 问题诊断:', diagnosis);
+    console.groupEnd();
+    
+    return { report, currentState, diagnosis };
+  },
+  
+  /**
+   * 清理调试信息
+   */
+  clearDebugInfo() {
+    scheduleDebugHelper.clearDebugInfo();
+    wx.showToast({
+      title: '调试信息已清理',
+      icon: 'success',
+      duration: 1000
     });
   }
 });

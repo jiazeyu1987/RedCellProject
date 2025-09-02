@@ -450,7 +450,7 @@ class HttpService {
         });
         
         resolve(mockData);
-      }, Math.random() * 1000 + 500); // 500-1500ms的随机延迟
+      }, Math.random() * 300 + 200); // 200-500ms的随机延迟，提升用户体验
     });
   }
 }
