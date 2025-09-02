@@ -1,0 +1,78 @@
+/* 加载骨架屏组件样式 */
+.loading-skeleton {
+  padding: 0 24rpx;
+}
+
+.skeleton-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 20rpx;
+  padding: 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.skeleton-avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: #f0f0f0;
+}
+
+.skeleton-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.skeleton-line {
+  height: 32rpx;
+  background: #f0f0f0;
+  border-radius: 16rpx;
+}
+
+.skeleton-title {
+  width: 60%;
+  height: 36rpx;
+}
+
+.skeleton-text {
+  width: 100%;
+}
+
+.skeleton-text.short {
+  width: 40%;
+}
+
+.skeleton-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.skeleton-button {
+  width: 56rpx;
+  height: 56rpx;
+  background: #f0f0f0;
+  border-radius: 28rpx;
+}
+
+/* 动画效果 */
+.loading-skeleton.animated .skeleton-avatar,
+.loading-skeleton.animated .skeleton-line,
+.loading-skeleton.animated .skeleton-button {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

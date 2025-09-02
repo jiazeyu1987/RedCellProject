@@ -1,0 +1,192 @@
+<!--家庭关系图谱组件模板-->
+<view class="family-relationship-map {{customClass}}">
+  <!-- 工具栏 -->
+  <view class="map-toolbar" wx:if="{{showActions}}">
+    <view class="toolbar-left">
+      <text class="toolbar-title">家庭关系图谱</text>
+      <text class="member-count">{{nodes.length}}位成员</text>
+    </view>
+    <view class="toolbar-right">
+      <button class="tool-btn" bind:tap="resetLayout">
+        <text class="tool-icon">⟲</text>
+        <text class="tool-label">重置</text>
+      </button>
+      <button class="tool-btn" bind:tap="exportMap" wx:if="{{mode === 'edit'}}">
+        <text class="tool-icon">💾</text>
+        <text class="tool-label">导出</text>
+      </button>
+      <button class="tool-btn primary" bind:tap="editMode" wx:if="{{mode === 'view'}}">
+        <text class="tool-icon">✎</text>
+        <text class="tool-label">编辑</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- Canvas容器 -->
+  <view class="map-canvas-container">
+    <canvas 
+      id="{{canvasId}}"
+      class="map-canvas"
+      type="2d"
+      bind:touchstart="onCanvasTouchStart"
+      bind:touchmove="onCanvasTouchMove"
+      bind:touchend="onCanvasTouchEnd"
+      bind:tap="onCanvasTap"
+      bind:longpress="onCanvasLongPress"
+    ></canvas>
+    
+    <!-- 加载状态 -->
+    <view class="loading-overlay" wx:if="{{!nodes.length && relationshipData}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">正在生成关系图谱...</text>
+    </view>
+    
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!nodes.length && !relationshipData}}">
+      <view class="empty-icon">👥</view>
+      <text class="empty-title">暂无家庭关系数据</text>
+      <text class="empty-subtitle">请先添加家庭成员信息</text>
+      <button class="empty-action" bind:tap="addFirstMember" wx:if="{{mode === 'edit'}}">
+        添加成员
+      </button>
+    </view>
+  </view>
+
+  <!-- 图例说明 -->
+  <view class="map-legend" wx:if="{{nodes.length > 0}}">
+    <view class="legend-title">图例说明</view>
+    <view class="legend-items">
+      <view class="legend-item">
+        <view class="legend-icon male"></view>
+        <text class="legend-label">男性</text>
+      </view>
+      <view class="legend-item">
+        <view class="legend-icon female"></view>
+        <text class="legend-label">女性</text>
+      </view>
+      <view class="legend-item">
+        <view class="legend-line"></view>
+        <text class="legend-label">关系连线</text>
+      </view>
+      <view class="legend-item">
+        <view class="legend-icon selected"></view>
+        <text class="legend-label">当前选中</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 缩放控制 -->
+  <view class="zoom-controls" wx:if="{{nodes.length > 0}}">
+    <button class="zoom-btn" bind:tap="zoomIn">
+      <text class="zoom-icon">+</text>
+    </button>
+    <view class="zoom-value">{{scalePercentage}}%</view>
+    <button class="zoom-btn" bind:tap="zoomOut">
+      <text class="zoom-icon">-</text>
+    </button>
+  </view>
+
+  <!-- 节点信息卡片 -->
+  <view class="node-info-card {{selectedNode ? 'show' : ''}}" wx:if="{{selectedNode}}">
+    <view class="card-header">
+      <view class="member-avatar">
+        <image wx:if="{{selectedNode.avatar}}" src="{{selectedNode.avatar}}" mode="aspectFill"></image>
+        <view wx:else class="avatar-placeholder {{selectedNode.gender}}">
+          <text class="avatar-icon">{{selectedNode.gender === 'male' ? '♂' : '♀'}}</text>
+        </view>
+      </view>
+      <view class="member-info">
+        <text class="member-name">{{selectedNode.name || '未知'}}</text>
+        <text class="member-details">{{selectedNode.age || '-'}}岁 · {{selectedNode.relationship || '成员'}}</text>
+        <text class="member-status status-{{selectedNode.healthStatus || 'unknown'}}">
+          {{selectedNode.healthStatus === 'healthy' ? '健康' : selectedNode.healthStatus === 'chronic' ? '慢性病' : selectedNode.healthStatus === 'critical' ? '高危' : '未知'}}
+        </text>
+      </view>
+      <button class="close-btn" bind:tap="closeNodeInfo">×</button>
+    </view>
+    
+    <view class="card-actions" wx:if="{{mode === 'edit'}}">
+      <button class="action-btn" bind:tap="editMember" data-member="{{selectedNode}}">
+        <text class="action-icon">✎</text>
+        <text class="action-label">编辑</text>
+      </button>
+      <button class="action-btn" bind:tap="addRelationship" data-member="{{selectedNode}}">
+        <text class="action-icon">🔗</text>
+        <text class="action-label">建立关系</text>
+      </button>
+      <button class="action-btn" bind:tap="viewDetails" data-member="{{selectedNode}}">
+        <text class="action-icon">👁</text>
+        <text class="action-label">详情</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 关系建立弹窗 -->
+  <view class="relationship-modal {{showRelationshipModal ? 'show' : ''}}" wx:if="{{showRelationshipModal}}">
+    <view class="modal-overlay" bind:tap="hideRelationshipModal"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">建立家庭关系</text>
+        <button class="modal-close" bind:tap="hideRelationshipModal">×</button>
+      </view>
+      
+      <view class="modal-body">
+        <view class="relationship-form">
+          <view class="form-section">
+            <text class="section-label">选择关系对象</text>
+            <scroll-view class="member-list" scroll-y="true">
+              <view 
+                class="member-item {{targetMemberId === node.id ? 'selected' : ''}}"
+                wx:for="{{nodes}}" 
+                wx:key="id"
+                wx:if="{{item.id !== selectedNode.id}}"
+                bind:tap="selectTargetMember"
+                data-member-id="{{item.id}}"
+              >
+                <view class="member-avatar-small">
+                  <image wx:if="{{item.avatar}}" src="{{item.avatar}}" mode="aspectFill"></image>
+                  <view wx:else class="avatar-placeholder-small {{item.gender}}">
+                    <text class="avatar-icon-small">{{item.gender === 'male' ? '♂' : '♀'}}</text>
+                  </view>
+                </view>
+                <view class="member-info-small">
+                  <text class="member-name-small">{{item.name || '未知'}}</text>
+                  <text class="member-age-small">{{item.age || '-'}}岁</text>
+                </view>
+              </view>
+            </scroll-view>
+          </view>
+          
+          <view class="form-section">
+            <text class="section-label">选择关系类型</text>
+            <view class="relationship-types">
+              <button 
+                class="relationship-type-btn {{relationshipType === type.value ? 'selected' : ''}}"
+                wx:for="{{relationshipTypes}}" 
+                wx:key="value"
+                bind:tap="selectRelationshipType"
+                data-type="{{item.value}}"
+              >
+                {{item.label}}
+              </button>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <view class="modal-footer">
+        <button class="modal-btn cancel" bind:tap="hideRelationshipModal">取消</button>
+        <button class="modal-btn confirm" bind:tap="confirmRelationship" disabled="{{!targetMemberId || !relationshipType}}">
+          确认建立
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作提示 -->
+  <view class="operation-tips {{showTips ? 'show' : ''}}" wx:if="{{showTips}}">
+    <view class="tip-content">
+      <text class="tip-text">{{tipText}}</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,20 @@
+<!--加载骨架屏组件-->
+<view class="loading-skeleton {{animated ? 'animated' : ''}}">
+  <view wx:for="{{rows}}" wx:key="index" class="skeleton-item">
+    <!-- 头像骨架 -->
+    <view wx:if="{{showAvatar}}" class="skeleton-avatar"></view>
+    
+    <!-- 内容骨架 -->
+    <view class="skeleton-content">
+      <view class="skeleton-line skeleton-title"></view>
+      <view class="skeleton-line skeleton-text"></view>
+      <view class="skeleton-line skeleton-text short"></view>
+    </view>
+    
+    <!-- 操作按钮骨架 -->
+    <view class="skeleton-actions">
+      <view class="skeleton-button"></view>
+      <view class="skeleton-button"></view>
+    </view>
+  </view>
+</view>

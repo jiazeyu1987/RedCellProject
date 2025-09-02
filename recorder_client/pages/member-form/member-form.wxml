@@ -1,0 +1,369 @@
+<!--成员添加/编辑页面-->
+<view class="member-form-page">
+  <!-- 加载状态 -->
+  <loading-skeleton wx:if="{{loading}}" />
+  
+  <!-- 主要内容 -->
+  <view wx:else class="form-content">
+    <!-- 步骤指示器 -->
+    <view class="step-indicator">
+      <view 
+        wx:for="{{steps}}" 
+        wx:key="key"
+        class="step-item {{index <= currentStep ? 'active' : ''}} {{index === currentStep ? 'current' : ''}}"
+        data-step="{{index}}"
+        bind:tap="onStepChange">
+        <view class="step-circle">
+          <text wx:if="{{index < currentStep}}" class="iconfont icon-check"></text>
+          <text wx:else>{{index + 1}}</text>
+        </view>
+        <text class="step-title">{{item.title}}</text>
+      </view>
+      
+      <!-- 连接线 -->
+      <view class="step-line" style="width: {{(currentStep / (steps.length - 1)) * 100}}%"></view>
+    </view>
+    
+    <!-- 表单内容 -->
+    <view class="form-container">
+      <!-- 基本信息 -->
+      <view wx:if="{{currentStep === 0}}" class="step-content">
+        <view class="step-header">
+          <text class="step-subtitle">基本信息</text>
+          <text class="step-desc">请填写成员的基本信息</text>
+        </view>
+        
+        <!-- 头像上传 -->
+        <view class="avatar-section">
+          <view class="avatar-container" bind:tap="onChooseAvatar">
+            <image 
+              wx:if="{{formData.avatar}}"
+              class="avatar-image" 
+              src="{{formData.avatar}}"
+              mode="aspectFill" />
+            <view wx:else class="avatar-placeholder">
+              <text class="iconfont icon-camera"></text>
+              <text class="placeholder-text">添加头像</text>
+            </view>
+            
+            <view wx:if="{{uploadingAvatar}}" class="upload-loading">
+              <view class="loading-spinner"></view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 基本信息表单 -->
+        <view class="form-section">
+          <form-item 
+            label="姓名"
+            type="input"
+            value="{{formData.name}}"
+            placeholder="请输入姓名"
+            required
+            error="{{errors.name}}"
+            data-field="name"
+            bind:change="onInputChange" />
+          
+          <form-item 
+            label="年龄"
+            type="input"
+            inputType="number"
+            value="{{formData.age}}"
+            placeholder="请输入年龄"
+            required
+            error="{{errors.age}}"
+            data-field="age"
+            bind:change="onInputChange" />
+          
+          <form-item 
+            label="性别"
+            type="picker"
+            value="{{genderOptions[getPickerIndex('gender', formData.gender)].label}}"
+            range="{{genderOptions}}"
+            rangeKey="label"
+            data-field="gender"
+            bind:change="onPickerChange" />
+          
+          <form-item 
+            label="家庭关系"
+            type="picker"
+            value="{{formData.relationship || '请选择关系'}}"
+            range="{{relationshipOptions}}"
+            rangeKey="label"
+            data-field="relationship"
+            bind:change="onPickerChange" />
+        </view>
+      </view>
+      
+      <!-- 联系方式 -->
+      <view wx:elif="{{currentStep === 1}}" class="step-content">
+        <view class="step-header">
+          <text class="step-subtitle">联系方式</text>
+          <text class="step-desc">请填写联系方式和地址信息</text>
+        </view>
+        
+        <view class="form-section">
+          <form-item 
+            label="手机号"
+            type="input"
+            inputType="tel"
+            value="{{formData.phone}}"
+            placeholder="请输入手机号"
+            error="{{errors.phone}}"
+            data-field="phone"
+            bind:change="onInputChange" />
+          
+          <form-item 
+            label="身份证号"
+            type="input"
+            value="{{formData.idCard}}"
+            placeholder="请输入身份证号"
+            error="{{errors.idCard}}"
+            data-field="idCard"
+            bind:change="onInputChange" />
+          
+          <form-item 
+            label="居住地址"
+            type="textarea"
+            value="{{formData.address}}"
+            placeholder="请输入详细地址"
+            data-field="address"
+            bind:change="onInputChange" />
+          
+          <form-item 
+            label="紧急联系人"
+            type="input"
+            value="{{formData.emergencyContact}}"
+            placeholder="请输入紧急联系人信息"
+            data-field="emergencyContact"
+            bind:change="onInputChange" />
+        </view>
+      </view>
+      
+      <!-- 健康信息 -->
+      <view wx:elif="{{currentStep === 2}}" class="step-content">
+        <view class="step-header">
+          <text class="step-subtitle">健康信息</text>
+          <text class="step-desc">请填写健康状态和医疗信息</text>
+        </view>
+        
+        <view class="form-section">
+          <form-item 
+            label="健康状态"
+            type="picker"
+            value="{{healthStatusOptions[getPickerIndex('healthStatus', formData.healthStatus)].label}}"
+            range="{{healthStatusOptions}}"
+            rangeKey="label"
+            data-field="healthStatus"
+            bind:change="onPickerChange" />
+          
+          <form-item 
+            label="服务频率"
+            type="picker"
+            value="{{serviceFrequencyOptions[getPickerIndex('serviceFrequency', formData.serviceFrequency)].label}}"
+            range="{{serviceFrequencyOptions}}"
+            rangeKey="label"
+            data-field="serviceFrequency"
+            bind:change="onPickerChange" />
+        </view>
+        
+        <!-- 医疗历史 -->
+        <view class="dynamic-section">
+          <view class="section-title">
+            <text class="iconfont icon-medical"></text>
+            <text>病史记录</text>
+          </view>
+          
+          <view class="input-with-button">
+            <input 
+              class="dynamic-input"
+              placeholder="输入病史并点击添加"
+              value="{{medicalHistoryInput}}"
+              data-field="medicalHistoryInput"
+              bind:input="onDynamicInputChange" />
+            <button class="add-btn" bind:tap="onAddMedicalHistory">
+              <text class="iconfont icon-plus"></text>
+            </button>
+          </view>
+          
+          <view class="tag-list">
+            <view 
+              wx:for="{{formData.medicalHistory}}" 
+              wx:key="index"
+              class="tag-item">
+              <text class="tag-text">{{item}}</text>
+              <text 
+                class="iconfont icon-close tag-remove"
+                data-index="{{index}}"
+                bind:tap="onRemoveMedicalHistory"></text>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 当前用药 -->
+        <view class="dynamic-section">
+          <view class="section-title">
+            <text class="iconfont icon-pill"></text>
+            <text>当前用药</text>
+          </view>
+          
+          <view class="input-with-button">
+            <input 
+              class="dynamic-input"
+              placeholder="输入药物名称并点击添加"
+              value="{{medicationInput}}"
+              data-field="medicationInput"
+              bind:input="onDynamicInputChange" />
+            <button class="add-btn" bind:tap="onAddMedication">
+              <text class="iconfont icon-plus"></text>
+            </button>
+          </view>
+          
+          <view class="tag-list">
+            <view 
+              wx:for="{{formData.currentMedications}}" 
+              wx:key="index"
+              class="tag-item">
+              <text class="tag-text">{{item}}</text>
+              <text 
+                class="iconfont icon-close tag-remove"
+                data-index="{{index}}"
+                bind:tap="onRemoveMedication"></text>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 过敏史 -->
+        <view class="dynamic-section">
+          <view class="section-title">
+            <text class="iconfont icon-warning"></text>
+            <text>过敏史</text>
+          </view>
+          
+          <view class="input-with-button">
+            <input 
+              class="dynamic-input"
+              placeholder="输入过敏物质并点击添加"
+              value="{{allergyInput}}"
+              data-field="allergyInput"
+              bind:input="onDynamicInputChange" />
+            <button class="add-btn" bind:tap="onAddAllergy">
+              <text class="iconfont icon-plus"></text>
+            </button>
+          </view>
+          
+          <view class="tag-list">
+            <view 
+              wx:for="{{formData.allergyHistory}}" 
+              wx:key="index"
+              class="tag-item allergy">
+              <text class="tag-text">{{item}}</text>
+              <text 
+                class="iconfont icon-close tag-remove"
+                data-index="{{index}}"
+                bind:tap="onRemoveAllergy"></text>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 其他信息 -->
+      <view wx:elif="{{currentStep === 3}}" class="step-content">
+        <view class="step-header">
+          <text class="step-subtitle">其他信息</text>
+          <text class="step-desc">请填写备注等其他信息</text>
+        </view>
+        
+        <view class="form-section">
+          <form-item 
+            label="备注信息"
+            type="textarea"
+            value="{{formData.notes}}"
+            placeholder="请输入备注信息，如特殊需求、注意事项等"
+            maxlength="500"
+            data-field="notes"
+            bind:change="onInputChange" />
+        </view>
+        
+        <!-- 信息预览 -->
+        <view class="preview-section">
+          <view class="section-title">
+            <text class="iconfont icon-eye"></text>
+            <text>信息预览</text>
+          </view>
+          
+          <view class="preview-card">
+            <view class="preview-item">
+              <text class="label">姓名：</text>
+              <text class="value">{{formData.name || '未填写'}}</text>
+            </view>
+            <view class="preview-item">
+              <text class="label">年龄性别：</text>
+              <text class="value">{{formData.age || '未填写'}}岁 {{formData.gender === 'male' ? '男' : '女'}}</text>
+            </view>
+            <view class="preview-item">
+              <text class="label">家庭关系：</text>
+              <text class="value">{{formData.relationship || '未设置'}}</text>
+            </view>
+            <view class="preview-item">
+              <text class="label">手机号：</text>
+              <text class="value">{{formData.phone || '未填写'}}</text>
+            </view>
+            <view class="preview-item">
+              <text class="label">健康状态：</text>
+              <status-tag 
+                type="{{formData.healthStatus}}"
+                text="{{formData.healthStatus === 'healthy' ? '健康' : formData.healthStatus === 'chronic' ? '慢性病' : '重症'}}" />
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 底部操作区 -->
+    <view class="bottom-actions">
+      <!-- 步骤导航按钮 -->
+      <view class="step-nav">
+        <button 
+          wx:if="{{currentStep > 0}}"
+          class="nav-btn prev-btn"
+          bind:tap="onPrevStep">
+          <text class="iconfont icon-arrow-left"></text>
+          <text>上一步</text>
+        </button>
+        
+        <button 
+          wx:if="{{currentStep < steps.length - 1}}"
+          class="nav-btn next-btn"
+          bind:tap="onNextStep">
+          <text>下一步</text>
+          <text class="iconfont icon-arrow-right"></text>
+        </button>
+      </view>
+      
+      <!-- 主要操作按钮 -->
+      <view class="main-actions">
+        <button 
+          class="action-btn cancel-btn"
+          bind:tap="onCancel">
+          取消
+        </button>
+        
+        <button 
+          wx:if="{{mode === 'add'}}"
+          class="action-btn reset-btn"
+          bind:tap="onReset">
+          重置
+        </button>
+        
+        <button 
+          class="action-btn submit-btn"
+          loading="{{submitting}}"
+          disabled="{{submitting}}"
+          bind:tap="onSubmit">
+          {{mode === 'add' ? '添加成员' : '保存修改'}}
+        </button>
+      </view>
+    </view>
+  </view>
+</view>

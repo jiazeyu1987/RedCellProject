@@ -1,10 +1,15 @@
 {
   "pages": [
-    "pages/index/index",
     "pages/login/login",
+    "pages/index/index",
     "pages/forgot-password/forgot-password",
     "pages/bind-phone/bind-phone",
-    "pages/logs/logs"
+    "pages/logs/logs",
+    "pages/family-members/family-members",
+    "pages/member-detail/member-detail",
+    "pages/member-form/member-form",
+    "pages/relationship-map/relationship-map",
+    "pages/schedule/schedule"
   ],
 
   "tabBar": {
@@ -15,11 +20,27 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "首页"
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/schedule/schedule",
+        "text": "日程",
+        "iconPath": "images/schedule.png",
+        "selectedIconPath": "images/schedule-active.png"
+      },
+      {
+        "pagePath": "pages/family-members/family-members",
+        "text": "患者",
+        "iconPath": "images/patients.png",
+        "selectedIconPath": "images/patients-active.png"
       },
       {
         "pagePath": "pages/logs/logs",
-        "text": "日志"
+        "text": "日志",
+        "iconPath": "images/logs.png",
+        "selectedIconPath": "images/logs-active.png"
       }
     ]
   },

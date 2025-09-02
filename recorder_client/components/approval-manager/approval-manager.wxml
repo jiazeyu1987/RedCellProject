@@ -1,129 +1,129 @@
 <!--审批管理组件-->
-<view class=\"approval-manager\" wx:if=\"{{show}}\">
+<view class="approval-manager" wx:if="{{show}}">
   <!-- 头部 -->
-  <view class=\"approval-header\">
-    <view class=\"header-title\">
-      <text class=\"title\">{{mode === 'list' ? '审批管理' : '审批详情'}}</text>
-      <view class=\"close-btn\" bind:tap=\"close\">
-        <text class=\"icon\">✕</text>
+  <view class="approval-header">
+    <view class="header-title">
+      <text class="title">{{mode === 'list' ? '审批管理' : '审批详情'}}</text>
+      <view class="close-btn" bind:tap="close">
+        <text class="icon">✕</text>
       </view>
     </view>
     
     <!-- 统计信息（列表模式） -->
-    <view class=\"statistics\" wx:if=\"{{mode === 'list'}}\">
-      <view class=\"stat-item\">
-        <text class=\"stat-number\">{{statistics.total}}</text>
-        <text class=\"stat-label\">总计</text>
+    <view class="statistics" wx:if="{{mode === 'list'}}">
+      <view class="stat-item">
+        <text class="stat-number">{{statistics.total}}</text>
+        <text class="stat-label">总计</text>
       </view>
-      <view class=\"stat-item pending\">
-        <text class=\"stat-number\">{{statistics.pending}}</text>
-        <text class=\"stat-label\">待审批</text>
+      <view class="stat-item pending">
+        <text class="stat-number">{{statistics.pending}}</text>
+        <text class="stat-label">待审批</text>
       </view>
-      <view class=\"stat-item urgent\">
-        <text class=\"stat-number\">{{statistics.urgent}}</text>
-        <text class=\"stat-label\">紧急</text>
+      <view class="stat-item urgent">
+        <text class="stat-number">{{statistics.urgent}}</text>
+        <text class="stat-label">紧急</text>
       </view>
-      <view class=\"stat-item overdue\">
-        <text class=\"stat-number\">{{statistics.overdue}}</text>
-        <text class=\"stat-label\">过期</text>
+      <view class="stat-item overdue">
+        <text class="stat-number">{{statistics.overdue}}</text>
+        <text class="stat-label">过期</text>
       </view>
     </view>
   </view>
 
   <!-- 列表模式 -->
-  <view class=\"approval-list\" wx:if=\"{{mode === 'list'}}\">
+  <view class="approval-list" wx:if="{{mode === 'list'}}">
     <!-- 筛选和排序 -->
-    <view class=\"filter-bar\">
-      <view class=\"filter-tabs\">
-        <view class=\"tab-item {{filterStatus === 'pending_approval' ? 'active' : ''}}\" 
-              data-status=\"pending_approval\" bind:tap=\"switchFilterStatus\">
+    <view class="filter-bar">
+      <view class="filter-tabs">
+        <view class="tab-item {{filterStatus === 'pending_approval' ? 'active' : ''}}" 
+              data-status="pending_approval" bind:tap="switchFilterStatus">
           待审批
         </view>
-        <view class=\"tab-item {{filterStatus === 'approved' ? 'active' : ''}}\" 
-              data-status=\"approved\" bind:tap=\"switchFilterStatus\">
+        <view class="tab-item {{filterStatus === 'approved' ? 'active' : ''}}" 
+              data-status="approved" bind:tap="switchFilterStatus">
           已批准
         </view>
-        <view class=\"tab-item {{filterStatus === 'rejected' ? 'active' : ''}}\" 
-              data-status=\"rejected\" bind:tap=\"switchFilterStatus\">
+        <view class="tab-item {{filterStatus === 'rejected' ? 'active' : ''}}" 
+              data-status="rejected" bind:tap="switchFilterStatus">
           已拒绝
         </view>
       </view>
       
-      <view class=\"sort-options\">
-        <text class=\"sort-label\">排序:</text>
-        <view class=\"sort-item {{sortBy === 'priority' ? 'active' : ''}}\" 
-              data-sort-by=\"priority\" bind:tap=\"switchSortBy\">
+      <view class="sort-options">
+        <text class="sort-label">排序:</text>
+        <view class="sort-item {{sortBy === 'priority' ? 'active' : ''}}" 
+              data-sort-by="priority" bind:tap="switchSortBy">
           优先级
         </view>
-        <view class=\"sort-item {{sortBy === 'time' ? 'active' : ''}}\" 
-              data-sort-by=\"time\" bind:tap=\"switchSortBy\">
+        <view class="sort-item {{sortBy === 'time' ? 'active' : ''}}" 
+              data-sort-by="time" bind:tap="switchSortBy">
           时间
         </view>
       </view>
     </view>
 
     <!-- 任务列表 -->
-    <scroll-view class=\"task-list\" scroll-y>
-      <view class=\"task-item\" wx:for=\"{{approvalTasks}}\" wx:key=\"id\" 
-            data-request-id=\"{{item.id}}\" bind:tap=\"viewTaskDetail\">
+    <scroll-view class="task-list" scroll-y>
+      <view class="task-item" wx:for="{{approvalTasks}}" wx:key="id" 
+            data-request-id="{{item.id}}" bind:tap="viewTaskDetail">
         <custom-card>
-          <view class=\"task-content\">
+          <view class="task-content">
             <!-- 头部信息 -->
-            <view class=\"task-header\">
-              <view class=\"task-info\">
-                <text class=\"applicant-name\">{{item.applicantName}}</text>
+            <view class="task-header">
+              <view class="task-info">
+                <text class="applicant-name">{{item.applicantName}}</text>
                 <status-tag 
-                  type=\"{{item.adjustType}}\" 
-                  size=\"small\" 
-                  text=\"{{item.adjustType === 'normal' ? '普通' : (item.adjustType === 'advanced' ? '高级' : '紧急')}}\"
+                  type="{{item.adjustType}}" 
+                  size="small" 
+                  text="{{item.adjustType === 'normal' ? '普通' : (item.adjustType === 'advanced' ? '高级' : '紧急')}}"
                 ></status-tag>
               </view>
               
-              <view class=\"task-priority\" style=\"color: {{getPriorityColor(item.priority)}}\">
-                <text class=\"priority-score\">{{item.priority}}</text>
-                <text class=\"priority-label\">优先级</text>
+              <view class="task-priority" style="color: {{getPriorityColor(item.priority)}}">
+                <text class="priority-score">{{item.priority}}</text>
+                <text class="priority-label">优先级</text>
               </view>
             </view>
 
             <!-- 调整信息 -->
-            <view class=\"adjust-info\">
-              <view class=\"time-change\">
-                <text class=\"original-time\">原时间: {{item.originalTime}}</text>
-                <text class=\"arrow\">→</text>
-                <text class=\"new-time\">新时间: {{item.newTime}}</text>
+            <view class="adjust-info">
+              <view class="time-change">
+                <text class="original-time">原时间: {{item.originalTime}}</text>
+                <text class="arrow">→</text>
+                <text class="new-time">新时间: {{item.newTime}}</text>
               </view>
-              <text class=\"reason\">原因: {{item.reason}}</text>
+              <text class="reason">原因: {{item.reason}}</text>
             </view>
 
             <!-- 进度信息 -->
-            <view class=\"progress-info\">
-              <view class=\"progress-bar\">
-                <view class=\"progress-fill\" 
-                      style=\"width: {{(item.currentStep / item.totalSteps) * 100}}%\"></view>
+            <view class="progress-info">
+              <view class="progress-bar">
+                <view class="progress-fill" 
+                      style="width: {{(item.currentStep / item.totalSteps) * 100}}%"></view>
               </view>
-              <text class=\"progress-text\">{{item.currentStep}}/{{item.totalSteps}}</text>
+              <text class="progress-text">{{item.currentStep}}/{{item.totalSteps}}</text>
             </view>
 
             <!-- 底部操作 -->
-            <view class=\"task-actions\">
-              <text class=\"created-time\">{{formatTime(item.createdAt)}}</text>
+            <view class="task-actions">
+              <text class="created-time">{{formatTime(item.createdAt)}}</text>
               
-              <view class=\"action-buttons\">
+              <view class="action-buttons">
                 <custom-button 
-                  type=\"primary\" 
-                  size=\"small\" 
-                  text=\"快速批准\"
-                  data-request-id=\"{{item.id}}\"
-                  bind:tap=\"quickApprove\"
-                  wx:if=\"{{item.urgentLevel !== 'urgent'}}\"
+                  type="primary" 
+                  size="small" 
+                  text="快速批准"
+                  data-request-id="{{item.id}}"
+                  bind:tap="quickApprove"
+                  wx:if="{{item.urgentLevel !== 'urgent'}}"
                 ></custom-button>
                 
                 <custom-button 
-                  type=\"default\" 
-                  size=\"small\" 
-                  text=\"查看详情\"
-                  data-request-id=\"{{item.id}}\"
-                  bind:tap=\"viewTaskDetail\"
+                  type="default" 
+                  size="small" 
+                  text="查看详情"
+                  data-request-id="{{item.id}}"
+                  bind:tap="viewTaskDetail"
                 ></custom-button>
               </view>
             </view>
@@ -132,69 +132,69 @@
       </view>
 
       <!-- 空状态 -->
-      <view class=\"empty-state\" wx:if=\"{{!loading && approvalTasks.length === 0}}\">
-        <text class=\"empty-icon\">📋</text>
-        <text class=\"empty-text\">暂无审批任务</text>
+      <view class="empty-state" wx:if="{{!loading && approvalTasks.length === 0}}">
+        <text class="empty-icon">📋</text>
+        <text class="empty-text">暂无审批任务</text>
       </view>
 
       <!-- 加载状态 -->
-      <view class=\"loading-state\" wx:if=\"{{loading}}\">
-        <text class=\"loading-text\">加载中...</text>
+      <view class="loading-state" wx:if="{{loading}}">
+        <text class="loading-text">加载中...</text>
       </view>
     </scroll-view>
   </view>
 
   <!-- 详情模式 -->
-  <view class=\"approval-detail\" wx:if=\"{{mode === 'detail' && currentTask}}\">
+  <view class="approval-detail" wx:if="{{mode === 'detail' && currentTask}}">
     <!-- 任务信息 -->
-    <view class=\"detail-section\">
-      <view class=\"section-title\">申请信息</view>
+    <view class="detail-section">
+      <view class="section-title">申请信息</view>
       <custom-card>
-        <view class=\"detail-content\">
-          <view class=\"detail-row\">
-            <text class=\"label\">申请人:</text>
-            <text class=\"value\">{{currentTask.applicantName}}</text>
+        <view class="detail-content">
+          <view class="detail-row">
+            <text class="label">申请人:</text>
+            <text class="value">{{currentTask.applicantName}}</text>
           </view>
-          <view class=\"detail-row\">
-            <text class=\"label\">调整类型:</text>
+          <view class="detail-row">
+            <text class="label">调整类型:</text>
             <status-tag 
-              type=\"{{currentTask.adjustType}}\" 
-              text=\"{{currentTask.adjustType === 'normal' ? '普通调整' : (currentTask.adjustType === 'advanced' ? '高级调整' : '紧急调整')}}\"
+              type="{{currentTask.adjustType}}" 
+              text="{{currentTask.adjustType === 'normal' ? '普通调整' : (currentTask.adjustType === 'advanced' ? '高级调整' : '紧急调整')}}"
             ></status-tag>
           </view>
-          <view class=\"detail-row\">
-            <text class=\"label\">原预约时间:</text>
-            <text class=\"value\">{{currentTask.originalTime}}</text>
+          <view class="detail-row">
+            <text class="label">原预约时间:</text>
+            <text class="value">{{currentTask.originalTime}}</text>
           </view>
-          <view class=\"detail-row\">
-            <text class=\"label\">新预约时间:</text>
-            <text class=\"value\">{{currentTask.newTime}}</text>
+          <view class="detail-row">
+            <text class="label">新预约时间:</text>
+            <text class="value">{{currentTask.newTime}}</text>
           </view>
-          <view class=\"detail-row\">
-            <text class=\"label\">调整原因:</text>
-            <text class=\"value reason-text\">{{currentTask.reason}}</text>
+          <view class="detail-row">
+            <text class="label">调整原因:</text>
+            <text class="value reason-text">{{currentTask.reason}}</text>
           </view>
-          <view class=\"detail-row\">
-            <text class=\"label\">影响评分:</text>
-            <text class=\"value impact-score\" style=\"color: {{currentTask.impactScore > 60 ? '#f5222d' : '#52c41a'}}\">{{currentTask.impactScore}}分</text>
+          <view class="detail-row">
+            <text class="label">影响评分:</text>
+            <text class="value impact-score" style="color: {{currentTask.impactScore > 60 ? '#f5222d' : '#52c41a'}}">{{currentTask.impactScore}}分</text>
           </view>
         </view>
       </custom-card>
     </view>
 
     <!-- 审批流程 -->
-    <view class=\"detail-section\">
-      <view class=\"section-title\">审批流程</view>
+    <view class="detail-section">
+      <view class="section-title">审批流程</view>
       <custom-card>
-        <view class=\"workflow-steps\">
-          <view class=\"step-item {{index < currentTask.currentStep ? 'completed' : (index === currentTask.currentStep - 1 ? 'current' : 'pending')}}\" 
-                wx:for=\"{{currentTask.workflow.steps}}\" wx:key=\"step\">
-            <view class=\"step-indicator\">
-              <text class=\"step-number\">{{item.step}}</text>
+        <view class="workflow-steps">
+          <view class="step-item {{index < currentTask.currentStep ? 'completed' : (index === currentTask.currentStep - 1 ? 'current' : 'pending')}}" 
+                wx:for="{{currentTask.workflow.steps}}" wx:key="step">
+            <view class="step-indicator">
+              <text class="step-number">{{item.step}}</text>
             </view>
-            <view class=\"step-content\">
-              <text class=\"step-name\">{{item.name}}</text>
-              <text class=\"step-role\">{{item.role}}</text>
+            <view class="step-content">
+              <text class="step-name">{{item.name}}</text>
+              <text class="step-role">{{item.role}}</text>
             </view>
           </view>
         </view>
@@ -202,69 +202,69 @@
     </view>
 
     <!-- 审批历史 -->
-    <view class=\"detail-section\" wx:if=\"{{currentTask.approvalHistory.length > 0}}\">
-      <view class=\"section-title\">审批历史</view>
+    <view class="detail-section" wx:if="{{currentTask.approvalHistory.length > 0}}">
+      <view class="section-title">审批历史</view>
       <custom-card>
-        <view class=\"history-list\">
-          <view class=\"history-item\" wx:for=\"{{currentTask.approvalHistory}}\" wx:key=\"timestamp\">
-            <view class=\"history-header\">
-              <text class=\"approver-name\">{{item.approverName}}</text>
+        <view class="history-list">
+          <view class="history-item" wx:for="{{currentTask.approvalHistory}}" wx:key="timestamp">
+            <view class="history-header">
+              <text class="approver-name">{{item.approverName}}</text>
               <status-tag 
-                type=\"{{item.decision}}\" 
-                text=\"{{item.decision === 'approve' ? '批准' : (item.decision === 'reject' ? '拒绝' : '要求修改')}}\"
-                size=\"small\"
+                type="{{item.decision}}" 
+                text="{{item.decision === 'approve' ? '批准' : (item.decision === 'reject' ? '拒绝' : '要求修改')}}"
+                size="small"
               ></status-tag>
             </view>
-            <text class=\"history-comment\" wx:if=\"{{item.comment}}\">{{item.comment}}</text>
-            <text class=\"history-time\">{{formatTime(item.timestamp)}}</text>
+            <text class="history-comment" wx:if="{{item.comment}}">{{item.comment}}</text>
+            <text class="history-time">{{formatTime(item.timestamp)}}</text>
           </view>
         </view>
       </custom-card>
     </view>
 
     <!-- 审批操作 -->
-    <view class=\"detail-section\" wx:if=\"{{currentTask.status === 'pending_approval'}}\">
-      <view class=\"section-title\">审批操作</view>
+    <view class="detail-section" wx:if="{{currentTask.status === 'pending_approval'}}">
+      <view class="section-title">审批操作</view>
       <custom-card>
-        <view class=\"approval-form\">
+        <view class="approval-form">
           <!-- 审批决定 -->
-          <view class=\"decision-options\">
-            <view class=\"option-item {{decision === 'approve' ? 'selected' : ''}}\" 
-                  data-decision=\"approve\" bind:tap=\"selectDecision\">
-              <text class=\"option-icon\">✓</text>
-              <text class=\"option-text\">批准</text>
+          <view class="decision-options">
+            <view class="option-item {{decision === 'approve' ? 'selected' : ''}}" 
+                  data-decision="approve" bind:tap="selectDecision">
+              <text class="option-icon">✓</text>
+              <text class="option-text">批准</text>
             </view>
-            <view class=\"option-item {{decision === 'reject' ? 'selected' : ''}}\" 
-                  data-decision=\"reject\" bind:tap=\"selectDecision\">
-              <text class=\"option-icon\">✗</text>
-              <text class=\"option-text\">拒绝</text>
+            <view class="option-item {{decision === 'reject' ? 'selected' : ''}}" 
+                  data-decision="reject" bind:tap="selectDecision">
+              <text class="option-icon">✗</text>
+              <text class="option-text">拒绝</text>
             </view>
-            <view class=\"option-item {{decision === 'request_changes' ? 'selected' : ''}}\" 
-                  data-decision=\"request_changes\" bind:tap=\"selectDecision\">
-              <text class=\"option-icon\">!</text>
-              <text class=\"option-text\">要求修改</text>
+            <view class="option-item {{decision === 'request_changes' ? 'selected' : ''}}" 
+                  data-decision="request_changes" bind:tap="selectDecision">
+              <text class="option-icon">!</text>
+              <text class="option-text">要求修改</text>
             </view>
           </view>
 
           <!-- 审批意见 -->
-          <view class=\"comment-section\">
-            <text class=\"comment-label\">审批意见{{decision === 'reject' ? '(必填)' : '(可选)'}}:</text>
+          <view class="comment-section">
+            <text class="comment-label">审批意见{{decision === 'reject' ? '(必填)' : '(可选)'}}:</text>
             <textarea 
-              class=\"comment-input\" 
-              placeholder=\"请输入审批意见...\"
-              value=\"{{comment}}\"
-              bind:input=\"onCommentInput\"
-              maxlength=\"200\"
+              class="comment-input" 
+              placeholder="请输入审批意见..."
+              value="{{comment}}"
+              bind:input="onCommentInput"
+              maxlength="200"
             ></textarea>
           </view>
 
           <!-- 提交按钮 -->
-          <view class=\"submit-section\">
+          <view class="submit-section">
             <custom-button 
-              type=\"primary\" 
-              text=\"提交审批\"
-              disabled=\"{{!decision}}\"
-              bind:tap=\"handleApproval\"
+              type="primary" 
+              text="提交审批"
+              disabled="{{!decision}}"
+              bind:tap="handleApproval"
             ></custom-button>
           </view>
         </view>
@@ -273,7 +273,7 @@
   </view>
 
   <!-- 刷新按钮 -->
-  <view class=\"refresh-button\" bind:tap=\"refreshData\">
-    <text class=\"refresh-icon\">↻</text>
+  <view class="refresh-button" bind:tap="refreshData">
+    <text class="refresh-icon">↻</text>
   </view>
-</view>"
+</view>

@@ -47,6 +47,43 @@ Page({
     // 下拉刷新状态
     refreshing: false,
     
+    // 底部导航数据
+    navItems: [
+      {
+        key: 'home',
+        text: '首页',
+        icon: '🏠',
+        url: '/pages/index/index',
+        switchTab: true,
+        active: true
+      },
+      {
+        key: 'schedule',
+        text: '日程',
+        icon: '📅',
+        url: '/pages/schedule/schedule',
+        switchTab: false,
+        active: false
+      },
+      {
+        key: 'patients',
+        text: '患者',
+        icon: '👥',
+        url: '/pages/family-members/family-members',
+        switchTab: false,
+        active: false
+      },
+      {
+        key: 'profile',
+        text: '我的',
+        icon: '👤',
+        url: '/pages/user-settings/user-settings',
+        switchTab: false,
+        active: false
+      }
+    ],
+    activeNavIndex: 0,
+    
     // 其他状态
     hasUserInfo: false,
     canIUseGetUserProfile: wx.canIUse('getUserProfile'),
@@ -88,86 +125,80 @@ Page({
       
       if (!token || !userData) {
         console.log('本地无登录信息，跳转到登录页');
-        setTimeout(() => {
-          LoginStateManager.redirectToLogin();
-        }, 100);
+        this.redirectToLogin();
         return;
       }
       
-      console.log('本地登录信息存在，尝试恢复登录状态');
+      console.log('本地登录信息存在，直接初始化页面');
       
-      // 检查登录状态，但给一些时间让状态同步
-      const isLoggedIn = await this.checkLoginWithRetry();
-      
-      if (!isLoggedIn) {
-        console.log('登录状态验证失败，跳转到登录页');
-        setTimeout(() => {
-          LoginStateManager.redirectToLogin();
-        }, 100);
-        return;
-      }
-      
-      console.log('登录状态检查通过，初始化页面');
-      
-      // 权限检查
-      const hasPermission = this.checkPagePermissions(
-        PagePermissions.INDEX.permissions,
-        PagePermissions.INDEX.options
-      );
-      
-      if (hasPermission) {
-        this.initPage();
-      } else {
-        console.warn('权限检查未通过');
-        wx.showToast({
-          title: '权限不足',
-          icon: 'none'
+      // 设置登录状态
+      try {
+        userStore.setState({
+          userInfo: userData,
+          token: token,
+          role: userData.role || 'recorder',
+          isLoggedIn: true
         });
+      } catch (error) {
+        console.error('设置用户状态失败:', error);
       }
+      
+      // 直接初始化页面，异步验证token
+      this.initPage();
+      
+      // 异步验证token有效性
+      this.asyncValidateToken(token);
+      
     } catch (error) {
       console.error('页面初始化失败:', error);
       // 发生错误时跳转到登录页
-      setTimeout(() => {
-        LoginStateManager.redirectToLogin();
-      }, 100);
+      this.redirectToLogin();
     }
   },
 
-  // 带重试的登录状态检查
-  async checkLoginWithRetry(maxRetries = 3, delay = 200) {
-    for (let i = 0; i < maxRetries; i++) {
-      try {
-        console.log(`第${i + 1}次检查登录状态`);
-        
-        // 检查登录状态，但不自动跳转
-        const isLoggedIn = await LoginStateManager.checkLoginStatus(false);
-        
-        if (isLoggedIn) {
-          console.log('登录状态检查成功');
-          return true;
-        }
-        
-        // 如果检查失败，等待一段时间后重试
-        if (i < maxRetries - 1) {
-          console.log(`登录状态检查失败，${delay}ms后重试`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
-      } catch (error) {
-        console.error(`第${i + 1}次登录状态检查出错:`, error);
-        if (i < maxRetries - 1) {
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
+  // 异步验证token
+  async asyncValidateToken(token) {
+    try {
+      const isValid = await LoginStateManager.validateToken(token);
+      if (!isValid) {
+        console.log('Token验证失败，跳转到登录页');
+        wx.showToast({
+          title: '登录已过期',
+          icon: 'none'
+        });
+        setTimeout(() => {
+          this.redirectToLogin();
+        }, 1500);
       }
+    } catch (error) {
+      console.error('Token验证出错:', error);
+      // 验证出错时不强制跳转，让用户继续使用
     }
-    
-    console.log('所有登录状态检查都失败');
-    return false;
   },
+
+  // 跳转到登录页
+  redirectToLogin() {
+    wx.reLaunch({
+      url: '/pages/login/login'
+    });
+  },
+
+  // 检查页面权限
+  checkPagePermissions(permissions, options = {}) {
+    try {
+      return PermissionMiddleware.checkPagePermissions(permissions, options);
+    } catch (error) {
+      console.error('权限检查失败:', error);
+      return true; // 错误时默认允许访问
+    }
+  },
+
+
 
   onShow() {
     console.log('首页显示');
     
-    // 每次页面显示时检查登录状态
+    // 每次页面显示时简单检查登录状态
     this.checkLoginOnShow();
   },
 
@@ -196,7 +227,7 @@ Page({
       
       if (!token || !userInfo) {
         console.log('本地无登录信息，跳转到登录页');
-        LoginStateManager.redirectToLogin();
+        this.redirectToLogin();
         return;
       }
       
@@ -706,15 +737,49 @@ Page({
     
     const actionMap = {
       startService: '/pages/service/start-service',
-      patientFiles: '/pages/patients/patients', 
+      patientFiles: '/pages/family-members/family-members', 
       schedule: '/pages/schedule/schedule',
       payment: '/pages/payment/payment'
     };
     
     const url = actionMap[action];
     if (url) {
+      console.log('准备跳转到:', url);
+      
+      // 添加更详细的调试信息
+      if (action === 'schedule') {
+        console.log('点击了日程管理按钮');
+        
+        // 检查登录状态
+        const token = wx.getStorageSync('token');
+        const userInfo = wx.getStorageSync('userInfo');
+        console.log('当前 token:', token ? '存在' : '不存在');
+        console.log('当前 userInfo:', userInfo ? '存在' : '不存在');
+        
+        wx.showLoading({ title: '跳转中...' });
+      }
+      
       wx.navigateTo({
-        url: url
+        url: url,
+        success: (res) => {
+          console.log('跳转成功:', url);
+          wx.hideLoading();
+        },
+        fail: (err) => {
+          console.error('跳转失败:', err, 'URL:', url);
+          wx.hideLoading();
+          wx.showToast({
+            title: `跳转失败: ${err.errMsg || '未知错误'}`,
+            icon: 'none',
+            duration: 3000
+          });
+        }
+      });
+    } else {
+      console.error('未找到对应的路径:', action);
+      wx.showToast({
+        title: '功能暂未开放',
+        icon: 'none'
       });
     }
   },
@@ -771,5 +836,46 @@ Page({
         }, '获取用户信息');
       }
     })
+  },
+  
+  // 底部导航处理
+  onNavChange(e) {
+    const { index, key, item } = e.detail;
+    console.log('底部导航点击:', key, item);
+    
+    // 更新激活状态
+    this.setData({
+      activeNavIndex: index
+    });
+    
+    // 处理特殊的跳转逻辑
+    if (key === 'schedule') {
+      console.log('通过底部导航跳转到日程管理');
+      
+      wx.showLoading({ title: '加载中...' });
+      
+      wx.navigateTo({
+        url: '/pages/schedule/schedule',
+        success: (res) => {
+          console.log('底部导航跳转成功');
+          wx.hideLoading();
+        },
+        fail: (err) => {
+          console.error('底部导航跳转失败:', err);
+          wx.hideLoading();
+          wx.showToast({
+            title: '跳转失败，请重试',
+            icon: 'none'
+          });
+        }
+      });
+    }
+    // 其他页面的跳转由bottom-nav组件自动处理
+  },
+
+  // 触底加载更多
+  onReachBottom() {
+    console.log('触发触底加载');
+    // 这里可以加载更多数据
   }
 })

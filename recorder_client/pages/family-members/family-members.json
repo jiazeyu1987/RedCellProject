@@ -1,0 +1,15 @@
+{
+  "navigationBarTitleText": "家庭成员",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50,
+  "backgroundColor": "#f8f9fa",
+  "usingComponents": {
+    "member-card": "/components/member-card/member-card",
+    "member-filter": "/components/member-filter/member-filter",
+    "member-statistics": "/components/member-statistics/member-statistics",
+    "family-relationship-map": "/components/family-relationship-map/family-relationship-map",
+    "loading-skeleton": "/components/loading-skeleton/loading-skeleton",
+    "empty-state": "/components/empty-state/empty-state",
+    "error-state": "/components/error-state/error-state"
+  }
+}

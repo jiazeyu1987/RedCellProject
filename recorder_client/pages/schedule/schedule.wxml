@@ -24,6 +24,25 @@
   <!-- 页面内容 -->
   <view class="page-content">
     
+    <!-- 等待患者提示条 -->
+    <view wx:if="{{waitingForPatient.isWaiting}}" class="waiting-patient-bar">
+      <view class="waiting-info">
+        <text class="waiting-icon">⏳</text>
+        <view class="waiting-text">
+          <text class="waiting-title">正在等待患者...</text>
+          <text class="waiting-time">剩余时间: {{Math.floor(waitingForPatient.remainingTime / 60)}}分{{waitingForPatient.remainingTime % 60}}秒</text>
+        </view>
+      </view>
+      <view class="waiting-actions">
+        <view class="waiting-btn arrived" bindtap="patientArrivedFromButton" data-schedule-id="{{waitingForPatient.scheduleId}}">
+          <text class="btn-text">患者已到</text>
+        </view>
+        <view class="waiting-btn stop" bindtap="stopWaiting">
+          <text class="btn-text">停止等待</text>
+        </view>
+      </view>
+    </view>
+    
     <!-- 统计概览 -->
     <view class="statistics-section">
       <!-- 主要统计 -->
@@ -89,13 +108,7 @@
       <scroll-view class="quick-filters-scroll" scroll-x="{{true}}" show-scrollbar="{{false}}">
         <view class="quick-filters-list">
           <view wx:for="{{quickFilters}}" wx:key="key"
-                class="quick-filter-item {{
-                  (item.key === 'today' && currentFilters.time === 'today') ||
-                  (item.key === 'pending' && currentFilters.status === 'pending') ||
-                  (item.key === 'urgent' && currentFilters.priority === 'urgent') ||
-                  (item.key === 'overdue' && currentFilters.time === 'overdue')
-                  ? 'active' : ''
-                }}"
+                class="quick-filter-item {{((item.key === 'today' && currentFilters.time === 'today') || (item.key === 'pending' && currentFilters.status === 'pending') || (item.key === 'urgent' && currentFilters.priority === 'urgent') || (item.key === 'overdue' && currentFilters.time === 'overdue')) ? 'active' : ''}}"
                 data-key="{{item.key}}"
                 bindtap="onQuickFilter">
             <text class="filter-icon">{{item.icon}}</text>
@@ -131,27 +144,144 @@
             <text class="action-icon">{{batchMode ? '✓' : '☑️'}}</text>
             <text class="action-text">{{batchMode ? '完成' : '批量'}}</text>
           </view>
+          <view wx:if="{{batchMode}}" class="action-btn quick-select-btn" bindtap="showBatchQuickMenu">
+            <text class="action-icon">⚡</text>
+            <text class="action-text">快选</text>
+          </view>
         </view>
       </view>
       
       <!-- 批量选择操作栏 -->
       <view wx:if="{{batchMode}}" class="batch-selection-bar">
+        <!-- 选择信息显示 -->
         <view class="selection-info">
-          <text class="selected-count">已选择 {{selectedSchedules.length}} / {{filteredScheduleList.length}}</text>
-        </view>
-        <view class="selection-actions">
-          <view class="selection-btn" bindtap="selectAll">
-            <text class="selection-icon">✅</text>
-            <text class="selection-text">全选</text>
+          <view class="selection-main-info">
+            <text class="selected-count">
+              {{selectedSchedules.length > 0 ? '已选择 ' + selectedSchedules.length + ' / ' + filteredScheduleList.length : '请选择项目'}}
+            </text>
+            <view wx:if="{{selectedSchedules.length > 0}}" class="selection-progress-wrapper">
+              <view class="selection-progress-bar">
+                <view class="selection-progress-fill" 
+                      style="width: {{Math.round(selectedSchedules.length / filteredScheduleList.length * 100)}}%"></view>
+              </view>
+              <text class="selection-percentage">{{Math.round(selectedSchedules.length / filteredScheduleList.length * 100)}}%</text>
+            </view>
           </view>
-          <view class="selection-btn" bindtap="selectInverse">
+          
+          <!-- 最后操作显示 -->
+          <view wx:if="{{batchSelection.lastSelectAction}}" class="last-action">
+            <text class="last-action-text">最后操作：{{batchSelection.lastSelectAction}}</text>
+          </view>
+        </view>
+        
+        <!-- 选择操作按钮 -->
+        <view class="selection-actions">
+          <view class="selection-btn {{selectedSchedules.length === filteredScheduleList.length ? 'all-selected' : ''}}" 
+                bindtap="selectAll">
+            <text class="selection-icon">{{selectedSchedules.length === filteredScheduleList.length ? '✓' : '☑️'}}</text>
+            <text class="selection-text">{{selectedSchedules.length === filteredScheduleList.length ? '已全选' : '全选'}}</text>
+            <view wx:if="{{selectedSchedules.length > 0 && selectedSchedules.length < filteredScheduleList.length}}" 
+                  class="selection-counter">{{filteredScheduleList.length - selectedSchedules.length}}</view>
+          </view>
+          
+          <view class="selection-btn {{selectedSchedules.length === 0 ? 'disabled' : ''}}" 
+                bindtap="selectInverse">
             <text class="selection-icon">🔄</text>
             <text class="selection-text">反选</text>
           </view>
-          <view class="selection-btn" bindtap="clearSelection">
+          
+          <view class="selection-btn {{selectedSchedules.length === 0 ? 'disabled' : ''}}" 
+                bindtap="clearSelection">
             <text class="selection-icon">❌</text>
             <text class="selection-text">清空</text>
           </view>
+        </view>
+      </view>
+      
+      <!-- 快速选择菜单 -->
+      <view wx:if="{{batchMode && batchSelection.showQuickSelectMenu}}" class="quick-select-menu">
+        <view class="quick-select-header">
+          <text class="menu-title">🚀 快速选择</text>
+          <view class="menu-close" bindtap="showBatchQuickMenu">
+            <text class="close-icon">❌</text>
+          </view>
+        </view>
+        
+        <!-- 快速选择选项 -->
+        <view class="quick-select-options">
+          <view class="quick-option-group">
+            <text class="group-title">按时间选择</text>
+            <view class="option-list">
+              <view class="quick-option" data-action="select_today" bindtap="quickSelectAction">
+                <text class="option-icon">📅</text>
+                <text class="option-text">今日预约</text>
+                <view class="option-count">{{todayScheduleCount}}</view>
+              </view>
+            </view>
+          </view>
+          
+          <view class="quick-option-group">
+            <text class="group-title">按状态选择</text>
+            <view class="option-list">
+              <view class="quick-option" data-action="select_pending" bindtap="quickSelectAction">
+                <text class="option-icon">⏳</text>
+                <text class="option-text">待处理</text>
+                <view class="option-count">{{pendingScheduleCount}}</view>
+              </view>
+              <view class="quick-option" data-action="select_urgent" bindtap="quickSelectAction">
+                <text class="option-icon">🔥</text>
+                <text class="option-text">紧急项目</text>
+                <view class="option-count">{{urgentScheduleCount}}</view>
+              </view>
+              <view class="quick-option" data-action="select_overdue" bindtap="quickSelectAction">
+                <text class="option-icon">⚠️</text>
+                <text class="option-text">已过期</text>
+                <view class="option-count">0</view>
+              </view>
+            </view>
+          </view>
+          
+          <view class="quick-option-group">
+            <text class="group-title">按数量选择</text>
+            <view class="option-list">
+              <view class="quick-option" data-action="select_first_10" bindtap="quickSelectAction">
+                <text class="option-icon">🔝</text>
+                <text class="option-text">前10个</text>
+                <view class="option-count">{{first10Count}}</view>
+              </view>
+              <view class="quick-option" data-action="select_range_5" bindtap="quickSelectAction">
+                <text class="option-icon">🎯</text>
+                <text class="option-text">中间5个</text>
+                <view class="option-count">{{middle5Count}}</view>
+              </view>
+              <view class="quick-option" data-action="select_last_10" bindtap="quickSelectAction">
+                <text class="option-icon">🔟</text>
+                <text class="option-text">后10个</text>
+                <view class="option-count">{{last10Count}}</view>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 高级选择 -->
+          <view class="quick-option-group">
+            <text class="group-title">高级选择</text>
+            <view class="option-list">
+              <view class="quick-option" data-condition="by_status" bindtap="selectByCondition">
+                <text class="option-icon">📊</text>
+                <text class="option-text">按状态筛选</text>
+              </view>
+              <view class="quick-option" data-condition="by_priority" bindtap="selectByCondition">
+                <text class="option-icon">🏅</text>
+                <text class="option-text">按优先级筛选</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 选择限制提示 -->
+        <view class="selection-limit-info">
+          <text class="limit-text">最大可选择 {{batchSelection.maxSelectLimit}} 个项目</text>
+          <text wx:if="{{selectedSchedules.length > 0}}" class="current-text">（当前已选 {{selectedSchedules.length}} 个）</text>
         </view>
       </view>
 
@@ -247,17 +377,18 @@
     <view wx:if="{{batchMode && selectedSchedules.length > 0}}" class="batch-actions-panel">
       <view class="batch-info">
         <text class="batch-count">已选择 {{selectedSchedules.length}} 项</text>
+        <text class="batch-subtitle">可执行多种批量操作</text>
       </view>
       <view class="batch-actions">
         <view class="batch-btn" data-action="reschedule" bindtap="onBatchAction">
           <text class="batch-icon">📅</text>
           <text class="batch-text">批量调整</text>
         </view>
-        <view class="batch-btn" data-action="cancel" bindtap="onBatchAction">
+        <view class="batch-btn danger" data-action="cancel" bindtap="onBatchAction">
           <text class="batch-icon">❌</text>
           <text class="batch-text">批量取消</text>
         </view>
-        <view class="batch-btn" data-action="confirm" bindtap="onBatchAction">
+        <view class="batch-btn success" data-action="confirm" bindtap="onBatchAction">
           <text class="batch-icon">✅</text>
           <text class="batch-text">批量确认</text>
         </view>
@@ -330,4 +461,1270 @@
     bind:approval-complete="onApprovalComplete"
     bind:close="closeApprovalManager">
   </approval-manager>
+
+  <!-- 批量调整操作面板 -->
+  <modal
+    visible="{{batchAdjustPanel.visible}}"
+    title="批量时间调整"
+    type="fullscreen"
+    bind:close="cancelBatchAdjustment">
+    <view slot="content" class="batch-adjust-panel">
+      
+      <!-- 步骤指示器 -->
+      <view class="step-indicator">
+        <view class="step-item {{batchAdjustPanel.currentStep >= 1 ? 'active' : ''}}">
+          <view class="step-number">1</view>
+          <text class="step-text">选择调整方式</text>
+        </view>
+        <view class="step-item {{batchAdjustPanel.currentStep >= 2 ? 'active' : ''}}">
+          <view class="step-number">2</view>
+          <text class="step-text">设置参数</text>
+        </view>
+        <view class="step-item {{batchAdjustPanel.currentStep >= 3 ? 'active' : ''}}">
+          <view class="step-number">3</view>
+          <text class="step-text">冲突检测</text>
+        </view>
+        <view class="step-item {{batchAdjustPanel.currentStep >= 4 ? 'active' : ''}}">
+          <view class="step-number">4</view>
+          <text class="step-text">确认执行</text>
+        </view>
+      </view>
+
+      <!-- 第一步：选择调整方式 -->
+      <view wx:if="{{batchAdjustPanel.currentStep === 1}}" class="adjust-type-selection">
+        <!-- 批量操作工具栏 -->
+        <view class="batch-toolbar">
+          <view class="toolbar-header">
+            <view class="selected-count">
+              <text class="count-number">{{batchAdjustPanel.totalCount}}</text>
+              <text class="count-label">个预约已选择</text>
+            </view>
+            <view class="toolbar-actions">
+              <button class="toolbar-btn quick-delay" bindtap="onQuickDelay">
+                <text class="btn-icon">⚡</text>
+                <text class="btn-text">快速延期</text>
+              </button>
+              <button class="toolbar-btn batch-reschedule" bindtap="onBatchReschedule">
+                <text class="btn-icon">📅</text>
+                <text class="btn-text">批量改期</text>
+              </button>
+              <button class="toolbar-btn smart-optimize" bindtap="onSmartOptimize">
+                <text class="btn-icon">🎯</text>
+                <text class="btn-text">智能优化</text>
+              </button>
+            </view>
+          </view>
+          
+          <!-- 快速操作菜单 -->
+          <view class="quick-actions">
+            <view class="action-group">
+              <text class="group-title">快速延期</text>
+              <view class="action-buttons">
+                <button class="quick-action-btn" data-delay="30" bindtap="onQuickDelaySelect">
+                  <text class="delay-text">30分钟</text>
+                </button>
+                <button class="quick-action-btn" data-delay="60" bindtap="onQuickDelaySelect">
+                  <text class="delay-text">1小时</text>
+                </button>
+                <button class="quick-action-btn" data-delay="120" bindtap="onQuickDelaySelect">
+                  <text class="delay-text">2小时</text>
+                </button>
+                <button class="quick-action-btn" data-delay="1440" bindtap="onQuickDelaySelect">
+                  <text class="delay-text">1天</text>
+                </button>
+              </view>
+            </view>
+            
+            <view class="action-group">
+              <text class="group-title">常用时间</text>
+              <view class="action-buttons">
+                <button class="quick-action-btn" data-time="tomorrow-9" bindtap="onQuickTimeSelect">
+                  <text class="time-text">明日9:00</text>
+                </button>
+                <button class="quick-action-btn" data-time="tomorrow-14" bindtap="onQuickTimeSelect">
+                  <text class="time-text">明日14:00</text>
+                </button>
+                <button class="quick-action-btn" data-time="next-monday" bindtap="onQuickTimeSelect">
+                  <text class="time-text">下周一</text>
+                </button>
+                <button class="quick-action-btn" data-time="weekend" bindtap="onQuickTimeSelect">
+                  <text class="time-text">周末</text>
+                </button>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="panel-title">
+          <text class="title-text">选择批量调整方式</text>
+          <view class="title-tips">
+            <text class="tips-text">💡 选择最适合的调整方式以提高效率</text>
+          </view>
+        </view>
+        
+        <view class="adjust-type-list">
+          <view class="adjust-type-item {{batchAdjustPanel.adjustType === 'uniform' ? 'selected' : ''}}" 
+                data-type="uniform" 
+                bindtap="onBatchAdjustTypeSelect">
+            <view class="type-icon">📅</view>
+            <view class="type-info">
+              <text class="type-title">统一调整</text>
+              <text class="type-desc">将所有预约调整到相同的时间偏移</text>
+              <view class="type-features">
+                <text class="feature-item">• 简单快速</text>
+                <text class="feature-item">• 保持相对顺序</text>
+                <text class="feature-item">• 适合整体延期</text>
+              </view>
+            </view>
+            <view class="type-indicator">
+              <text class="indicator-text">{{batchAdjustPanel.adjustType === 'uniform' ? '已选择' : '选择'}}</text>
+            </view>
+          </view>
+          
+          <view class="adjust-type-item {{batchAdjustPanel.adjustType === 'staggered' ? 'selected' : ''}}" 
+                data-type="staggered" 
+                bindtap="onBatchAdjustTypeSelect">
+            <view class="type-icon">⏰</view>
+            <view class="type-info">
+              <text class="type-title">错开调整</text>
+              <text class="type-desc">按固定间隔依次安排预约时间</text>
+              <view class="type-features">
+                <text class="feature-item">• 避免时间冲突</text>
+                <text class="feature-item">• 均匀分布</text>
+                <text class="feature-item">• 可控间隔</text>
+              </view>
+            </view>
+            <view class="type-indicator">
+              <text class="indicator-text">{{batchAdjustPanel.adjustType === 'staggered' ? '已选择' : '选择'}}</text>
+            </view>
+          </view>
+          
+          <view class="adjust-type-item {{batchAdjustPanel.adjustType === 'smart' ? 'selected' : ''}}" 
+                data-type="smart" 
+                bindtap="onBatchAdjustTypeSelect">
+            <view class="type-icon">🤖</view>
+            <view class="type-info">
+              <text class="type-title">智能调整</text>
+              <text class="type-desc">基于距离、优先级等因素智能安排</text>
+              <view class="type-features">
+                <text class="feature-item">• AI智能分析</text>
+                <text class="feature-item">• 多因子优化</text>
+                <text class="feature-item">• 最优路径</text>
+              </view>
+            </view>
+            <view class="type-indicator">
+              <text class="indicator-text">{{batchAdjustPanel.adjustType === 'smart' ? '已选择' : '选择'}}</text>
+            </view>
+          </view>
+          
+          <view class="adjust-type-item {{batchAdjustPanel.adjustType === 'proportion' ? 'selected' : ''}}" 
+                data-type="proportion" 
+                bindtap="onBatchAdjustTypeSelect">
+            <view class="type-icon">📊</view>
+            <view class="type-info">
+              <text class="type-title">按比例调整</text>
+              <text class="type-desc">根据预约重要性按比例分配时间</text>
+              <view class="type-features">
+                <text class="feature-item">• 差异化处理</text>
+                <text class="feature-item">• 优先级权重</text>
+                <text class="feature-item">• 精细控制</text>
+              </view>
+            </view>
+            <view class="type-indicator">
+              <text class="indicator-text">{{batchAdjustPanel.adjustType === 'proportion' ? '已选择' : '选择'}}</text>
+            </view>
+          </view>
+          
+          <view class="adjust-type-item {{batchAdjustPanel.adjustType === 'template' ? 'selected' : ''}}" 
+                data-type="template" 
+                bindtap="onBatchAdjustTypeSelect">
+            <view class="type-icon">📋</view>
+            <view class="type-info">
+              <text class="type-title">模板调整</text>
+              <text class="type-desc">使用预设的调整模板快速处理</text>
+              <view class="type-features">
+                <text class="feature-item">• 预设模板</text>
+                <text class="feature-item">• 一键应用</text>
+                <text class="feature-item">• 可复用</text>
+              </view>
+            </view>
+            <view class="type-indicator">
+              <text class="indicator-text">{{batchAdjustPanel.adjustType === 'template' ? '已选择' : '选择'}}</text>
+            </view>
+          </view>
+          
+          <view class="adjust-type-item {{batchAdjustPanel.adjustType === 'custom' ? 'selected' : ''}}" 
+                data-type="custom" 
+                bindtap="onBatchAdjustTypeSelect">
+            <view class="type-icon">⚙️</view>
+            <view class="type-info">
+              <text class="type-title">自定义调整</text>
+              <text class="type-desc">为每个预约设置不同的调整规则</text>
+              <view class="type-features">
+                <text class="feature-item">• 完全自定义</text>
+                <text class="feature-item">• 个性化设置</text>
+                <text class="feature-item">• 精确控制</text>
+              </view>
+            </view>
+            <view class="type-indicator">
+              <text class="indicator-text">{{batchAdjustPanel.adjustType === 'custom' ? '已选择' : '选择'}}</text>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 操作提示 -->
+        <view class="operation-tips">
+          <view class="tip-item">
+            <text class="tip-icon">💡</text>
+            <text class="tip-text">建议优先选择智能调整，系统会自动优化时间安排</text>
+          </view>
+          <view class="tip-item">
+            <text class="tip-icon">⚠️</text>
+            <text class="tip-text">调整前请确认患者联系信息，以便及时通知</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 第二步：设置参数 -->
+      <view wx:if="{{batchAdjustPanel.currentStep === 2}}" class="adjust-params-setting">
+        <view class="panel-title">
+          <text class="title-text">调整参数设置</text>
+          <view class="title-info">
+            <text class="info-text">当前方式：</text>
+            <text class="info-value">{{batchAdjustPanel.adjustTypeName}}</text>
+          </view>
+        </view>
+        
+        <!-- 统一调整参数 -->
+        <view wx:if="{{batchAdjustPanel.adjustType === 'uniform'}}" class="uniform-params">
+          <view class="param-section">
+            <view class="section-title">
+              <text class="section-text">基本设置</text>
+            </view>
+            
+            <view class="param-group">
+              <text class="param-label">调整方式</text>
+              <view class="param-options">
+                <button class="param-btn {{batchAdjustPanel.adjustParams.delayType === 'minutes' ? 'active' : ''}}" 
+                        data-field="delayType" data-value="minutes" bindtap="onAdjustParamChange">分钟</button>
+                <button class="param-btn {{batchAdjustPanel.adjustParams.delayType === 'hours' ? 'active' : ''}}" 
+                        data-field="delayType" data-value="hours" bindtap="onAdjustParamChange">小时</button>
+                <button class="param-btn {{batchAdjustPanel.adjustParams.delayType === 'days' ? 'active' : ''}}" 
+                        data-field="delayType" data-value="days" bindtap="onAdjustParamChange">天数</button>
+                <button class="param-btn {{batchAdjustPanel.adjustParams.delayType === 'fixed' ? 'active' : ''}}" 
+                        data-field="delayType" data-value="fixed" bindtap="onAdjustParamChange">固定时间</button>
+              </view>
+            </view>
+            
+            <view wx:if="{{batchAdjustPanel.adjustParams.delayType !== 'fixed'}}" class="param-group">
+              <text class="param-label">延迟数量</text>
+              <view class="param-input-group">
+                <input class="param-input" 
+                       type="number" 
+                       value="{{batchAdjustPanel.adjustParams.delayValue}}"
+                       data-field="delayValue" 
+                       bindinput="onAdjustParamChange" 
+                       placeholder="输入数量" />
+                <text class="param-unit">{{batchAdjustPanel.adjustParams.delayType === 'minutes' ? '分钟' : (batchAdjustPanel.adjustParams.delayType === 'hours' ? '小时' : '天')}}</text>
+              </view>
+            </view>
+            
+            <view wx:if="{{batchAdjustPanel.adjustParams.delayType === 'fixed'}}" class="param-group">
+              <view class="param-row">
+                <text class="param-label">目标日期</text>
+                <picker mode="date" 
+                        value="{{batchAdjustPanel.adjustParams.targetDate}}"
+                        data-field="targetDate"
+                        bindchange="onAdjustParamChange">
+                  <input class="param-input" value="{{batchAdjustPanel.adjustParams.targetDate}}" disabled />
+                </picker>
+              </view>
+              
+              <view class="param-row">
+                <text class="param-label">目标时间</text>
+                <picker mode="time" 
+                        value="{{batchAdjustPanel.adjustParams.targetTime}}"
+                        data-field="targetTime"
+                        bindchange="onAdjustParamChange">
+                  <input class="param-input" value="{{batchAdjustPanel.adjustParams.targetTime}}" disabled />
+                </picker>
+              </view>
+            </view>
+          </view>
+          
+          <view class="param-section">
+            <view class="section-title">
+              <text class="section-text">高级设置</text>
+            </view>
+            
+            <view class="param-group">
+              <view class="param-switch">
+                <text class="switch-label">保持原有顺序</text>
+                <switch checked="{{batchAdjustPanel.adjustParams.keepOrder}}" 
+                        data-field="keepOrder" 
+                        bindchange="onAdjustParamChange" />
+              </view>
+            </view>
+            
+            <view class="param-group">
+              <view class="param-switch">
+                <text class="switch-label">避开工作时间外</text>
+                <switch checked="{{batchAdjustPanel.adjustParams.avoidNonWorkHours}}" 
+                        data-field="avoidNonWorkHours" 
+                        bindchange="onAdjustParamChange" />
+              </view>
+            </view>
+            
+            <view class="param-group">
+              <view class="param-switch">
+                <text class="switch-label">避开周末</text>
+                <switch checked="{{batchAdjustPanel.adjustParams.avoidWeekends}}" 
+                        data-field="avoidWeekends" 
+                        bindchange="onAdjustParamChange" />
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 错开调整参数 -->
+        <view wx:if="{{batchAdjustPanel.adjustType === 'staggered'}}" class="staggered-params">
+          <view class="param-group">
+            <text class="param-label">开始时间</text>
+            <picker mode="time" 
+                    value="{{batchAdjustPanel.adjustParams.startTime}}"
+                    data-field="startTime"
+                    bindchange="onAdjustParamChange">
+              <input class="param-input" value="{{batchAdjustPanel.adjustParams.startTime}}" disabled />
+            </picker>
+          </view>
+          
+          <view class="param-group">
+            <text class="param-label">间隔时间</text>
+            <input class="param-input" 
+                   type="number" 
+                   value="{{batchAdjustPanel.adjustParams.interval}}"
+                   data-field="interval" 
+                   bindinput="onAdjustParamChange" />
+            <text class="param-unit">分钟</text>
+          </view>
+        </view>
+        
+        <!-- 智能调整参数 -->
+        <view wx:if="{{batchAdjustPanel.adjustType === 'smart'}}" class="smart-params">
+          <view class="param-group">
+            <text class="param-label">优化策略</text>
+            <view class="param-options">
+              <button class="param-btn {{batchAdjustPanel.adjustParams.strategy === 'distance' ? 'active' : ''}}" 
+                      data-field="strategy" data-value="distance" bindtap="onAdjustParamChange">距离优先</button>
+              <button class="param-btn {{batchAdjustPanel.adjustParams.strategy === 'priority' ? 'active' : ''}}" 
+                      data-field="strategy" data-value="priority" bindtap="onAdjustParamChange">优先级优先</button>
+              <button class="param-btn {{batchAdjustPanel.adjustParams.strategy === 'time' ? 'active' : ''}}" 
+                      data-field="strategy" data-value="time" bindtap="onAdjustParamChange">时间优先</button>
+            </view>
+          </view>
+          
+          <view class="param-group">
+            <text class="param-label">考虑交通</text>
+            <switch checked="{{batchAdjustPanel.adjustParams.considerTraffic}}" 
+                    data-field="considerTraffic" 
+                    bindchange="onAdjustParamChange" />
+          </view>
+          
+          <view class="param-group">
+            <text class="param-label">避开周末</text>
+            <switch checked="{{batchAdjustPanel.adjustParams.avoidWeekends}}" 
+                    data-field="avoidWeekends" 
+                    bindchange="onAdjustParamChange" />
+          </view>
+        </view>
+        
+        <!-- 增强的预览区域 -->
+        <view class="enhanced-preview-section">
+          <view class="preview-header">
+            <view class="preview-title">
+              <text class="title-text">实时预览</text>
+              <view class="preview-stats">
+                <text class="stats-text">{{batchAdjustPanel.preview.length}} 个项目</text>
+              </view>
+            </view>
+            <view class="preview-controls">
+              <button class="preview-btn" bindtap="onRefreshPreview">
+                <text class="btn-icon">🔄</text>
+                <text class="btn-text">刷新</text>
+              </button>
+              <button class="preview-btn" bindtap="onTogglePreviewDetail">
+                <text class="btn-icon">{{showPreviewDetail ? '🔼' : '🔽'}}</text>
+                <text class="btn-text">{{showPreviewDetail ? '简化' : '详细'}}</text>
+              </button>
+            </view>
+          </view>
+          
+          <view wx:if="{{batchAdjustPanel.preview.length > 0}}" class="enhanced-preview-list">
+            <view wx:for="{{batchAdjustPanel.preview}}" wx:key="scheduleId" class="enhanced-preview-item {{item.conflict ? 'conflict' : ''}}">
+              <view class="preview-main">
+                <view class="preview-patient">
+                  <text class="patient-name">{{item.patientName}}</text>
+                  <view wx:if="{{item.priority}}" class="priority-tag {{item.priority}}">
+                    <text class="priority-text">{{item.priority}}</text>
+                  </view>
+                </view>
+                
+                <view class="preview-time-comparison">
+                  <view class="time-row">
+                    <text class="time-label">原时间</text>
+                    <text class="original-time">{{item.originalTime}}</text>
+                  </view>
+                  <view class="time-arrow">→</view>
+                  <view class="time-row">
+                    <text class="time-label">新时间</text>
+                    <text class="new-time {{item.conflict ? 'conflict' : 'success'}}">{{item.newTime}}</text>
+                  </view>
+                </view>
+                
+                <view wx:if="{{item.conflict}}" class="conflict-indicator">
+                  <text class="conflict-icon">⚠️</text>
+                  <text class="conflict-text">时间冲突</text>
+                </view>
+              </view>
+              
+              <view wx:if="{{showPreviewDetail}}" class="preview-details">
+                <view wx:if="{{item.smartReason}}" class="detail-item">
+                  <text class="detail-label">调整原因</text>
+                  <text class="detail-value">{{item.smartReason}}</text>
+                </view>
+                
+                <view wx:if="{{item.duration}}" class="detail-item">
+                  <text class="detail-label">服务时长</text>
+                  <text class="detail-value">{{item.duration}} 分钟</text>
+                </view>
+                
+                <view wx:if="{{item.distance}}" class="detail-item">
+                  <text class="detail-label">距离</text>
+                  <text class="detail-value">{{item.distance}} 公里</text>
+                </view>
+              </view>
+            </view>
+          </view>
+          
+          <view wx:else class="empty-preview">
+            <text class="empty-text">暂无预览数据，请先设置调整参数</text>
+          </view>
+        </view>
+        
+        <view class="step-buttons">
+          <button class="btn-secondary" bindtap="cancelBatchAdjustment">
+            <text class="btn-icon">❌</text>
+            <text class="btn-text">取消</text>
+          </button>
+          <button class="btn-outline" bindtap="onSaveAdjustTemplate">
+            <text class="btn-icon">💾</text>
+            <text class="btn-text">保存模板</text>
+          </button>
+          <button class="btn-primary" bindtap="performConflictDetection">
+            <text class="btn-icon">🔍</text>
+            <text class="btn-text">检测冲突</text>
+          </button>
+        </view>
+      </view>
+
+      <!-- 第三步：冲突检测结果 -->
+      <view wx:if="{{batchAdjustPanel.currentStep === 3}}" class="conflict-detection">
+        <view class="panel-title">冲突检测结果</view>
+        
+        <view wx:if="{{batchAdjustPanel.conflicts.length === 0}}" class="no-conflict">
+          <view class="success-icon">✅</view>
+          <text class="success-text">未发现时间冲突，可以直接执行调整</text>
+        </view>
+        
+        <view wx:else class="conflict-list">
+          <view class="conflict-summary">
+            <text class="conflict-count">发现 {{batchAdjustPanel.conflicts.length}} 个时间冲突</text>
+          </view>
+          
+          <view wx:for="{{batchAdjustPanel.conflicts}}" wx:key="scheduleId" class="conflict-item">
+            <view class="conflict-info">
+              <text class="conflict-patient">{{item.patientName}}</text>
+              <text class="conflict-details">{{item.details}}</text>
+            </view>
+            <view class="conflict-type {{item.type}}">{{item.type === 'internal' ? '内部冲突' : '外部冲突'}}</view>
+          </view>
+          
+          <button class="btn-warning" bindtap="showBatchConflictHandler">处理冲突</button>
+        </view>
+        
+        <view class="step-buttons">
+          <button class="btn-secondary" bindtap="onBatchAdjustTypeSelect">返回设置</button>
+          <button wx:if="{{batchAdjustPanel.conflicts.length === 0}}" 
+                  class="btn-primary" 
+                  bindtap="setCurrentStep" 
+                  data-step="4">确认执行</button>
+        </view>
+      </view>
+
+      <!-- 第四步：确认执行 -->
+      <view wx:if="{{batchAdjustPanel.currentStep === 4}}" class="confirm-execution">
+        <view class="panel-title">确认执行批量调整</view>
+        
+        <view class="execution-summary">
+          <view class="summary-item">
+            <text class="summary-label">调整方式：</text>
+            <text class="summary-value">{{batchAdjustPanel.adjustType}}</text>
+          </view>
+          <view class="summary-item">
+            <text class="summary-label">影响预约：</text>
+            <text class="summary-value">{{batchAdjustPanel.totalCount}} 个</text>
+          </view>
+          <view class="summary-item">
+            <text class="summary-label">冲突处理：</text>
+            <text class="summary-value">{{batchAdjustPanel.conflicts.length === 0 ? '无冲突' : '已解决'}}</text>
+          </view>
+        </view>
+        
+        <view class="final-preview">
+          <view class="preview-title">最终调整方案</view>
+          <view class="final-preview-list">
+            <view wx:for="{{batchAdjustPanel.preview}}" 
+                  wx:key="scheduleId" 
+                  class="final-preview-item {{item.status}}">
+              <view class="preview-patient">{{item.patientName}}</view>
+              <view class="preview-time-change">
+                <text class="original">{{item.originalTime}}</text>
+                <text class="arrow">→</text>
+                <text class="new">{{item.newTime}}</text>
+              </view>
+              <view wx:if="{{item.resolutionMethod}}" class="resolution-method">{{item.resolutionMethod}}</view>
+            </view>
+          </view>
+        </view>
+        
+        <view class="step-buttons">
+          <button class="btn-secondary" bindtap="cancelBatchAdjustment">取消</button>
+          <button class="btn-primary" bindtap="confirmBatchAdjustment">确认执行</button>
+        </view>
+      </view>
+      
+    </view>
+  </modal>
+
+  <!-- 批量冲突处理界面 -->
+  <modal
+    visible="{{batchConflictPanel.visible}}"
+    title="冲突处理"
+    type="fullscreen"
+    bind:close="closeBatchConflictPanel">
+    <view slot="content" class="batch-conflict-panel">
+      
+      <!-- 增强的冲突总览 -->
+      <view class="enhanced-conflict-overview">
+        <view class="overview-header">
+          <text class="overview-title">🚨 冲突情况总览</text>
+          <view class="overview-severity">
+            <view class="severity-indicator {{batchConflictPanel.overallSeverity}}">
+              <text class="severity-text">{{batchConflictPanel.overallSeverityText}}</text>
+            </view>
+          </view>
+        </view>
+        
+        <view class="enhanced-overview-stats">
+          <view class="stat-card total">
+            <view class="stat-icon">⚠️</view>
+            <view class="stat-content">
+              <text class="stat-number">{{batchConflictPanel.conflicts.length}}</text>
+              <text class="stat-label">总冲突数</text>
+              <text class="stat-desc">需要处理的冲突项</text>
+            </view>
+          </view>
+          
+          <view class="stat-card internal">
+            <view class="stat-icon">🔄</view>
+            <view class="stat-content">
+              <text class="stat-number">{{batchConflictPanel.internalConflicts.length}}</text>
+              <text class="stat-label">内部冲突</text>
+              <text class="stat-desc">批量调整项间冲突</text>
+            </view>
+          </view>
+          
+          <view class="stat-card external">
+            <view class="stat-icon">🔗</view>
+            <view class="stat-content">
+              <text class="stat-number">{{batchConflictPanel.externalConflicts.length}}</text>
+              <text class="stat-label">外部冲突</text>
+              <text class="stat-desc">与现有预约冲突</text>
+            </view>
+          </view>
+          
+          <view class="stat-card critical">
+            <view class="stat-icon">🔥</view>
+            <view class="stat-content">
+              <text class="stat-number">{{batchConflictPanel.criticalConflicts.length}}</text>
+              <text class="stat-label">严重冲突</text>
+              <text class="stat-desc">高优先级冲突</text>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 冲突分布图表 -->
+        <view class="conflict-distribution">
+          <text class="distribution-title">冲突严重程度分布</text>
+          <view class="severity-bars">
+            <view class="severity-bar high">
+              <view class="bar-fill" style="width: {{batchConflictPanel.severityStats.high.percentage}}%"></view>
+              <text class="bar-label">严重 ({{batchConflictPanel.severityStats.high.count}})</text>
+            </view>
+            <view class="severity-bar medium">
+              <view class="bar-fill" style="width: {{batchConflictPanel.severityStats.medium.percentage}}%"></view>
+              <text class="bar-label">中等 ({{batchConflictPanel.severityStats.medium.count}})</text>
+            </view>
+            <view class="severity-bar low">
+              <view class="bar-fill" style="width: {{batchConflictPanel.severityStats.low.percentage}}%"></view>
+              <text class="bar-label">轻微 ({{batchConflictPanel.severityStats.low.count}})</text>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 冲突影响评估 -->
+        <view class="conflict-impact-assessment">
+          <text class="assessment-title">影响评估</text>
+          <view class="impact-items">
+            <view class="impact-item">
+              <text class="impact-icon">👥</text>
+              <text class="impact-text">影响患者: {{batchConflictPanel.impactAnalysis.affectedPatients}} 位</text>
+            </view>
+            <view class="impact-item">
+              <text class="impact-icon">⏰</text>
+              <text class="impact-text">时间延误: {{batchConflictPanel.impactAnalysis.totalDelay}} 小时</text>
+            </view>
+            <view class="impact-item">
+              <text class="impact-icon">💰</text>
+              <text class="impact-text">经济损失: ¥{{batchConflictPanel.impactAnalysis.economicLoss}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 增强的解决策略选择 -->
+      <view class="enhanced-resolution-strategy">
+        <view class="strategy-header">
+          <text class="strategy-title">🎁 选择解决策略</text>
+          <view class="strategy-tips">
+            <view class="tip-item">
+              <text class="tip-icon">ℹ️</text>
+              <text class="tip-text">建议优先使用智能自动解决</text>
+            </view>
+          </view>
+        </view>
+        
+        <view class="enhanced-strategy-options">
+          <view class="strategy-option-card {{batchConflictPanel.resolutionStrategy === 'auto' ? 'active' : ''}}" 
+                data-strategy="auto" 
+                bindtap="onConflictResolutionSelect">
+            <view class="strategy-header-card">
+              <view class="strategy-icon-wrapper">
+                <view class="strategy-icon auto">🤖</view>
+                <view class="strategy-badge recommended">推荐</view>
+              </view>
+              <view class="strategy-info">
+                <text class="strategy-name">智能自动解决</text>
+                <text class="strategy-subtitle">高效、准确、省时</text>
+              </view>
+              <view class="strategy-status">
+                <text class="status-text">{{batchConflictPanel.resolutionStrategy === 'auto' ? '已选中' : '点击选择'}}</text>
+              </view>
+            </view>
+            
+            <view class="strategy-description">
+              <text class="description-text">系统会自动分析冲突原因，找到最优的时间重新安排方案。</text>
+            </view>
+            
+            <view class="strategy-features">
+              <view class="feature-item">
+                <text class="feature-icon">✓</text>
+                <text class="feature-text">智能分析最优时间</text>
+              </view>
+              <view class="feature-item">
+                <text class="feature-icon">✓</text>
+                <text class="feature-text">考虑多种约束条件</text>
+              </view>
+              <view class="feature-item">
+                <text class="feature-icon">✓</text>
+                <text class="feature-text">保障服务连续性</text>
+              </view>
+            </view>
+            
+            <view class="strategy-metrics">
+              <view class="metric-item">
+                <text class="metric-label">成功率</text>
+                <text class="metric-value">95%</text>
+              </view>
+              <view class="metric-item">
+                <text class="metric-label">平均时间</text>
+                <text class="metric-value">30秒</text>
+              </view>
+              <view class="metric-item">
+                <text class="metric-label">满意度</text>
+                <text class="metric-value">4.8★</text>
+              </view>
+            </view>
+          </view>
+          
+          <view class="strategy-option-card {{batchConflictPanel.resolutionStrategy === 'manual' ? 'active' : ''}}" 
+                data-strategy="manual" 
+                bindtap="onConflictResolutionSelect">
+            <view class="strategy-header-card">
+              <view class="strategy-icon-wrapper">
+                <view class="strategy-icon manual">👤</view>
+                <view class="strategy-badge expert">专业</view>
+              </view>
+              <view class="strategy-info">
+                <text class="strategy-name">手动精准解决</text>
+                <text class="strategy-subtitle">灵活、可控、个性化</text>
+              </view>
+              <view class="strategy-status">
+                <text class="status-text">{{batchConflictPanel.resolutionStrategy === 'manual' ? '已选中' : '点击选择'}}</text>
+              </view>
+            </view>
+            
+            <view class="strategy-description">
+              <text class="description-text">为每个冲突项目手动选择处理方式，可以根据实际情况灵活调整。</text>
+            </view>
+            
+            <view class="strategy-features">
+              <view class="feature-item">
+                <text class="feature-icon">✓</text>
+                <text class="feature-text">完全控制处理过程</text>
+              </view>
+              <view class="feature-item">
+                <text class="feature-icon">✓</text>
+                <text class="feature-text">个性化解决方案</text>
+              </view>
+              <view class="feature-item">
+                <text class="feature-icon">✓</text>
+                <text class="feature-text">专业经验指导</text>
+              </view>
+            </view>
+            
+            <view class="strategy-complexity">
+              <text class="complexity-label">复杂度:</text>
+              <view class="complexity-bars">
+                <view class="complexity-bar active"></view>
+                <view class="complexity-bar active"></view>
+                <view class="complexity-bar active"></view>
+                <view class="complexity-bar"></view>
+                <view class="complexity-bar"></view>
+              </view>
+              <text class="complexity-text">中等</text>
+            </view>
+          </view>
+          
+          <view class="strategy-option-card {{batchConflictPanel.resolutionStrategy === 'skip' ? 'active' : ''}}" 
+                data-strategy="skip" 
+                bindtap="onConflictResolutionSelect">
+            <view class="strategy-header-card">
+              <view class="strategy-icon-wrapper">
+                <view class="strategy-icon skip">⏭️</view>
+                <view class="strategy-badge fast">快速</view>
+              </view>
+              <view class="strategy-info">
+                <text class="strategy-name">跳过冲突项目</text>
+                <text class="strategy-subtitle">简单、快速、保守</text>
+              </view>
+              <view class="strategy-status">
+                <text class="status-text">{{batchConflictPanel.resolutionStrategy === 'skip' ? '已选中' : '点击选择'}}</text>
+              </view>
+            </view>
+            
+            <view class="strategy-description">
+              <text class="description-text">跳过所有冲突项目，仅处理无冲突的预约，保持原有时间安排。</text>
+            </view>
+            
+            <view class="strategy-features">
+              <view class="feature-item warning">
+                <text class="feature-icon">⚠️</text>
+                <text class="feature-text">部分项目无法调整</text>
+              </view>
+              <view class="feature-item">
+                <text class="feature-icon">✓</text>
+                <text class="feature-text">保持原有时间不变</text>
+              </view>
+              <view class="feature-item">
+                <text class="feature-icon">✓</text>
+                <text class="feature-text">操作简单快速</text>
+              </view>
+            </view>
+            
+            <view class="strategy-impact">
+              <view class="impact-item">
+                <text class="impact-label">将跳过:</text>
+                <text class="impact-value">{{batchConflictPanel.conflicts.length}} 个冲突项目</text>
+              </view>
+              <view class="impact-item">
+                <text class="impact-label">将处理:</text>
+                <text class="impact-value">{{batchAdjustPanel.totalCount - batchConflictPanel.conflicts.length}} 个无冲突项目</text>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 智能推荐选项 -->
+          <view class="strategy-option-card smart-recommendation" 
+                data-strategy="smart" 
+                bindtap="onConflictResolutionSelect">
+            <view class="strategy-header-card">
+              <view class="strategy-icon-wrapper">
+                <view class="strategy-icon smart">🤔</view>
+                <view class="strategy-badge ai">智能推荐</view>
+              </view>
+              <view class="strategy-info">
+                <text class="strategy-name">智能混合策略</text>
+                <text class="strategy-subtitle">基于AI的智能决策</text>
+              </view>
+              <view class="strategy-status">
+                <text class="status-text">点击选择</text>
+              </view>
+            </view>
+            
+            <view class="strategy-description">
+              <text class="description-text">基于历史数据和当前情况，智能组合多种策略，为您推荐最优解决方案。</text>
+            </view>
+            
+            <view class="ai-analysis">
+              <text class="ai-title">🧠 AI 分析结果：</text>
+              <view class="ai-suggestions">
+                <view class="ai-suggestion">
+                  <text class="suggestion-icon">•</text>
+                  <text class="suggestion-text">70% 项目建议自动解决</text>
+                </view>
+                <view class="ai-suggestion">
+                  <text class="suggestion-icon">•</text>
+                  <text class="suggestion-text">20% 项目需要手动干预</text>
+                </view>
+                <view class="ai-suggestion">
+                  <text class="suggestion-icon">•</text>
+                  <text class="suggestion-text">10% 项目建议跳过</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 策略对比表 -->
+        <view class="strategy-comparison">
+          <text class="comparison-title">策略对比一览</text>
+          <view class="comparison-table">
+            <view class="comparison-row header">
+              <text class="col-strategy">策略</text>
+              <text class="col-time">时间</text>
+              <text class="col-complexity">复杂度</text>
+              <text class="col-success">成功率</text>
+            </view>
+            <view class="comparison-row">
+              <text class="col-strategy">自动解决</text>
+              <text class="col-time">30秒</text>
+              <text class="col-complexity low">低</text>
+              <text class="col-success high">95%</text>
+            </view>
+            <view class="comparison-row">
+              <text class="col-strategy">手动解决</text>
+              <text class="col-time">5-15分钟</text>
+              <text class="col-complexity medium">中</text>
+              <text class="col-success high">98%</text>
+            </view>
+            <view class="comparison-row">
+              <text class="col-strategy">跳过处理</text>
+              <text class="col-time">5秒</text>
+              <text class="col-complexity low">低</text>
+              <text class="col-success medium">60%</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 自动解决设置 -->
+      <view wx:if="{{batchConflictPanel.resolutionStrategy === 'auto'}}" class="auto-resolution-settings">
+        <view class="settings-title">自动解决设置</view>
+        <view class="setting-group">
+          <view class="setting-item">
+            <text class="setting-label">偏好更早的时间</text>
+            <switch checked="{{batchConflictPanel.autoResolutionOptions.preferEarlier}}" 
+                    data-field="preferEarlier" 
+                    bindchange="onAutoResolutionOptionChange" />
+          </view>
+          
+          <view class="setting-item">
+            <text class="setting-label">允许在周末安排</text>
+            <switch checked="{{batchConflictPanel.autoResolutionOptions.allowWeekends}}" 
+                    data-field="allowWeekends" 
+                    bindchange="onAutoResolutionOptionChange" />
+          </view>
+          
+          <view class="setting-item">
+            <text class="setting-label">最大延迟天数</text>
+            <input class="setting-input" 
+                   type="number" 
+                   value="{{batchConflictPanel.autoResolutionOptions.maxDaysDelay}}"
+                   data-field="maxDaysDelay" 
+                   bindinput="onAutoResolutionOptionChange" />
+          </view>
+        </view>
+      </view>
+
+      <!-- 手动解决设置 -->
+      <view wx:if="{{batchConflictPanel.resolutionStrategy === 'manual'}}" class="manual-resolution-settings">
+        <view class="settings-title">手动解决设置</view>
+        <view class="manual-options-list">
+          <view wx:for="{{batchConflictPanel.manualOptions}}" 
+                wx:key="conflictId" 
+                class="manual-option-item">
+            <view class="conflict-info">
+              <text class="conflict-patient">{{item.patientName}}</text>
+              <text class="conflict-details">{{item.conflictDetails}}</text>
+            </view>
+            
+            <view class="resolution-options">
+              <view wx:for="{{item.options}}" 
+                    wx:for-item="option" 
+                    wx:key="key" 
+                    class="resolution-option {{item.selectedOption === option.key ? 'selected' : ''}}" 
+                    data-conflict-id="{{item.conflictId}}" 
+                    data-option="{{option.key}}" 
+                    bindtap="onManualOptionSelect">
+                <text class="option-icon">{{option.icon}}</text>
+                <text class="option-label">{{option.label}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 跳过解决说明 -->
+      <view wx:if="{{batchConflictPanel.resolutionStrategy === 'skip'}}" class="skip-resolution-info">
+        <view class="info-title">跳过解决说明</view>
+        <view class="info-content">
+          <text>选择跳过解决将：</text>
+          <view class="info-list">
+            <text class="info-item">• 保留所有无冲突的预约调整</text>
+            <text class="info-item">• 跳过所有有冲突的预约调整</text>
+            <text class="info-item">• 保持原有时间不变</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 增强的冲突详情列表 -->
+      <view class="enhanced-conflict-details-list">
+        <view class="details-header">
+          <text class="details-title">🔍 冲突详情分析</text>
+          <view class="details-controls">
+            <button class="detail-btn" bindtap="onSortConflictsBySeverity">
+              <text class="btn-icon">🔄</text>
+              <text class="btn-text">按严重程度排序</text>
+            </button>
+            <button class="detail-btn" bindtap="onFilterConflictsByType">
+              <text class="btn-icon">🔍</text>
+              <text class="btn-text">筛选</text>
+            </button>
+          </view>
+        </view>
+        
+        <view class="enhanced-conflict-items">
+          <view wx:for="{{batchConflictPanel.sortedConflicts}}" 
+                wx:key="scheduleId" 
+                class="enhanced-conflict-item {{item.severity}}">
+            
+            <!-- 冲突级别指示器 -->
+            <view class="conflict-severity-indicator">
+              <view class="severity-dot {{item.severity}}">
+                <text class="severity-icon">{{item.severityIcon}}</text>
+              </view>
+              <view class="severity-info">
+                <text class="severity-level">{{item.severityText}}</text>
+                <text class="severity-score">评分: {{item.severityScore}}/100</text>
+              </view>
+            </view>
+            
+            <!-- 冲突主体信息 -->
+            <view class="enhanced-conflict-header">
+              <view class="patient-info-enhanced">
+                <view class="patient-avatar">
+                  <text class="avatar-text">{{item.patientName.substring(0,1)}}</text>
+                </view>
+                <view class="patient-details">
+                  <text class="patient-name">{{item.patientName}}</text>
+                  <view class="patient-tags">
+                    <view class="conflict-type-badge {{item.type}}">
+                      <text class="badge-icon">{{item.type === 'internal' ? '🔄' : '🔗'}}</text>
+                      <text class="badge-text">{{item.type === 'internal' ? '内部冲突' : '外部冲突'}}</text>
+                    </view>
+                    <view wx:if="{{item.priority}}" class="priority-badge {{item.priority}}">
+                      <text class="priority-text">{{item.priorityText}}</text>
+                    </view>
+                  </view>
+                </view>
+              </view>
+              
+              <!-- 冲突状态指示 -->
+              <view class="conflict-status">
+                <view class="status-indicator {{item.resolutionStatus || 'pending'}}">
+                  <text class="status-text">{{item.resolutionStatusText || '待处理'}}</text>
+                </view>
+              </view>
+            </view>
+            
+            <!-- 时间冲突对比 -->
+            <view class="enhanced-time-comparison">
+              <view class="time-section original">
+                <text class="time-label">原定时间</text>
+                <view class="time-display">
+                  <text class="time-value">{{item.originalTime}}</text>
+                  <text class="time-date">{{item.originalDate}}</text>
+                </view>
+              </view>
+              
+              <view class="time-arrow-section">
+                <view class="conflict-arrow">
+                  <text class="arrow-symbol">→</text>
+                  <view class="conflict-warning">
+                    <text class="warning-icon">⚠️</text>
+                  </view>
+                </view>
+              </view>
+              
+              <view class="time-section new">
+                <text class="time-label">调整时间</text>
+                <view class="time-display conflict">
+                  <text class="time-value">{{item.newTime}}</text>
+                  <text class="time-date">{{item.newDate}}</text>
+                </view>
+              </view>
+            </view>
+            
+            <!-- 冲突详细描述 -->
+            <view class="enhanced-conflict-description">
+              <view class="description-header">
+                <text class="description-title">冲突原因分析</text>
+                <button class="expand-btn" data-conflict-id="{{item.scheduleId}}" bindtap="onToggleConflictDetails">
+                  <text class="expand-icon">{{item.expanded ? '▲' : '▼'}}</text>
+                </button>
+              </view>
+              
+              <view class="description-content">
+                <text class="main-description">{{item.details}}</text>
+                
+                <view wx:if="{{item.expanded}}" class="detailed-analysis">
+                  <view class="analysis-item">
+                    <text class="analysis-label">冲突类型:</text>
+                    <text class="analysis-value">{{item.conflictTypeDescription}}</text>
+                  </view>
+                  
+                  <view class="analysis-item">
+                    <text class="analysis-label">影响范围:</text>
+                    <text class="analysis-value">{{item.impactScope}}</text>
+                  </view>
+                  
+                  <view wx:if="{{item.conflictWith && item.conflictWith.length > 0}}" class="analysis-item">
+                    <text class="analysis-label">冲突对象:</text>
+                    <view class="conflict-targets">
+                      <view wx:for="{{item.conflictWith}}" wx:for-item="target" wx:key="*this" class="conflict-target">
+                        <text class="target-name">{{target.patientName}}</text>
+                        <text class="target-time">{{target.time}}</text>
+                      </view>
+                    </view>
+                  </view>
+                  
+                  <view class="analysis-item">
+                    <text class="analysis-label">建议方案:</text>
+                    <view class="suggestion-list">
+                      <view wx:for="{{item.suggestions}}" wx:for-item="suggestion" wx:key="*this" class="suggestion-item">
+                        <text class="suggestion-icon">•</text>
+                        <text class="suggestion-text">{{suggestion}}</text>
+                      </view>
+                    </view>
+                  </view>
+                </view>
+              </view>
+            </view>
+            
+            <!-- 冲突操作快捷键 -->
+            <view class="conflict-quick-actions">
+              <button class="quick-action-btn priority" 
+                      data-conflict-id="{{item.scheduleId}}" 
+                      data-action="reschedule" 
+                      bindtap="onQuickConflictAction">
+                <text class="action-icon">📝</text>
+                <text class="action-text">重新安排</text>
+              </button>
+              
+              <button class="quick-action-btn secondary" 
+                      data-conflict-id="{{item.scheduleId}}" 
+                      data-action="skip" 
+                      bindtap="onQuickConflictAction">
+                <text class="action-icon">⏭️</text>
+                <text class="action-text">跳过处理</text>
+              </button>
+              
+              <button wx:if="{{item.canForce}}" 
+                      class="quick-action-btn warning" 
+                      data-conflict-id="{{item.scheduleId}}" 
+                      data-action="force" 
+                      bindtap="onQuickConflictAction">
+                <text class="action-icon">⚠️</text>
+                <text class="action-text">强制执行</text>
+              </button>
+            </view>
+          </view>
+          
+          <!-- 无冲突显示 -->
+          <view wx:if="{{batchConflictPanel.conflicts.length === 0}}" class="no-conflicts-state">
+            <view class="no-conflicts-icon">✨</view>
+            <text class="no-conflicts-title">没有检测到冲突</text>
+            <text class="no-conflicts-desc">所有批量调整项目都可以安全执行</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="conflict-actions">
+        <button class="btn-secondary" bindtap="closeBatchConflictPanel">取消</button>
+        <button class="btn-primary" bindtap="executeConflictResolution">执行解决</button>
+      </view>
+      
+    </view>
+  </modal>
+
+  <!-- 批量调整操作面板 -->
+  <modal wx:if="{{batchAdjustPanel.visible}}" show="{{batchAdjustPanel.visible}}" title="批量时间调整" custom-class="batch-adjust-modal">
+    <view class="batch-adjust-panel">
+      
+      <!-- 步骤指示器 -->
+      <view class="step-indicator">
+        <view class="step-item {{batchAdjustPanel.currentStep >= 1 ? 'active' : ''}} {{batchAdjustPanel.currentStep === 1 ? 'current' : ''}}">
+          <view class="step-number">1</view>
+          <text class="step-label">选择方式</text>
+        </view>
+        <view class="step-line {{batchAdjustPanel.currentStep >= 2 ? 'active' : ''}}"></view>
+        <view class="step-item {{batchAdjustPanel.currentStep >= 2 ? 'active' : ''}} {{batchAdjustPanel.currentStep === 2 ? 'current' : ''}}">
+          <view class="step-number">2</view>
+          <text class="step-label">设置参数</text>
+        </view>
+        <view class="step-line {{batchAdjustPanel.currentStep >= 3 ? 'active' : ''}}"></view>
+        <view class="step-item {{batchAdjustPanel.currentStep >= 3 ? 'active' : ''}} {{batchAdjustPanel.currentStep === 3 ? 'current' : ''}}">
+          <view class="step-number">3</view>
+          <text class="step-label">冲突检测</text>
+        </view>
+        <view class="step-line {{batchAdjustPanel.currentStep >= 4 ? 'active' : ''}}"></view>
+        <view class="step-item {{batchAdjustPanel.currentStep >= 4 ? 'active' : ''}} {{batchAdjustPanel.currentStep === 4 ? 'current' : ''}}">
+          <view class="step-number">4</view>
+          <text class="step-label">确认执行</text>
+        </view>
+      </view>
+
+      <!-- 步骤1：选择调整方式 -->
+      <view wx:if="{{batchAdjustPanel.currentStep === 1}}" class="step-content step-adjust-type">
+        <view class="section-title">
+          <text class="title-text">选择调整方式</text>
+          <text class="title-subtitle">为 {{batchAdjustPanel.totalCount}} 个预约选择时间调整方式</text>
+        </view>
+        
+        <view class="adjust-type-grid">
+          <view class="adjust-type-card" data-type="uniform" bindtap="onBatchAdjustTypeSelect">
+            <view class="type-icon">⏰</view>
+            <view class="type-info">
+              <text class="type-title">统一调整</text>
+              <text class="type-desc">将所有预约统一延后或调整到指定时间</text>
+            </view>
+            <view class="type-features">
+              <text class="feature-item">• 统一延后X小时/天</text>
+              <text class="feature-item">• 固定到指定时间</text>
+            </view>
+          </view>
+          
+          <view class="adjust-type-card" data-type="staggered" bindtap="onBatchAdjustTypeSelect">
+            <view class="type-icon">📊</view>
+            <view class="type-info">
+              <text class="type-title">错开调整</text>
+              <text class="type-desc">按时间间隔依次安排，避免时间冲突</text>
+            </view>
+            <view class="type-features">
+              <text class="feature-item">• 按间隔自动排列</text>
+              <text class="feature-item">• 支持多种排序规则</text>
+            </view>
+          </view>
+          
+          <view class="adjust-type-card" data-type="smart" bindtap="onBatchAdjustTypeSelect">
+            <view class="type-icon">🤖</view>
+            <view class="type-info">
+              <text class="type-title">智能调整</text>
+              <text class="type-desc">基于距离、优先级等因素智能安排</text>
+            </view>
+            <view class="type-features">
+              <text class="feature-item">• 考虑地理位置</text>
+              <text class="feature-item">• 优化路线安排</text>
+            </view>
+          </view>
+          
+          <view class="adjust-type-card" data-type="proportion" bindtap="onBatchAdjustTypeSelect">
+            <view class="type-icon">📈</view>
+            <view class="type-info">
+              <text class="type-title">按比例调整</text>
+              <text class="type-desc">根据优先级按比例分配时间段</text>
+            </view>
+            <view class="type-features">
+              <text class="feature-item">• 优先级比例分配</text>
+              <text class="feature-item">• 自定义比例设置</text>
+            </view>
+          </view>
+          
+          <view class="adjust-type-card" data-type="template" bindtap="onBatchAdjustTypeSelect">
+            <view class="type-icon">📋</view>
+            <view class="type-info">
+              <text class="type-title">模板调整</text>
+              <text class="type-desc">使用预设模板快速调整</text>
+            </view>
+            <view class="type-features">
+              <text class="feature-item">• 预设调整方案</text>
+              <text class="feature-item">• 一键应用模板</text>
+            </view>
+          </view>
+          
+          <view class="adjust-type-card" data-type="custom" bindtap="onBatchAdjustTypeSelect">
+            <view class="type-icon">🔧</view>
+            <view class="type-info">
+              <text class="type-title">自定义调整</text>
+              <text class="type-desc">自定义调整规则和条件</text>
+            </view>
+            <view class="type-features">
+              <text class="feature-item">• 灵活自定义规则</text>
+              <text class="feature-item">• 复杂条件设置</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 操作按钮区域 -->
+      <view class="panel-actions">
+        <view wx:if="{{batchAdjustPanel.currentStep > 1}}" 
+              class="action-btn secondary" 
+              data-action="prev" 
+              bindtap="onBatchAdjustStep">
+          <text>上一步</text>
+        </view>
+        
+        <view wx:if="{{batchAdjustPanel.currentStep < 4}}" 
+              class="action-btn primary" 
+              data-action="next" 
+              bindtap="onBatchAdjustStep">
+          <text>下一步</text>
+        </view>
+        
+        <view wx:if="{{batchAdjustPanel.currentStep === 4}}" 
+              class="action-btn primary execute" 
+              bindtap="executeBatchAdjustment">
+          <text>执行调整</text>
+        </view>
+        
+        <view class="action-btn cancel" bindtap="closeBatchAdjustPanel">
+          <text>取消</text>
+        </view>
+      </view>
+      
+    </view>
+  </modal>
 </view>

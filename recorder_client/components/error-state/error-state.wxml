@@ -1,0 +1,15 @@
+<!--错误状态组件-->
+<view class="error-state">
+  <view class="error-icon">
+    <icon class="icon" type="{{icon}}" size="64" color="#ff3b30"/>
+  </view>
+  
+  <view class="error-content">
+    <view class="error-title">{{title}}</view>
+    <view class="error-description">{{description}}</view>
+  </view>
+  
+  <view wx:if="{{showAction}}" class="error-action">
+    <button class="action-button" bindtap="onActionTap">{{actionText}}</button>
+  </view>
+</view>

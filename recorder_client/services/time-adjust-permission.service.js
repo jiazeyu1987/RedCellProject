@@ -1,4 +1,5 @@
 /**
+/**
  * 时间调整权限管理服务
  * 负责管理时间调整相关的权限控制、限制检查和审批流程
  */
@@ -7,14 +8,15 @@ const RolePermissionManager = require('../utils/role-permission.js');
 const { TIME_ADJUST_CONFIG, TimeAdjustUtils } = require('../constants/time-adjust-config.js');
 const CONFIG = require('../constants/config.js');
 
-class TimeAdjustPermissionService {
+// 定义服务方法
+const TimeAdjustPermissionService = {
   
   /**
    * 获取用户当前的调整权限信息
    * @param {Object} userInfo 用户信息
    * @returns {Object} 权限信息
    */
-  static getUserAdjustPermissions(userInfo) {
+  getUserAdjustPermissions(userInfo) {
     const { role, experience, certifications = [] } = userInfo;
     const permissionLevel = RolePermissionManager.getTimeAdjustPermissionLevel(role);
     const permissions = TIME_ADJUST_CONFIG.permissions[permissionLevel];
@@ -39,14 +41,14 @@ class TimeAdjustPermissionService {
       experience: experience || 0,
       certifications: certifications
     };
-  }
+  },
 
   /**
    * 获取用户可用的调整类型
    * @param {string} userRole 用户角色
    * @returns {Array} 可用的调整类型
    */
-  static getAvailableAdjustTypes(userRole) {
+  getAvailableAdjustTypes(userRole) {
     const types = [];
     
     if (RolePermissionManager.hasTimeAdjustPermission(userRole, 'normal')) {
@@ -80,7 +82,7 @@ class TimeAdjustPermissionService {
     }
     
     return types;
-  }
+  },
 
   /**
    * 验证调整请求的权限
@@ -88,7 +90,7 @@ class TimeAdjustPermissionService {
    * @param {Object} adjustData 调整数据
    * @returns {Object} 验证结果
    */
-  static async validateAdjustRequest(userInfo, adjustData) {
+  async validateAdjustRequest(userInfo, adjustData) {
     const permissions = this.getUserAdjustPermissions(userInfo);
     const validation = {
       valid: true,
@@ -183,7 +185,7 @@ class TimeAdjustPermissionService {
     this.checkSpecialConditions(validation, adjustData, permissions);
 
     return validation;
-  }
+  },
 
   /**
    * 确定调整类型
@@ -192,7 +194,7 @@ class TimeAdjustPermissionService {
    * @param {Object} adjustData 调整数据
    * @returns {string} 调整类型
    */
-  static determineAdjustType(hoursDiff, noticeHours, adjustData) {
+  determineAdjustType(hoursDiff, noticeHours, adjustData) {
     // 紧急情况检查
     if (adjustData.appointmentInfo?.urgent || 
         adjustData.urgentLevel === 'urgent' ||
@@ -226,21 +228,21 @@ class TimeAdjustPermissionService {
     }
     
     return 'normal';
-  }
+  },
 
   /**
    * 获取调整类型名称
    * @param {string} adjustType 调整类型
    * @returns {string} 类型名称
    */
-  static getAdjustTypeName(adjustType) {
+  getAdjustTypeName(adjustType) {
     const typeNames = {
       'normal': '普通调整',
       'advanced': '高级调整',
       'emergency': '紧急调整'
     };
     return typeNames[adjustType] || '未知类型';
-  }
+  },
 
   /**
    * 检查特殊情况
@@ -248,7 +250,7 @@ class TimeAdjustPermissionService {
    * @param {Object} adjustData 调整数据
    * @param {Object} permissions 用户权限
    */
-  static checkSpecialConditions(validation, adjustData, permissions) {
+  checkSpecialConditions(validation, adjustData, permissions) {
     const originalTime = new Date(adjustData.originalTime);
     const newTime = new Date(adjustData.newTime);
     const typePermissions = TIME_ADJUST_CONFIG.permissions[permissions.level];
@@ -349,7 +351,7 @@ class TimeAdjustPermissionService {
       validation.warnings.push(`调整影响评分较高（${impactScore}分），建议谨慎处理`);
       validation.requireApproval = true;
     }
-  }
+  },
 
   /**
    * 检查时间范围限制（增强版）
@@ -358,7 +360,7 @@ class TimeAdjustPermissionService {
    * @param {Object} adjustData 调整数据
    * @returns {Object} 检查结果
    */
-  static checkTimeRangeRestrictions(newTime, typePermissions, adjustData) {
+  checkTimeRangeRestrictions(newTime, typePermissions, adjustData) {
     const result = { valid: true, reason: '' };
     const hour = newTime.getHours();
     const minute = newTime.getMinutes();
@@ -412,7 +414,7 @@ class TimeAdjustPermissionService {
     }
     
     return result;
-  }
+  },
   
   /**
    * 检查特殊日期限制
@@ -421,7 +423,7 @@ class TimeAdjustPermissionService {
    * @param {Object} adjustData 调整数据
    * @returns {Object} 检查结果
    */
-  static checkSpecialDayRestrictions(newTime, typePermissions, adjustData) {
+  checkSpecialDayRestrictions(newTime, typePermissions, adjustData) {
     const result = { valid: true, reason: '' };
     const timeRangeRestrictions = typePermissions.timeRangeRestrictions;
     
@@ -453,7 +455,7 @@ class TimeAdjustPermissionService {
     }
     
     return result;
-  }
+  },
   
   /**
    * 检查条件性限制
@@ -461,7 +463,7 @@ class TimeAdjustPermissionService {
    * @param {Object} typePermissions 权限配置
    * @returns {Object} 检查结果
    */
-  static checkConditionalRestrictions(adjustData, typePermissions) {
+  checkConditionalRestrictions(adjustData, typePermissions) {
     const result = { valid: true, reason: '', requireApproval: false };
     const conditionalRestrictions = typePermissions.conditionalRestrictions;
     
@@ -538,7 +540,7 @@ class TimeAdjustPermissionService {
     }
     
     return result;
-  }
+  },
   
   /**
    * 判断时间是否在指定范围内
@@ -547,7 +549,7 @@ class TimeAdjustPermissionService {
    * @param {string} end 结束时间 (HH:MM)
    * @returns {boolean} 是否在范围内
    */
-  static isTimeInRange(time, start, end) {
+  isTimeInRange(time, start, end) {
     const timeMinutes = this.timeToMinutes(time);
     const startMinutes = this.timeToMinutes(start);
     const endMinutes = this.timeToMinutes(end);
@@ -558,26 +560,26 @@ class TimeAdjustPermissionService {
     }
     
     return timeMinutes >= startMinutes && timeMinutes <= endMinutes;
-  }
+  },
   
   /**
    * 时间转换为分钟数
    * @param {string} time 时间 (HH:MM)
    * @returns {number} 分钟数
    */
-  static timeToMinutes(time) {
+  timeToMinutes(time) {
     const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
-  }
+  },
   
   /**
    * 格式化时间范围
    * @param {Array} ranges 时间范围数组
    * @returns {string} 格式化的时间范围
    */
-  static formatTimeRanges(ranges) {
+  formatTimeRanges(ranges) {
     return ranges.map(range => `${range.start}-${range.end}`).join(', ');
-  }
+  },
   
   /**
    * 判断是否跨周
@@ -585,7 +587,7 @@ class TimeAdjustPermissionService {
    * @param {Date} endTime 结束时间
    * @returns {boolean} 是否跨周
    */
-  static isCrossWeek(startTime, endTime) {
+  isCrossWeek(startTime, endTime) {
     const getWeekStart = (date) => {
       const d = new Date(date);
       const day = d.getDay();
@@ -597,14 +599,14 @@ class TimeAdjustPermissionService {
     const endWeek = getWeekStart(endTime);
     
     return startWeek.getTime() !== endWeek.getTime();
-  }
+  },
   
   /**
    * 判断是否为节假日
    * @param {Date} date 日期
    * @returns {boolean} 是否为节假日
    */
-  static isHoliday(date) {
+  isHoliday(date) {
     // 这里可以集成节假日API或者本地节假日数据
     // 暂时使用简单的判断逻辑
     const holidays = [
@@ -619,7 +621,7 @@ class TimeAdjustPermissionService {
     
     const dateStr = date.toISOString().split('T')[0];
     return holidays.includes(dateStr);
-  }
+  },
   
   /**
    * 计算调整影响评分
@@ -628,7 +630,7 @@ class TimeAdjustPermissionService {
    * @param {Object} adjustData 调整数据
    * @returns {number} 影响评分 (0-100)
    */
-  static calculateAdjustmentImpact(originalTime, newTime, adjustData) {
+  calculateAdjustmentImpact(originalTime, newTime, adjustData) {
     let score = 0;
     
     // 时间差影响 (最大30分)
@@ -667,7 +669,7 @@ class TimeAdjustPermissionService {
     else if (hour < 9 || hour > 17) score += 5;
     
     return Math.min(Math.round(score), 100);
-  }
+  },
   
   /**
    * 获取调整审批流程配置
@@ -675,7 +677,7 @@ class TimeAdjustPermissionService {
    * @param {number} impactScore 影响分数
    * @returns {Object} 审批流程配置
    */
-  static getApprovalWorkflow(adjustType, impactScore = 0) {
+  getApprovalWorkflow(adjustType, impactScore = 0) {
     const workflows = {
       normal: {
         steps: [
@@ -721,7 +723,7 @@ class TimeAdjustPermissionService {
     };
 
     return workflows[adjustType] || workflows.normal;
-  }
+  },
 
   /**
    * 检查用户是否可以审批指定的调整申请
@@ -729,7 +731,7 @@ class TimeAdjustPermissionService {
    * @param {Object} adjustRequest 调整申请
    * @returns {boolean} 是否可以审批
    */
-  static canApproveAdjustment(userRole, adjustRequest) {
+  canApproveAdjustment(userRole, adjustRequest) {
     if (!RolePermissionManager.hasApprovalPermission(userRole)) {
       return false;
     }
@@ -747,14 +749,14 @@ class TimeAdjustPermissionService {
 
     return RolePermissionManager.hasPermission(userRole, currentStep.role) ||
            userRole === currentStep.role;
-  }
+  },
 
   /**
    * 获取用户可审批的调整类型
    * @param {string} userRole 用户角色
    * @returns {Array} 可审批的调整类型
    */
-  static getApprovableAdjustTypes(userRole) {
+  getApprovableAdjustTypes(userRole) {
     const approvableTypes = [];
     
     if (RolePermissionManager.hasApprovalPermission(userRole)) {
@@ -776,7 +778,7 @@ class TimeAdjustPermissionService {
     }
     
     return approvableTypes;
-  }
+  },
 
   /**
    * 获取今日剩余调整次数
@@ -784,7 +786,7 @@ class TimeAdjustPermissionService {
    * @param {string} permissionLevel 权限级别
    * @returns {Promise<number>} 剩余次数
    */
-  static async getDailyRemainingAdjustments(userId, permissionLevel) {
+  async getDailyRemainingAdjustments(userId, permissionLevel) {
     try {
       // 这里应该调用API获取今日已使用次数
       // const response = await api.get(`/adjustments/daily-count/${userId}`);
@@ -799,14 +801,14 @@ class TimeAdjustPermissionService {
       console.error('获取今日调整次数失败:', error);
       return 0;
     }
-  }
+  },
 
   /**
    * 获取今日已使用的调整次数
    * @param {string} userId 用户ID
    * @returns {Promise<number>} 已使用次数
    */
-  static async getTodayUsedAdjustments(userId) {
+  async getTodayUsedAdjustments(userId) {
     try {
       const today = new Date();
       const todayStr = today.toISOString().split('T')[0];
@@ -818,7 +820,7 @@ class TimeAdjustPermissionService {
       console.error('获取今日调整次数失败:', error);
       return 0;
     }
-  }
+  },
 
   /**
    * 获取详细的调整次数统计
@@ -826,7 +828,7 @@ class TimeAdjustPermissionService {
    * @param {string} permissionLevel 权限级别
    * @returns {Promise<Object>} 统计信息
    */
-  static async getAdjustmentStatistics(userId, permissionLevel) {
+  async getAdjustmentStatistics(userId, permissionLevel) {
     try {
       const today = new Date();
       const todayStr = today.toISOString().split('T')[0];
@@ -871,7 +873,7 @@ class TimeAdjustPermissionService {
       console.error('获取调整统计失败:', error);
       return this.getEmptyStatistics();
     }
-  }
+  },
 
   /**
    * 获取指定日期的调整记录
@@ -879,7 +881,7 @@ class TimeAdjustPermissionService {
    * @param {string} dateStr 日期字符串 (YYYY-MM-DD)
    * @returns {Promise<Array>} 调整记录
    */
-  static async getDayAdjustments(userId, dateStr) {
+  async getDayAdjustments(userId, dateStr) {
     try {
       const storageKey = `${CONFIG.STORAGE_KEYS.USER_ADJUSTMENTS}_${userId}_${dateStr}`;
       return wx.getStorageSync(storageKey) || [];
@@ -887,14 +889,14 @@ class TimeAdjustPermissionService {
       console.error('获取日调整记录失败:', error);
       return [];
     }
-  }
+  },
 
   /**
    * 获取本周调整记录
    * @param {string} userId 用户ID
    * @returns {Promise<Array>} 调整记录
    */
-  static async getWeekAdjustments(userId) {
+  async getWeekAdjustments(userId) {
     try {
       const adjustments = [];
       const today = new Date();
@@ -913,14 +915,14 @@ class TimeAdjustPermissionService {
       console.error('获取周调整记录失败:', error);
       return [];
     }
-  }
+  },
 
   /**
    * 获取本月调整记录
    * @param {string} userId 用户ID
    * @returns {Promise<Array>} 调整记录
    */
-  static async getMonthAdjustments(userId) {
+  async getMonthAdjustments(userId) {
     try {
       const adjustments = [];
       const today = new Date();
@@ -939,14 +941,14 @@ class TimeAdjustPermissionService {
       console.error('获取月调整记录失败:', error);
       return [];
     }
-  }
+  },
 
   /**
    * 分析调整类型分布
    * @param {Array} adjustments 调整记录
    * @returns {Object} 类型分布
    */
-  static analyzeAdjustmentTypes(adjustments) {
+  analyzeAdjustmentTypes(adjustments) {
     const types = {
       normal: 0,
       advanced: 0,
@@ -960,14 +962,14 @@ class TimeAdjustPermissionService {
     });
     
     return types;
-  }
+  },
 
   /**
    * 分析时间分布
    * @param {Array} adjustments 调整记录
    * @returns {Object} 时间分布
    */
-  static analyzeTimeDistribution(adjustments) {
+  analyzeTimeDistribution(adjustments) {
     const distribution = {
       morning: 0,    // 8-12
       afternoon: 0,  // 12-18
@@ -992,13 +994,13 @@ class TimeAdjustPermissionService {
     });
     
     return distribution;
-  }
+  },
 
   /**
    * 获取空的统计信息
    * @returns {Object} 空的统计信息
    */
-  static getEmptyStatistics() {
+  getEmptyStatistics() {
     return {
       today: {
         used: 0,
@@ -1023,7 +1025,7 @@ class TimeAdjustPermissionService {
       timeDistribution: { morning: 0, afternoon: 0, evening: 0, night: 0 },
       emergencyCount: 0
     };
-  }
+  },
 
   /**
    * 检查调整次数限制
@@ -1032,7 +1034,7 @@ class TimeAdjustPermissionService {
    * @param {boolean} isEmergency 是否为紧急调整
    * @returns {Promise<Object>} 限制检查结果
    */
-  static async checkAdjustmentLimits(userId, permissionLevel, isEmergency = false) {
+  async checkAdjustmentLimits(userId, permissionLevel, isEmergency = false) {
     const result = {
       canAdjust: false,
       reason: '',
@@ -1074,7 +1076,7 @@ class TimeAdjustPermissionService {
       result.reason = '检查限制失败';
       return result;
     }
-  }
+  },
 
   /**
    * 记录调整操作
@@ -1082,7 +1084,7 @@ class TimeAdjustPermissionService {
    * @param {Object} adjustmentData 调整数据
    * @returns {Promise<boolean>} 记录是否成功
    */
-  static async recordAdjustment(userId, adjustmentData) {
+  async recordAdjustment(userId, adjustmentData) {
     try {
       const today = new Date();
       const todayStr = today.toISOString().split('T')[0];
@@ -1101,7 +1103,7 @@ class TimeAdjustPermissionService {
       console.error('记录调整操作失败:', error);
       return false;
     }
-  }
+  },
 
   /**
    * 检查用户是否有紧急调整权限（增强版）
@@ -1109,7 +1111,7 @@ class TimeAdjustPermissionService {
    * @param {Object} emergencyContext 紧急情况上下文
    * @returns {Object} 紧急调整权限检查结果
    */
-  static canEmergencyAdjust(userRole, emergencyContext = {}) {
+  canEmergencyAdjust(userRole, emergencyContext = {}) {
     const result = {
       canAdjust: false,
       level: 'none',
@@ -1174,17 +1176,17 @@ class TimeAdjustPermissionService {
     }
     
     return result;
-  }
+  },
 
   /**
    * 检查用户是否有紧急审批权限
    * @param {string} userRole 用户角色
    * @returns {boolean} 是否有紧急审批权限
    */
-  static canEmergencyApprove(userRole) {
+  canEmergencyApprove(userRole) {
     return userRole === CONFIG.USER_ROLES.SUPERVISOR ||
            userRole === CONFIG.USER_ROLES.ADMIN;
-  }
+  },
 
   /**
    * 判断是否为紧急调整情况（增强版）
@@ -1193,7 +1195,7 @@ class TimeAdjustPermissionService {
    * @param {Object} contextInfo 上下文信息
    * @returns {Object} 紧急情况分析结果
    */
-  static analyzeEmergencyCondition(adjustData, appointmentInfo = {}, contextInfo = {}) {
+  analyzeEmergencyCondition(adjustData, appointmentInfo = {}, contextInfo = {}) {
     const analysis = {
       isEmergency: false,
       urgencyLevel: 'normal',
@@ -1324,8 +1326,9 @@ class TimeAdjustPermissionService {
     }
     
     return analysis;
-  }
-  static analyzeEmergencyLevel(adjustData, appointmentInfo = {}) {
+  },
+
+  analyzeEmergencyLevel(adjustData, appointmentInfo = {}) {
     const analysis = {
       isEmergency: false,
       emergencyLevel: 'normal', // normal | medium | high | critical
@@ -1403,7 +1406,7 @@ class TimeAdjustPermissionService {
     );
 
     return analysis;
-  }
+  },
 
   /**
    * 处理紧急调整申请
@@ -1411,7 +1414,7 @@ class TimeAdjustPermissionService {
    * @param {Object} adjustData 调整数据
    * @returns {Object} 处理结果
    */
-  static async processEmergencyAdjust(userInfo, adjustData) {
+  async processEmergencyAdjust(userInfo, adjustData) {
     const result = {
       success: false,
       canProceed: false,
@@ -1461,14 +1464,14 @@ class TimeAdjustPermissionService {
     });
 
     return result;
-  }
+  },
 
   /**
    * 获取紧急级别名称
    * @param {string} level 紧急级别
    * @returns {string} 级别名称
    */
-  static getEmergencyLevelName(level) {
+  getEmergencyLevelName(level) {
     const levelNames = {
       'normal': '普通',
       'medium': '中等',
@@ -1476,14 +1479,14 @@ class TimeAdjustPermissionService {
       'critical': '极紧急'
     };
     return levelNames[level] || '未知';
-  }
+  },
 
   /**
    * 获取紧急调整工作流
    * @param {string} type 流程类型
    * @returns {Object} 工作流配置
    */
-  static getEmergencyWorkflow(type) {
+  getEmergencyWorkflow(type) {
     const workflows = {
       auto_approve: {
         type: 'emergency_auto',
@@ -1520,7 +1523,7 @@ class TimeAdjustPermissionService {
     };
 
     return workflows[type] || workflows.emergency_approval;
-  }
+  },
 
   /**
    * 记录紧急调整
@@ -1528,7 +1531,7 @@ class TimeAdjustPermissionService {
    * @param {Object} emergencyData 紧急调整数据
    * @returns {Promise<boolean>} 记录结果
    */
-  static async recordEmergencyAdjust(userId, emergencyData) {
+  async recordEmergencyAdjust(userId, emergencyData) {
     try {
       const today = new Date().toISOString().split('T')[0];
       const storageKey = `${CONFIG.STORAGE_KEYS.USER_ADJUSTMENTS}_emergency_${userId}_${today}`;
@@ -1546,15 +1549,15 @@ class TimeAdjustPermissionService {
       console.error('记录紧急调整失败:', error);
       return false;
     }
-  }
+  },
 
   /**
    * 生成调整操作ID
    * @returns {string} 调整ID
    */
-  static generateAdjustmentId() {
+  generateAdjustmentId() {
     return 'adj_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-  }
+  },
 
   /**
    * 创建特殊权限申请
@@ -1562,7 +1565,7 @@ class TimeAdjustPermissionService {
    * @param {Object} requestData 申请数据
    * @returns {Promise<Object>} 申请结果
    */
-  static async createSpecialPermissionRequest(userInfo, requestData) {
+  async createSpecialPermissionRequest(userInfo, requestData) {
     const result = {
       success: false,
       requestId: null,
@@ -1641,7 +1644,7 @@ class TimeAdjustPermissionService {
       result.message = '申请提交失败，请稍后重试';
       return result;
     }
-  }
+  },
 
   /**
    * 检查特殊申请资格
@@ -1649,7 +1652,7 @@ class TimeAdjustPermissionService {
    * @param {string} requestType 申请类型
    * @returns {Object} 资格检查结果
    */
-  static checkSpecialRequestEligibility(userInfo, requestType) {
+  checkSpecialRequestEligibility(userInfo, requestType) {
     const result = {
       eligible: false,
       reason: ''
@@ -1696,15 +1699,15 @@ class TimeAdjustPermissionService {
     }
 
     return result;
-  }
+  },
 
   /**
    * 生成特殊申请ID
    * @returns {string} 申请ID
    */
-  static generateSpecialRequestId() {
+  generateSpecialRequestId() {
     return 'sreq_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-  }
+  },
 
   /**
    * 分析申请紧急性
@@ -1712,7 +1715,7 @@ class TimeAdjustPermissionService {
    * @param {string} requestType 申请类型
    * @returns {Object} 紧急性分析
    */
-  static analyzeRequestUrgency(adjustData, requestType) {
+  analyzeRequestUrgency(adjustData, requestType) {
     const analysis = {
       level: 'normal', // normal | medium | high | urgent
       score: 0,
@@ -1757,7 +1760,7 @@ class TimeAdjustPermissionService {
     }
 
     return analysis;
-  }
+  },
 
   /**
    * 获取特殊申请审批流程
@@ -1765,7 +1768,7 @@ class TimeAdjustPermissionService {
    * @param {string} urgencyLevel 紧急级别
    * @returns {Object} 审批流程
    */
-  static getSpecialRequestWorkflow(requestType, urgencyLevel) {
+  getSpecialRequestWorkflow(requestType, urgencyLevel) {
     const baseWorkflows = {
       time_extension: {
         type: 'special_permission',
@@ -1820,14 +1823,14 @@ class TimeAdjustPermissionService {
     }
 
     return workflow;
-  }
+  },
 
   /**
    * 获取请求的权限级别
    * @param {string} requestType 申请类型
    * @returns {string} 权限级别
    */
-  static getRequestedPermissionLevel(requestType) {
+  getRequestedPermissionLevel(requestType) {
     const levelMapping = {
       'time_extension': 'advanced',
       'count_increase': 'advanced',
@@ -1835,14 +1838,14 @@ class TimeAdjustPermissionService {
     };
     
     return levelMapping[requestType] || 'normal';
-  }
+  },
 
   /**
    * 保存特殊申请
    * @param {Object} specialRequest 特殊申请数据
    * @returns {Promise<boolean>} 保存结果
    */
-  static async saveSpecialRequest(specialRequest) {
+  async saveSpecialRequest(specialRequest) {
     try {
       const storageKey = `special_requests_${specialRequest.applicantId}`;
       const requests = wx.getStorageSync(storageKey) || [];
@@ -1867,14 +1870,14 @@ class TimeAdjustPermissionService {
       console.error('保存特殊申请失败:', error);
       return false;
     }
-  }
+  },
 
   /**
    * 发送特殊申请通知
    * @param {Object} specialRequest 特殊申请数据
    * @returns {Promise<void>}
    */
-  static async sendSpecialRequestNotification(specialRequest) {
+  async sendSpecialRequestNotification(specialRequest) {
     try {
       // 这里应该集成通知服务
       // 暂时使用控制台输出
@@ -1888,7 +1891,7 @@ class TimeAdjustPermissionService {
     } catch (error) {
       console.error('发送特殊申请通知失败:', error);
     }
-  }
+  },
 
   /**
    * 获取用户的特殊申请列表
@@ -1896,7 +1899,7 @@ class TimeAdjustPermissionService {
    * @param {string} status 申请状态过滤器
    * @returns {Promise<Array>} 申请列表
    */
-  static async getUserSpecialRequests(userId, status = null) {
+  async getUserSpecialRequests(userId, status = null) {
     try {
       const storageKey = `special_requests_${userId}`;
       const requests = wx.getStorageSync(storageKey) || [];
@@ -1910,14 +1913,14 @@ class TimeAdjustPermissionService {
       console.error('获取特殊申请列表失败:', error);
       return [];
     }
-  }
+  },
 
   /**
    * 创建调整权限报告
    * @param {Object} userInfo 用户信息
    * @returns {Object} 权限报告
    */
-  static generatePermissionReport(userInfo) {
+  generatePermissionReport(userInfo) {
     const permissions = this.getUserAdjustPermissions(userInfo);
     const availableTypes = this.getAvailableAdjustTypes(userInfo.role);
     
@@ -1943,14 +1946,14 @@ class TimeAdjustPermissionService {
       },
       recommendations: this.generatePermissionRecommendations(userInfo)
     };
-  }
+  },
 
   /**
    * 生成权限提升建议
    * @param {Object} userInfo 用户信息
    * @returns {Array} 建议列表
    */
-  static generatePermissionRecommendations(userInfo) {
+  generatePermissionRecommendations(userInfo) {
     const recommendations = [];
     const { role, experience = 0, certifications = [] } = userInfo;
 
@@ -1986,7 +1989,7 @@ class TimeAdjustPermissionService {
     }
 
     return recommendations;
-  }
+  },
   
   /**
    * 申请特殊权限
@@ -1994,7 +1997,7 @@ class TimeAdjustPermissionService {
    * @param {Object} requestData 申请数据
    * @returns {Promise<Object>} 申请结果
    */
-  static async requestSpecialPermission(userId, requestData) {
+  async requestSpecialPermission(userId, requestData) {
     try {
       const requestId = this.generateRequestId();
       const request = {
@@ -2048,7 +2051,7 @@ class TimeAdjustPermissionService {
         message: '申请提交失败，请稍后重试'
       };
     }
-  }
+  },
   
   /**
    * 检查用户是否有有效的临时权限
@@ -2056,7 +2059,7 @@ class TimeAdjustPermissionService {
    * @param {string} permissionType 权限类型
    * @returns {Promise<Object>} 权限检查结果
    */
-  static async checkTemporaryPermissions(userId, permissionType) {
+  async checkTemporaryPermissions(userId, permissionType) {
     try {
       const tempPermissionsKey = `temp_permissions_${userId}`;
       const tempPermissions = wx.getStorageSync(tempPermissionsKey) || [];
@@ -2091,7 +2094,7 @@ class TimeAdjustPermissionService {
         reason: '系统错误，无法检查权限'
       };
     }
-  }
+  },
   
   /**
    * 获取申请审批流程
@@ -2099,7 +2102,7 @@ class TimeAdjustPermissionService {
    * @param {string} urgencyLevel 紧急级别
    * @returns {Object} 审批流程
    */
-  static getRequestApprovalWorkflow(requestType, urgencyLevel = 'normal') {
+  getRequestApprovalWorkflow(requestType, urgencyLevel = 'normal') {
     const baseWorkflows = {
       time_extension: {
         type: 'time_permission',
@@ -2143,26 +2146,23 @@ class TimeAdjustPermissionService {
     };
 
     return baseWorkflows[requestType] || baseWorkflows.count_increase;
-  }
+  },
   
   /**
    * 生成申请ID
    * @returns {string} 申请ID
    */
-  static generateRequestId() {
+  generateRequestId() {
     return 'REQ_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-  }
-}
-
-module.exports = TimeAdjustPermissionService;
+  },
 
   /**
-   * 更新全局统计信息
+   * 更新全局统计
    * @param {string} userId 用户ID
    * @param {Object} adjustmentRecord 调整记录
-   * @returns {Promise<boolean>} 是否更新成功
+   * @returns {Promise<boolean>} 更新结果
    */
-  static async updateGlobalStatistics(userId, adjustmentRecord) {
+  async updateGlobalStatistics(userId, adjustmentRecord) {
     try {
       const globalStatsKey = `${CONFIG.STORAGE_KEYS.USER_ADJUSTMENTS}_global_${userId}`;
       let globalStats = wx.getStorageSync(globalStatsKey) || {
@@ -2214,13 +2214,13 @@ module.exports = TimeAdjustPermissionService;
       console.error('更新全局统计失败:', error);
       return false;
     }
-  }
-  
+  },
+
   /**
    * 触发调整相关事件
    * @param {Object} adjustmentRecord 调整记录
    */
-  static triggerAdjustmentEvents(adjustmentRecord) {
+  triggerAdjustmentEvents(adjustmentRecord) {
     try {
       // 发送自定义事件
       if (typeof getApp === 'function') {
@@ -2254,15 +2254,15 @@ module.exports = TimeAdjustPermissionService;
     } catch (error) {
       console.error('触发调整事件失败:', error);
     }
-  }
-  
+  },
+
   /**
    * 获取调整数据分析报告
    * @param {string} userId 用户ID
    * @param {Object} options 分析选项
    * @returns {Promise<Object>} 分析报告
    */
-  static async getAdjustmentAnalysisReport(userId, options = {}) {
+  async getAdjustmentAnalysisReport(userId, options = {}) {
     try {
       const {
         timeRange = 'month', // day, week, month, quarter, year
@@ -2360,15 +2360,15 @@ module.exports = TimeAdjustPermissionService;
       console.error('生成调整分析报告失败:', error);
       return null;
     }
-  }
-  
+  },
+
   /**
    * 检查时间范围调整限制（增强版）
    * @param {Object} userInfo 用户信息
    * @param {Object} adjustData 调整数据
    * @returns {Object} 时间范围检查结果
    */
-  static checkTimeRangeAdjustLimits(userInfo, adjustData) {
+  checkTimeRangeAdjustLimits(userInfo, adjustData) {
     const result = {
       valid: true,
       violations: [],
@@ -2404,11 +2404,7 @@ module.exports = TimeAdjustPermissionService;
     // 2. 检查工作时间范围限制
     const newHour = newTime.getHours();
     const isWorkingHours = newHour >= 8 && newHour <= 18;
-    
-}
-
-module.exports = TimeAdjustPermissionService;
-      const restrictionLevel = this.getTimeRestrictionLevel(newHour, permissions.level);
+    const restrictionLevel = this.getTimeRestrictionLevel(newHour, permissions.level);
       
       if (restrictionLevel === 'forbidden') {
         result.valid = false;
@@ -2434,10 +2430,9 @@ module.exports = TimeAdjustPermissionService;
           });
         }
       }
-    }
     
     return result;
-  }
+  },
   
   /**
    * 获取时间限制级别
@@ -2445,7 +2440,7 @@ module.exports = TimeAdjustPermissionService;
    * @param {string} permissionLevel 权限级别
    * @returns {string} 限制级别
    */
-  static getTimeRestrictionLevel(hour, permissionLevel) {
+  getTimeRestrictionLevel(hour, permissionLevel) {
     const restrictions = {
       'normal': {
         forbidden: [22, 23, 0, 1, 2, 3, 4, 5, 6], // 22:00-06:00 禁止
@@ -2470,15 +2465,15 @@ module.exports = TimeAdjustPermissionService;
     }
     
     return 'allowed';
-  }
-  
+  },
+
   /**
    * 实现调整次数限制功能
    * @param {Object} userInfo 用户信息
    * @param {Object} adjustData 调整数据
    * @returns {Promise<Object>} 次数限制检查结果
    */
-  static async implementAdjustmentCountLimits(userInfo, adjustData) {
+  async implementAdjustmentCountLimits(userInfo, adjustData) {
     const result = {
       canAdjust: false,
       remainingCount: 0,
@@ -2532,3 +2527,7 @@ module.exports = TimeAdjustPermissionService;
       };
     }
   }
+};
+
+// 导出服务实例
+module.exports = TimeAdjustPermissionService;

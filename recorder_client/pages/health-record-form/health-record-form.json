@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "健康记录",
+  "navigationBarBackgroundColor": "#667eea",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#f5f5f5",
+  "backgroundTextStyle": "dark",
+  "enablePullDownRefresh": false,
+  "disableScroll": false,
+  "usingComponents": {}
+}

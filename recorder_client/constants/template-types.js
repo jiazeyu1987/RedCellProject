@@ -521,6 +521,509 @@ export const TEMPLATE_TYPE_CONFIGS = {
       title: '时间调整提醒',
       content: '{patientName}您好，提醒您{reminderType}。\n\n提醒时间：{reminderTime}\n请及时处理。'
     }
+  },
+
+  // 预约变更和取消
+  [TEMPLATE_TYPES.APPOINTMENT_CHANGE]: {
+    name: '预约变更通知',
+    description: '预约信息变更后的通知',
+    category: 'appointment',
+    icon: 'calendar-edit',
+    color: '#FF9800',
+    priority: 'high',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.SMS,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.CARD
+    ],
+    requiredVariables: [
+      'patientName',
+      'serviceName',
+      'originalTime',
+      'newTime'
+    ],
+    optionalVariables: [
+      'changeReason',
+      'address',
+      'contactPhone'
+    ],
+    defaultTemplate: {
+      title: '预约变更通知',
+      content: '尊敬的{patientName}，您的{serviceName}预约时间已变更。\n\n原时间：{originalTime}\n新时间：{newTime}\n\n如有疑问请联系我们。'
+    }
+  },
+
+  [TEMPLATE_TYPES.APPOINTMENT_CANCEL]: {
+    name: '预约取消通知',
+    description: '预约取消后的通知',
+    category: 'appointment',
+    icon: 'calendar-x',
+    color: '#F44336',
+    priority: 'high',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.SMS,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.CARD
+    ],
+    requiredVariables: [
+      'patientName',
+      'serviceName',
+      'cancelTime'
+    ],
+    optionalVariables: [
+      'cancelReason',
+      'refundInfo',
+      'rebookingInfo'
+    ],
+    defaultTemplate: {
+      title: '预约取消通知',
+      content: '{patientName}您好，您的{serviceName}预约已取消。\n\n取消时间：{cancelTime}\n\n如需重新预约，请联系我们。'
+    }
+  },
+
+  // 服务相关
+  [TEMPLATE_TYPES.SERVICE_START]: {
+    name: '服务开始通知',
+    description: '服务开始时的通知',
+    category: 'service',
+    icon: 'play-circle',
+    color: '#4CAF50',
+    priority: 'normal',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.CARD
+    ],
+    requiredVariables: [
+      'patientName',
+      'serviceName',
+      'startTime'
+    ],
+    optionalVariables: [
+      'recorderName',
+      'serviceLocation',
+      'estimatedDuration'
+    ],
+    defaultTemplate: {
+      title: '服务开始',
+      content: '{patientName}您好，您的{serviceName}服务现在开始。\n\n开始时间：{startTime}\n服务人员：{recorderName}'
+    }
+  },
+
+  [TEMPLATE_TYPES.SERVICE_PROGRESS]: {
+    name: '服务进度通知',
+    description: '服务进度更新通知',
+    category: 'service',
+    icon: 'activity',
+    color: '#2196F3',
+    priority: 'normal',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.CARD
+    ],
+    requiredVariables: [
+      'patientName',
+      'serviceName',
+      'progressInfo'
+    ],
+    optionalVariables: [
+      'completionRate',
+      'nextStep',
+      'estimatedCompletion'
+    ],
+    defaultTemplate: {
+      title: '服务进度更新',
+      content: '{patientName}您好，您的{serviceName}进度更新：\n\n{progressInfo}\n\n感谢您的配合！'
+    }
+  },
+
+  [TEMPLATE_TYPES.SERVICE_EVALUATION]: {
+    name: '服务评价通知',
+    description: '服务完成后的评价邀请',
+    category: 'service',
+    icon: 'star',
+    color: '#FFD700',
+    priority: 'low',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.CARD
+    ],
+    requiredVariables: [
+      'patientName',
+      'serviceName',
+      'completedTime'
+    ],
+    optionalVariables: [
+      'recorderName',
+      'evaluationLink'
+    ],
+    defaultTemplate: {
+      title: '服务评价邀请',
+      content: '{patientName}您好，您的{serviceName}已完成，期待您的宝贵评价！\n\n完成时间：{completedTime}\n服务人员：{recorderName}'
+    }
+  },
+
+  // 付款相关
+  [TEMPLATE_TYPES.PAYMENT_SUCCESS]: {
+    name: '付款成功通知',
+    description: '付款成功后的通知',
+    category: 'payment',
+    icon: 'check-circle',
+    color: '#4CAF50',
+    priority: 'normal',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.CARD
+    ],
+    requiredVariables: [
+      'patientName',
+      'amount',
+      'paymentTime'
+    ],
+    optionalVariables: [
+      'serviceName',
+      'paymentMethod',
+      'transactionId'
+    ],
+    defaultTemplate: {
+      title: '付款成功',
+      content: '{patientName}您好，您的付款已成功。\n\n付款金额：{amount}元\n付款时间：{paymentTime}\n\n感谢您的支付！'
+    }
+  },
+
+  [TEMPLATE_TYPES.PAYMENT_OVERDUE]: {
+    name: '付款逾期通知',
+    description: '付款逾期后的通知',
+    category: 'payment',
+    icon: 'alert-circle',
+    color: '#FF5722',
+    priority: 'urgent',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.SMS,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.CARD
+    ],
+    requiredVariables: [
+      'patientName',
+      'amount',
+      'overdueDate'
+    ],
+    optionalVariables: [
+      'serviceName',
+      'lateFee',
+      'contactPhone'
+    ],
+    defaultTemplate: {
+      title: '付款逾期提醒',
+      content: '{patientName}您好，您有{amount}元的费用已逾期。\n\n逾期时间：{overdueDate}\n\n请尽快完成付款以避免影响服务。'
+    }
+  },
+
+  [TEMPLATE_TYPES.PAYMENT_REFUND]: {
+    name: '退款通知',
+    description: '退款处理后的通知',
+    category: 'payment',
+    icon: 'refund',
+    color: '#607D8B',
+    priority: 'normal',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.CARD
+    ],
+    requiredVariables: [
+      'patientName',
+      'refundAmount',
+      'refundTime'
+    ],
+    optionalVariables: [
+      'refundReason',
+      'refundMethod',
+      'processingTime'
+    ],
+    defaultTemplate: {
+      title: '退款通知',
+      content: '{patientName}您好，您的退款已处理完成。\n\n退款金额：{refundAmount}元\n处理时间：{refundTime}\n\n请注意查收。'
+    }
+  },
+
+  // 健康相关
+  [TEMPLATE_TYPES.MEDICATION_REMINDER]: {
+    name: '用药提醒通知',
+    description: '用药时间提醒通知',
+    category: 'health',
+    icon: 'pill',
+    color: '#4CAF50',
+    priority: 'high',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_SUBSCRIBE,
+      NOTIFICATION_CHANNELS.IN_APP,
+      NOTIFICATION_CHANNELS.PUSH
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT
+    ],
+    requiredVariables: [
+      'patientName',
+      'medicationName',
+      'dosage',
+      'timeToTake'
+    ],
+    optionalVariables: [
+      'instructions',
+      'sideEffects'
+    ],
+    defaultTemplate: {
+      title: '用药提醒',
+      content: '{patientName}您好，该服用{medicationName}了。\n\n剂量：{dosage}\n时间：{timeToTake}\n\n请按时用药。'
+    }
+  },
+
+  [TEMPLATE_TYPES.CHECKUP_REMINDER]: {
+    name: '复查提醒通知',
+    description: '复查时间提醒通知',
+    category: 'health',
+    icon: 'stethoscope',
+    color: '#FF9800',
+    priority: 'high',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.SMS,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.CARD
+    ],
+    requiredVariables: [
+      'patientName',
+      'checkupType',
+      'dueDate'
+    ],
+    optionalVariables: [
+      'lastCheckup',
+      'doctorName',
+      'hospitalName'
+    ],
+    defaultTemplate: {
+      title: '复查提醒',
+      content: '{patientName}您好，您需要进行{checkupType}复查。\n\n建议时间：{dueDate}\n\n请及时预约。'
+    }
+  },
+
+  [TEMPLATE_TYPES.HEALTH_REPORT]: {
+    name: '健康报告通知',
+    description: '健康报告生成通知',
+    category: 'health',
+    icon: 'file-text',
+    color: '#2196F3',
+    priority: 'normal',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.CARD,
+      MESSAGE_FORMATS.RICH_TEXT
+    ],
+    requiredVariables: [
+      'patientName',
+      'reportType',
+      'generateTime'
+    ],
+    optionalVariables: [
+      'reportPeriod',
+      'summaryInfo',
+      'downloadLink'
+    ],
+    defaultTemplate: {
+      title: '健康报告',
+      content: '{patientName}您好，您的{reportType}已生成。\n\n生成时间：{generateTime}\n\n请及时查看。'
+    }
+  },
+
+  // 系统相关
+  [TEMPLATE_TYPES.SYSTEM_MAINTENANCE]: {
+    name: '系统维护通知',
+    description: '系统维护相关通知',
+    category: 'system',
+    icon: 'tool',
+    color: '#FF9800',
+    priority: 'high',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.RICH_TEXT
+    ],
+    requiredVariables: [
+      'maintenanceTime',
+      'estimatedDuration'
+    ],
+    optionalVariables: [
+      'maintenanceReason',
+      'affectedServices'
+    ],
+    defaultTemplate: {
+      title: '系统维护通知',
+      content: '系统将于{maintenanceTime}进行维护，预计耗时{estimatedDuration}。\n\n维护期间部分功能可能不可用，敬请谅解。'
+    }
+  },
+
+  [TEMPLATE_TYPES.SYSTEM_UPDATE]: {
+    name: '系统更新通知',
+    description: '系统版本更新通知',
+    category: 'system',
+    icon: 'refresh',
+    color: '#4CAF50',
+    priority: 'normal',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.RICH_TEXT
+    ],
+    requiredVariables: [
+      'version',
+      'updateTime'
+    ],
+    optionalVariables: [
+      'newFeatures',
+      'bugFixes',
+      'updateNotes'
+    ],
+    defaultTemplate: {
+      title: '系统更新',
+      content: '系统已更新至版本{version}。\n\n更新时间：{updateTime}\n\n新增功能和改进请查看更新说明。'
+    }
+  },
+
+  // 营销推广
+  [TEMPLATE_TYPES.MARKETING_PROMOTION]: {
+    name: '优惠促销通知',
+    description: '优惠活动和促销信息',
+    category: 'marketing',
+    icon: 'gift',
+    color: '#E91E63',
+    priority: 'low',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.CARD,
+      MESSAGE_FORMATS.IMAGE_TEXT
+    ],
+    requiredVariables: [
+      'promotionTitle',
+      'promotionContent'
+    ],
+    optionalVariables: [
+      'discount',
+      'validPeriod',
+      'actionLink'
+    ],
+    defaultTemplate: {
+      title: '优惠活动',
+      content: '【特惠活动】{promotionTitle}\n\n{promotionContent}\n\n机会难得，不要错过！'
+    }
+  },
+
+  [TEMPLATE_TYPES.MARKETING_EVENT]: {
+    name: '活动邀请通知',
+    description: '活动邀请和事件通知',
+    category: 'marketing',
+    icon: 'calendar-event',
+    color: '#9C27B0',
+    priority: 'low',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.CARD,
+      MESSAGE_FORMATS.IMAGE_TEXT
+    ],
+    requiredVariables: [
+      'eventTitle',
+      'eventTime',
+      'eventLocation'
+    ],
+    optionalVariables: [
+      'eventDescription',
+      'registrationLink',
+      'benefits'
+    ],
+    defaultTemplate: {
+      title: '活动邀请',
+      content: '诚邀您参加{eventTitle}\n\n时间：{eventTime}\n地点：{eventLocation}\n\n期待您的参与！'
+    }
+  },
+
+  [TEMPLATE_TYPES.MARKETING_SURVEY]: {
+    name: '调研问卷通知',
+    description: '用户调研和问卷邀请',
+    category: 'marketing',
+    icon: 'clipboard-list',
+    color: '#607D8B',
+    priority: 'low',
+    supportedChannels: [
+      NOTIFICATION_CHANNELS.WECHAT_TEMPLATE,
+      NOTIFICATION_CHANNELS.IN_APP
+    ],
+    supportedFormats: [
+      MESSAGE_FORMATS.TEXT,
+      MESSAGE_FORMATS.CARD
+    ],
+    requiredVariables: [
+      'surveyTitle',
+      'surveyPurpose'
+    ],
+    optionalVariables: [
+      'incentive',
+      'deadline',
+      'surveyLink'
+    ],
+    defaultTemplate: {
+      title: '问卷调研',
+      content: '邀请您参与{surveyTitle}调研。\n\n调研目的：{surveyPurpose}\n\n您的意见对我们很重要！'
+    }
   }
 };
 
@@ -759,6 +1262,12 @@ export function getCategoryInfo() {
       description: '预约相关的通知模板',
       icon: 'calendar',
       color: '#4CAF50'
+    },
+    time_adjust: {
+      name: '时间调整',
+      description: '时间调整相关的通知模板', 
+      icon: 'clock',
+      color: '#FF9800'
     },
     service: {
       name: '服务管理', 

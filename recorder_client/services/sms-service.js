@@ -3,13 +3,13 @@
  * 负责短信发送、验证码管理等功能
  */
 
-import {
+const {
   NOTIFICATION_TYPES,
   NOTIFICATION_CHANNELS,
   NOTIFICATION_STATUS
-} from '../constants/notification-config.js';
+} = require('../constants/notification-config.js');
 
-import notificationAPI from '../api/notification-api.js';
+const notificationAPI = require('../api/notification-api.js');
 
 class SMSService {
   constructor() {
@@ -680,4 +680,4 @@ class SMSService {
   }
 }
 
-export default SMSService;
+module.exports = SMSService;

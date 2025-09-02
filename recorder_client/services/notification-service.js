@@ -3,7 +3,7 @@
  * 负责通知的创建、发送、状态管理等核心功能
  */
 
-import {
+const {
   NOTIFICATION_TYPES,
   NOTIFICATION_PRIORITY,
   NOTIFICATION_STATUS,
@@ -13,11 +13,11 @@ import {
   ROLE_NOTIFICATION_PERMISSIONS,
   NOTIFICATION_RETRY_CONFIG,
   DEFAULT_NOTIFICATION_CONFIG
-} from '../constants/notification-config.js';
+} = require('../constants/notification-config.js');
 
-import TemplateManager from './template-manager.js';
-import WechatMessageService from './wechat-message.service.js';
-import SMSService from './sms-service.js';
+const TemplateManager = require('./template-manager.js');
+const WechatMessageService = require('./wechat-message.service.js');
+const SMSService = require('./sms-service.js');
 
 class NotificationService {
   constructor() {
@@ -39,7 +39,7 @@ class NotificationService {
       console.log('[NotificationService] 初始化通知服务...');
       
       // 初始化模板管理器
-      this.templateManager = new TemplateManager();
+      this.templateManager = TemplateManager;
       await this.templateManager.init();
       
       // 初始化微信消息服务
@@ -152,11 +152,49 @@ class NotificationService {
   }
 
   /**
+   * 创建并发送通知
+   * @param {Object} notificationData 通知数据
+   * @returns {Promise<boolean>} 发送结果
+   */
+  async createAndSend(notificationData) {
+    try {
+      // 创建通知
+      const notification = this.createNotificationFromTemplate(notificationData);
+      
+      // 发送通知
+      return await this.sendNotification(notification);
+    } catch (error) {
+      console.error('[NotificationService] 创建并发送通知失败:', error);
+      return false;
+    }
+  }
+
+  /**
+   * 获取默认模板
+   * @param {string} type 通知类型
+   * @param {string} channel 发送渠道
+   * @returns {Object} 默认模板
+   */
+  getDefaultTemplate(type, channel) {
+    try {
+      if (!this.templateManager) {
+        return null;
+      }
+      
+      return this.templateManager.getDefaultTemplateByType(type);
+    } catch (error) {
+      console.error('[NotificationService] 获取默认模板失败:', error);
+      return null;
+    }
+  }
+
+  /**
    * 创建通知
    * @param {Object} options 通知选项
    * @returns {Object} 通知对象
    */
   createNotification(options) {
+    const {
       type,
       title,
       content,
@@ -936,6 +974,579 @@ class NotificationService {
     this.rateLimit.clear();
     this.retryCount.clear();
   }
+
+  // ============= 通知效果分析功能 =============
+  
+  /**
+   * 获取通知阅读率统计分析
+   * @param {Object} options 分析选项
+   * @returns {Object} 阅读率分析数据
+   */
+  getNotificationReadRateAnalysis(options = {}) {
+    const {
+      startDate = null,
+      endDate = null,
+      type = null,
+      groupBy = 'day', // day, week, month, hour
+      userGroup = null
+    } = options;
+    
+    try {
+      const notifications = wx.getStorageSync('in_app_notifications') || [];
+      const analytics = wx.getStorageSync('notification_analytics') || [];
+      
+      // 筛选通知数据
+      let filteredNotifications = this.filterNotificationsByDate(notifications, startDate, endDate);
+      
+      if (type) {
+        filteredNotifications = filteredNotifications.filter(n => n.type === type);
+      }
+      
+      if (userGroup) {
+        filteredNotifications = filteredNotifications.filter(n => 
+          n.targetUser && n.targetUser.group === userGroup
+        );
+      }
+      
+      // 按时间分组统计
+      const groupedStats = this.groupNotificationsByTime(filteredNotifications, groupBy);
+      
+      // 计算各分组的阅读率
+      const readRateStats = {};
+      
+      for (const [timeKey, notifications] of Object.entries(groupedStats)) {
+        const totalSent = notifications.length;
+        const totalRead = notifications.filter(n => n.readTime).length;
+        
+        // 计算阅读时长分布
+        const readDurations = this.calculateReadDurations(notifications, analytics);
+        
+        // 计算阅读完成度
+        const completionRate = this.calculateReadCompletionRate(notifications, analytics);
+        
+        readRateStats[timeKey] = {
+          totalSent,
+          totalRead,
+          readRate: totalSent > 0 ? (totalRead / totalSent * 100).toFixed(2) : 0,
+          readDurations: {
+            average: readDurations.average || 0,
+            median: readDurations.median || 0,
+            distribution: readDurations.distribution || {}
+          },
+          completionRate: completionRate || 0
+        };
+      }
+      
+      // 计算趋势
+      const trend = this.calculateReadRateTrend(readRateStats);
+      
+      // 生成预测
+      const prediction = this.predictReadRate(readRateStats, groupBy);
+      
+      return {
+        stats: readRateStats,
+        trend,
+        prediction,
+        summary: {
+          overallReadRate: this.calculateOverallReadRate(filteredNotifications),
+          bestPerformingType: this.getBestPerformingType(filteredNotifications),
+          peakReadingHours: this.getPeakReadingHours(filteredNotifications, analytics),
+          readingPatterns: this.identifyReadingPatterns(filteredNotifications, analytics)
+        }
+      };
+    } catch (error) {
+      console.error('[NotificationService] 获取阅读率统计失败:', error);
+      return {
+        stats: {},
+        trend: { direction: 'stable', change: 0 },
+        prediction: null,
+        summary: {
+          overallReadRate: 0,
+          bestPerformingType: null,
+          peakReadingHours: [],
+          readingPatterns: []
+        }
+      };
+    }
+  }
+
+  /**
+   * 获取通知点击率统计分析
+   * @param {Object} options 分析选项
+   * @returns {Object} 点击率分析数据
+   */
+  getNotificationClickRateAnalysis(options = {}) {
+    const {
+      startDate = null,
+      endDate = null,
+      type = null,
+      groupBy = 'day'
+    } = options;
+    
+    try {
+      const notifications = wx.getStorageSync('in_app_notifications') || [];
+      const clickEvents = wx.getStorageSync('notification_click_events') || [];
+      
+      // 筛选数据
+      let filteredNotifications = this.filterNotificationsByDate(notifications, startDate, endDate);
+      let filteredEvents = this.filterEventsByDate(clickEvents, startDate, endDate);
+      
+      if (type) {
+        filteredNotifications = filteredNotifications.filter(n => n.type === type);
+        filteredEvents = filteredEvents.filter(e => e.notificationType === type);
+      }
+      
+      // 按时间分组统计
+      const groupedStats = this.groupNotificationsByTime(filteredNotifications, groupBy);
+      const groupedClicks = this.groupClickEventsByTime(filteredEvents, groupBy);
+      
+      // 计算各分组的点击率
+      const clickRateStats = {};
+      
+      for (const [timeKey, notifications] of Object.entries(groupedStats)) {
+        const clicks = groupedClicks[timeKey] || [];
+        const totalSent = notifications.length;
+        const totalClicked = new Set(clicks.map(c => c.notificationId)).size;
+        const totalClicks = clicks.length;
+        
+        // 点击热力图数据
+        const heatmapData = this.generateClickHeatmapData(clicks);
+        
+        // 点击转化漏斗分析
+        const funnelData = this.calculateClickFunnel(notifications, clicks);
+        
+        // 点击时间分布
+        const timeDistribution = this.calculateClickTimeDistribution(clicks);
+        
+        clickRateStats[timeKey] = {
+          totalSent,
+          totalClicked,
+          totalClicks,
+          clickRate: totalSent > 0 ? (totalClicked / totalSent * 100).toFixed(2) : 0,
+          clicksPerNotification: totalClicked > 0 ? (totalClicks / totalClicked).toFixed(2) : 0,
+          heatmapData,
+          funnelData,
+          timeDistribution
+        };
+      }
+      
+      return {
+        stats: clickRateStats,
+        behaviorSequence: this.analyzeClickBehaviorSequence(filteredEvents),
+        summary: {
+          overallClickRate: this.calculateOverallClickRate(filteredNotifications, filteredEvents),
+          bestPerformingTime: this.getBestClickPerformingTime(clickRateStats),
+          clickPatterns: this.identifyClickPatterns(filteredEvents)
+        }
+      };
+    } catch (error) {
+      console.error('[NotificationService] 获取点击率统计失败:', error);
+      return {
+        stats: {},
+        behaviorSequence: [],
+        summary: {
+          overallClickRate: 0,
+          bestPerformingTime: null,
+          clickPatterns: []
+        }
+      };
+    }
+  }
+
+  /**
+   * 获取通知转化率跟踪分析
+   * @param {Object} options 转化跟踪选项
+   * @returns {Object} 转化率数据
+   */
+  getNotificationConversionAnalysis(options = {}) {
+    const {
+      startDate = null,
+      endDate = null,
+      type = null,
+      conversionGoals = ['click', 'page_view', 'action', 'transaction']
+    } = options;
+    
+    try {
+      const notifications = wx.getStorageSync('in_app_notifications') || [];
+      const conversionEvents = wx.getStorageSync('notification_conversion_events') || [];
+      
+      // 筛选数据
+      let filteredNotifications = this.filterNotificationsByDate(notifications, startDate, endDate);
+      let filteredConversions = this.filterEventsByDate(conversionEvents, startDate, endDate);
+      
+      if (type) {
+        filteredNotifications = filteredNotifications.filter(n => n.type === type);
+        filteredConversions = filteredConversions.filter(c => c.notificationType === type);
+      }
+      
+      // 转化目标定义
+      const conversionTargets = this.defineConversionTargets(conversionGoals);
+      
+      // 转化路径追踪
+      const conversionPaths = this.trackConversionPaths(filteredNotifications, filteredConversions);
+      
+      // 转化率计算
+      const conversionRates = {};
+      
+      for (const goal of conversionGoals) {
+        const goalConversions = filteredConversions.filter(c => c.goal === goal);
+        const totalSent = filteredNotifications.length;
+        const totalConverted = new Set(goalConversions.map(c => c.notificationId)).size;
+        
+        conversionRates[goal] = {
+          totalSent,
+          totalConverted,
+          conversionRate: totalSent > 0 ? (totalConverted / totalSent * 100).toFixed(2) : 0,
+          avgConversionTime: this.calculateAvgConversionTime(goalConversions),
+          conversionValue: this.calculateConversionValue(goalConversions)
+        };
+      }
+      
+      return {
+        conversionTargets,
+        conversionRates,
+        conversionPaths,
+        summary: {
+          totalConversions: Object.values(conversionRates).reduce((sum, rate) => sum + parseInt(rate.totalConverted), 0),
+          bestPerformingGoal: this.getBestPerformingConversionGoal(conversionRates),
+          avgConversionTime: this.calculateOverallAvgConversionTime(filteredConversions)
+        }
+      };
+    } catch (error) {
+      console.error('[NotificationService] 获取转化率统计失败:', error);
+      return {
+        conversionTargets: {},
+        conversionRates: {},
+        conversionPaths: [],
+        summary: {
+          totalConversions: 0,
+          bestPerformingGoal: null,
+          avgConversionTime: 0
+        }
+      };
+    }
+  }
+
+  /**
+   * 获取用户参与度分析
+   * @param {Object} options 分析选项
+   * @returns {Object} 用户参与度数据
+   */
+  getUserEngagementAnalysis(options = {}) {
+    const {
+      startDate = null,
+      endDate = null,
+      type = null
+    } = options;
+    
+    try {
+      const notifications = wx.getStorageSync('in_app_notifications') || [];
+      const userActions = wx.getStorageSync('user_engagement_actions') || [];
+      
+      // 筛选数据
+      let filteredNotifications = this.filterNotificationsByDate(notifications, startDate, endDate);
+      let filteredActions = this.filterEventsByDate(userActions, startDate, endDate);
+      
+      if (type) {
+        filteredNotifications = filteredNotifications.filter(n => n.type === type);
+        filteredActions = filteredActions.filter(a => a.notificationType === type);
+      }
+      
+      // 参与度综合评分
+      const engagementScores = this.calculateEngagementScores(filteredNotifications, filteredActions);
+      
+      // 用户活跃度分析
+      const activityAnalysis = this.analyzeUserActivity(filteredActions);
+      
+      // 参与深度评估
+      const depthAssessment = this.assessEngagementDepth(filteredNotifications, filteredActions);
+      
+      return {
+        engagementScores,
+        activityAnalysis,
+        depthAssessment,
+        summary: {
+          averageScore: this.calculateAverageEngagementScore(engagementScores),
+          activeUsers: this.countActiveUsers(filteredActions),
+          engagementTrend: this.calculateEngagementTrend(filteredActions)
+        }
+      };
+    } catch (error) {
+      console.error('[NotificationService] 获取用户参与度统计失败:', error);
+      return {
+        engagementScores: {},
+        activityAnalysis: {},
+        depthAssessment: {},
+        summary: {
+          averageScore: 0,
+          activeUsers: 0,
+          engagementTrend: { direction: 'stable', change: 0 }
+        }
+      };
+    }
+  }
+
+  // ============= 辅助方法 =============
+  
+  /**
+   * 按日期筛选通知
+   */
+  filterNotificationsByDate(notifications, startDate, endDate) {
+    let filtered = [...notifications];
+    
+    if (startDate) {
+      const start = new Date(startDate).getTime();
+      filtered = filtered.filter(n => new Date(n.createdAt).getTime() >= start);
+    }
+    
+    if (endDate) {
+      const end = new Date(endDate).getTime();
+      filtered = filtered.filter(n => new Date(n.createdAt).getTime() <= end);
+    }
+    
+    return filtered;
+  }
+
+  /**
+   * 按日期筛选事件
+   */
+  filterEventsByDate(events, startDate, endDate) {
+    let filtered = [...events];
+    
+    if (startDate) {
+      const start = new Date(startDate).getTime();
+      filtered = filtered.filter(e => new Date(e.timestamp).getTime() >= start);
+    }
+    
+    if (endDate) {
+      const end = new Date(endDate).getTime();
+      filtered = filtered.filter(e => new Date(e.timestamp).getTime() <= end);
+    }
+    
+    return filtered;
+  }
+
+  /**
+   * 按时间分组通知
+   */
+  groupNotificationsByTime(notifications, groupBy) {
+    const groups = {};
+    
+    notifications.forEach(notification => {
+      const date = new Date(notification.createdAt);
+      let key;
+      
+      switch (groupBy) {
+        case 'hour':
+          key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${String(date.getHours()).padStart(2, '0')}`;
+          break;
+        case 'day':
+          key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          break;
+        case 'week':
+          const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
+          key = `${weekStart.getFullYear()}-W${Math.ceil((weekStart.getDate() + new Date(weekStart.getFullYear(), 0, 1).getDay()) / 7)}`;
+          break;
+        case 'month':
+          key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+          break;
+        default:
+          key = date.toISOString().split('T')[0];
+      }
+      
+      if (!groups[key]) {
+        groups[key] = [];
+      }
+      groups[key].push(notification);
+    });
+    
+    return groups;
+  }
+
+  /**
+   * 计算阅读时长分布
+   */
+  calculateReadDurations(notifications, analytics) {
+    const durations = [];
+    
+    notifications.forEach(notification => {
+      if (notification.readTime && notification.sentTime) {
+        const duration = new Date(notification.readTime) - new Date(notification.sentTime);
+        if (duration > 0) {
+          durations.push(duration);
+        }
+      }
+    });
+    
+    if (durations.length === 0) {
+      return { average: 0, median: 0, distribution: {} };
+    }
+    
+    const sorted = durations.sort((a, b) => a - b);
+    const average = durations.reduce((sum, d) => sum + d, 0) / durations.length;
+    const median = sorted[Math.floor(sorted.length / 2)];
+    
+    // 分布统计
+    const distribution = {
+      '0-5min': durations.filter(d => d <= 5 * 60 * 1000).length,
+      '5-30min': durations.filter(d => d > 5 * 60 * 1000 && d <= 30 * 60 * 1000).length,
+      '30min-2h': durations.filter(d => d > 30 * 60 * 1000 && d <= 2 * 60 * 60 * 1000).length,
+      '2h+': durations.filter(d => d > 2 * 60 * 60 * 1000).length
+    };
+    
+    return { average, median, distribution };
+  }
+
+  /**
+   * 计算阅读完成率
+   */
+  calculateReadCompletionRate(notifications, analytics) {
+    // 这里可以根据实际的分析数据来计算
+    // 目前简单返回已读率
+    const totalSent = notifications.length;
+    const totalRead = notifications.filter(n => n.readTime).length;
+    return totalSent > 0 ? (totalRead / totalSent * 100).toFixed(2) : 0;
+  }
+
+  /**
+   * 计算阅读率趋势
+   */
+  calculateReadRateTrend(readRateStats) {
+    const keys = Object.keys(readRateStats).sort();
+    if (keys.length < 2) {
+      return { direction: 'stable', change: 0 };
+    }
+    
+    const latest = parseFloat(readRateStats[keys[keys.length - 1]].readRate);
+    const previous = parseFloat(readRateStats[keys[keys.length - 2]].readRate);
+    
+    const change = latest - previous;
+    let direction = 'stable';
+    
+    if (change > 1) {
+      direction = 'up';
+    } else if (change < -1) {
+      direction = 'down';
+    }
+    
+    return { direction, change: change.toFixed(2) };
+  }
+
+  /**
+   * 预测阅读率
+   */
+  predictReadRate(readRateStats, groupBy) {
+    // 简单的线性预测
+    const keys = Object.keys(readRateStats).sort();
+    if (keys.length < 3) {
+      return null;
+    }
+    
+    const rates = keys.map(key => parseFloat(readRateStats[key].readRate));
+    const trend = (rates[rates.length - 1] - rates[0]) / (rates.length - 1);
+    
+    return {
+      nextPeriod: (rates[rates.length - 1] + trend).toFixed(2),
+      confidence: 'medium',
+      trend: trend.toFixed(2)
+    };
+  }
+
+  /**
+   * 计算整体阅读率
+   */
+  calculateOverallReadRate(notifications) {
+    const totalSent = notifications.length;
+    const totalRead = notifications.filter(n => n.readTime).length;
+    return totalSent > 0 ? (totalRead / totalSent * 100).toFixed(2) : 0;
+  }
+
+  /**
+   * 获取表现最佳的类型
+   */
+  getBestPerformingType(notifications) {
+    const typeStats = {};
+    
+    notifications.forEach(notification => {
+      if (!typeStats[notification.type]) {
+        typeStats[notification.type] = { total: 0, read: 0 };
+      }
+      typeStats[notification.type].total++;
+      if (notification.readTime) {
+        typeStats[notification.type].read++;
+      }
+    });
+    
+    let bestType = null;
+    let bestRate = 0;
+    
+    for (const [type, stats] of Object.entries(typeStats)) {
+      const rate = stats.total > 0 ? (stats.read / stats.total) : 0;
+      if (rate > bestRate) {
+        bestRate = rate;
+        bestType = type;
+      }
+    }
+    
+    return bestType;
+  }
+
+  /**
+   * 记录通知分析事件
+   */
+  recordNotificationAnalytics(notificationId, eventType, data = {}) {
+    try {
+      const analytics = wx.getStorageSync('notification_analytics') || [];
+      
+      const event = {
+        id: this.generateNotificationId(),
+        notificationId,
+        eventType, // 'read', 'click', 'dismiss', 'action'
+        timestamp: new Date().toISOString(),
+        data,
+        userId: data.userId || null,
+        sessionId: data.sessionId || null
+      };
+      
+      analytics.unshift(event);
+      
+      // 限制存储数量
+      const maxEvents = 1000;
+      if (analytics.length > maxEvents) {
+        analytics.splice(maxEvents);
+      }
+      
+      wx.setStorageSync('notification_analytics', analytics);
+      console.log('[NotificationService] 记录分析事件:', event);
+    } catch (error) {
+      console.error('[NotificationService] 记录分析事件失败:', error);
+    }
+  }
 }
 
-export default NotificationService;
+// ============= 占位辅助方法实现 =============
+
+NotificationService.prototype.getPeakReadingHours = function(notifications, analytics) { return []; };
+NotificationService.prototype.identifyReadingPatterns = function(notifications, analytics) { return []; };
+NotificationService.prototype.groupClickEventsByTime = function(events, groupBy) { return {}; };
+NotificationService.prototype.generateClickHeatmapData = function(clicks) { return []; };
+NotificationService.prototype.calculateClickFunnel = function(notifications, clicks) { return {}; };
+NotificationService.prototype.calculateClickTimeDistribution = function(clicks) { return {}; };
+NotificationService.prototype.analyzeClickBehaviorSequence = function(events) { return []; };
+NotificationService.prototype.calculateOverallClickRate = function(notifications, events) { return 0; };
+NotificationService.prototype.getBestClickPerformingTime = function(stats) { return null; };
+NotificationService.prototype.identifyClickPatterns = function(events) { return []; };
+NotificationService.prototype.defineConversionTargets = function(goals) { return {}; };
+NotificationService.prototype.trackConversionPaths = function(notifications, conversions) { return []; };
+NotificationService.prototype.calculateAvgConversionTime = function(conversions) { return 0; };
+NotificationService.prototype.calculateConversionValue = function(conversions) { return 0; };
+NotificationService.prototype.getBestPerformingConversionGoal = function(rates) { return null; };
+NotificationService.prototype.calculateOverallAvgConversionTime = function(conversions) { return 0; };
+NotificationService.prototype.calculateEngagementScores = function(notifications, actions) { return {}; };
+NotificationService.prototype.analyzeUserActivity = function(actions) { return {}; };
+NotificationService.prototype.assessEngagementDepth = function(notifications, actions) { return {}; };
+NotificationService.prototype.calculateAverageEngagementScore = function(scores) { return 0; };
+NotificationService.prototype.countActiveUsers = function(actions) { return 0; };
+NotificationService.prototype.calculateEngagementTrend = function(actions) { return { direction: 'stable', change: 0 }; };
+
+module.exports = NotificationService;

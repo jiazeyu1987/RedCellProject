@@ -223,6 +223,42 @@ Component({
       this.setData({
         confirmLoading: loading
       });
+    },
+
+    /**
+     * 更新弹窗样式类
+     */
+    updateModalClass() {
+      let modalClass = 'modal-container';
+      
+      // 类型样式
+      if (this.properties.type) {
+        modalClass += ` modal-${this.properties.type}`;
+      }
+      
+      // 尺寸样式
+      if (this.properties.size && this.properties.size !== 'medium') {
+        modalClass += ` modal-${this.properties.size}`;
+      }
+      
+      // 主题样式
+      if (this.properties.theme && this.properties.theme !== 'default') {
+        modalClass += ` modal-${this.properties.theme}`;
+      }
+      
+      // 无头部样式
+      if (!this.properties.showHeader) {
+        modalClass += ' modal-no-header';
+      }
+      
+      // 无底部样式
+      if (!this.properties.showFooter) {
+        modalClass += ' modal-no-footer';
+      }
+
+      this.setData({
+        modalClass: modalClass
+      });
     }
   },
 
@@ -249,41 +285,5 @@ Component({
     'type, size, theme, showHeader, showFooter': function() {
       this.updateModalClass();
     }
-  },
-
-  /**
-   * 更新弹窗样式类
-   */
-  updateModalClass() {
-    let modalClass = 'modal-container';
-    
-    // 类型样式
-    if (this.properties.type) {
-      modalClass += ` modal-${this.properties.type}`;
-    }
-    
-    // 尺寸样式
-    if (this.properties.size && this.properties.size !== 'medium') {
-      modalClass += ` modal-${this.properties.size}`;
-    }
-    
-    // 主题样式
-    if (this.properties.theme && this.properties.theme !== 'default') {
-      modalClass += ` modal-${this.properties.theme}`;
-    }
-    
-    // 无头部样式
-    if (!this.properties.showHeader) {
-      modalClass += ' modal-no-header';
-    }
-    
-    // 无底部样式
-    if (!this.properties.showFooter) {
-      modalClass += ' modal-no-footer';
-    }
-
-    this.setData({
-      modalClass: modalClass
-    });
   }
 });

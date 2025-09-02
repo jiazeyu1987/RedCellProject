@@ -1,11 +1,11 @@
 // components/template-editor/template-editor.js
-import {
+const {
   MESSAGE_FORMATS,
   TEMPLATE_TYPES,
   getTemplateTypeConfig,
   getFormatConfig,
   validateTypeFormatCompatibility
-} from '../../constants/template-types.js';
+} = require('../../constants/template-types.js');
 
 Component({
   /**

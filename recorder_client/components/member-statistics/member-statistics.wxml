@@ -1,0 +1,207 @@
+<!--成员统计组件-->
+<view class="member-statistics {{animationClass}}">
+  <!-- 统计卡片头部 -->
+  <view class="statistics-header">
+    <view class="header-title">
+      <icon class="title-icon" type="chart" size="16" color="#007AFF"/>
+      <text class="title-text">成员概览</text>
+    </view>
+    
+    <view class="header-actions">
+      <view class="refresh-button" bindtap="onRefresh">
+        <icon class="refresh-icon" type="refresh" size="14" color="#666"/>
+      </view>
+      <view class="chart-button" bindtap="onChartModeTap">
+        <icon class="chart-icon" type="{{displayMode === 'chart' ? 'list' : 'chart'}}" size="14" color="#666"/>
+      </view>
+      <view class="export-button" bindtap="onExportReport">
+        <icon class="export-icon" type="download" size="14" color="#666"/>
+      </view>
+      <view class="toggle-button" bindtap="toggleDisplayMode">
+        <icon class="toggle-icon" 
+              type="{{displayMode === 'simple' ? 'expand' : 'collapse'}}" 
+              size="14" 
+              color="#666"/>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 统计项网格 -->
+  <view class="statistics-grid {{displayMode}}" wx:if="{{displayMode !== 'chart'}}">
+    <view 
+      wx:for="{{processedStats}}" 
+      wx:key="key"
+      class="stat-item {{item.key}}"
+      bindtap="onStatItemTap"
+      data-stat="{{item}}"
+    >
+      <!-- 统计图标 -->
+      <view class="stat-icon-container" style="background: {{item.bgColor}}">
+        <icon class="stat-icon" type="{{item.icon}}" size="20" color="{{item.color}}"/>
+      </view>
+      
+      <!-- 统计内容 -->
+      <view class="stat-content">
+        <!-- 数值区域 -->
+        <view class="stat-value-section">
+          <text class="stat-value">{{item.displayValue !== undefined ? item.displayValue : item.value}}</text>
+          <text wx:if="{{item.unit}}" class="stat-unit">{{item.unit}}</text>
+          
+          <!-- 百分比指示器 -->
+          <view wx:if="{{item.percentage && displayMode === 'detailed'}}" class="stat-percentage">
+            <text class="percentage-text">{{item.percentage}}%</text>
+          </view>
+          
+          <!-- 趋势指示器 -->
+          <view wx:if="{{item.trend && displayMode === 'detailed'}}" class="stat-trend {{item.trend.direction}}">
+            <icon class="trend-icon" 
+                  type="{{item.trend.direction === 'up' ? 'arrow-up' : item.trend.direction === 'down' ? 'arrow-down' : 'minus'}}" 
+                  size="10"/>
+            <text class="trend-text">{{item.trend.percentage}}%</text>
+          </view>
+        </view>
+        
+        <!-- 标题和描述 -->
+        <view class="stat-info">
+          <text class="stat-title">{{item.title}}</text>
+          <text wx:if="{{displayMode === 'detailed'}}" class="stat-description">{{item.description}}</text>
+        </view>
+      </view>
+      
+      <!-- 点击指示 -->
+      <view class="stat-indicator">
+        <icon class="indicator-icon" type="arrow-right" size="12" color="#C7C7CC"/>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 图表模式 -->
+  <view wx:if="{{displayMode === 'chart'}}" class="chart-container">
+    <!-- 年龄分布图表 -->
+    <view class="chart-section">
+      <view class="chart-title">年龄分布</view>
+      <view class="chart-content">
+        <view wx:for="{{chartData.ageChart}}" wx:key="name" class="chart-bar">
+          <view class="bar-label">{{item.name}}</view>
+          <view class="bar-container">
+            <view class="bar-fill" 
+                  style="width: {{(item.value / statistics.total * 100)}}%; background: {{item.color}}"></view>
+            <text class="bar-value">{{item.value}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 健康状态分布图表 -->
+    <view class="chart-section">
+      <view class="chart-title">健康状态分布</view>
+      <view class="chart-content">
+        <view wx:for="{{chartData.healthChart}}" wx:key="name" class="chart-bar">
+          <view class="bar-label">{{item.name}}</view>
+          <view class="bar-container">
+            <view class="bar-fill" 
+                  style="width: {{(item.value / statistics.total * 100)}}%; background: {{item.color}}"></view>
+            <text class="bar-value">{{item.value}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 服务频率分布图表 -->
+    <view class="chart-section">
+      <view class="chart-title">服务频率分布</view>
+      <view class="chart-content">
+        <view wx:for="{{chartData.serviceChart}}" wx:key="name" class="chart-bar">
+          <view class="bar-label">{{item.name}}</view>
+          <view class="bar-container">
+            <view class="bar-fill" 
+                  style="width: {{(item.value / statistics.total * 100)}}%; background: {{item.color}}"></view>
+            <text class="bar-value">{{item.value}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 详细模式下的额外信息 -->
+  <view wx:if="{{displayMode === 'detailed'}}" class="statistics-detail">
+    <!-- 扩展统计项 -->
+    <view wx:if="{{extendedStats.length > 0}}" class="extended-stats">
+      <view class="extended-title">
+        <icon class="extended-icon" type="data" size="14" color="#666"/>
+        <text class="extended-text">详细统计</text>
+      </view>
+      
+      <view class="extended-grid">
+        <view wx:for="{{extendedStats}}" wx:key="key" class="extended-item">
+          <view class="extended-icon-container">
+            <icon class="extended-item-icon" type="{{item.icon}}" size="16" color="{{item.color}}"/>
+          </view>
+          <view class="extended-content">
+            <view class="extended-value-section">
+              <text class="extended-value">{{item.value}}</text>
+              <text wx:if="{{item.unit}}" class="extended-unit">{{item.unit}}</text>
+            </view>
+            <text class="extended-title-text">{{item.title}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 快速洞察 -->
+    <view wx:if="{{insights.length > 0}}" class="quick-insights">
+      <view class="insights-title">
+        <icon class="insights-icon" type="lightbulb" size="14" color="#FF9500"/>
+        <text class="insights-text">智能洞察</text>
+      </view>
+      
+      <view class="insight-items">
+        <view 
+          wx:for="{{insights}}" 
+          wx:key="title"
+          class="insight-item {{item.type}}"
+          bindtap="onInsightTap"
+          data-insight="{{item}}"
+        >
+          <view class="insight-icon-container">
+            <icon class="insight-icon" type="{{item.icon}}" size="14" color="{{item.color}}"/>
+          </view>
+          <view class="insight-content">
+            <text class="insight-title">{{item.title}}</text>
+            <text class="insight-message">{{item.message}}</text>
+          </view>
+          <view wx:if="{{item.action}}" class="insight-action">
+            <text class="action-text">{{item.action}}</text>
+            <icon class="action-arrow" type="arrow-right" size="10" color="#C7C7CC"/>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 趋势分析 -->
+    <view class="trend-analysis">
+      <view class="analysis-title">
+        <icon class="analysis-icon" type="trend" size="14" color="#666"/>
+        <text class="analysis-text">趋势分析</text>
+      </view>
+      
+      <view class="trend-items">
+        <view wx:for="{{processedStats}}" wx:key="key" class="trend-item" wx:if="{{item.trend}}">
+          <view class="trend-label">{{item.title}}</view>
+          <view class="trend-change {{item.trend.direction}}">
+            <icon class="trend-change-icon" 
+                  type="{{item.trend.direction === 'up' ? 'arrow-up' : item.trend.direction === 'down' ? 'arrow-down' : 'minus'}}" 
+                  size="10"/>
+            <text class="trend-change-text">{{item.trend.text}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 加载状态 -->
+  <view wx:if="{{!processedStats || processedStats.length === 0}}" class="statistics-loading">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载统计数据...</text>
+  </view>
+</view>

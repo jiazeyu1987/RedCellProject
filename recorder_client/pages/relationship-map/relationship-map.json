@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "家庭关系图谱",
+  "navigationBarBackgroundColor": "#667eea",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#f8f9fa",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "family-relationship-map": "/components/family-relationship-map/family-relationship-map"
+  }
+}

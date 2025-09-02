@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "usingComponents": {
+    "button": "../button/button",
+    "card": "../card/card",
+    "status-tag": "../status-tag/status-tag"
+  }
+}
