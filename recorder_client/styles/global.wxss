@@ -9,6 +9,12 @@ page {
   color: #333333;
 }
 
+/* 移除微信小程序button组件的默认伪元素样式 */
+button::after {
+  border: none !important;
+  background: none !important;
+}
+
 /* 全局容器 */
 .container {
   padding: 30rpx;

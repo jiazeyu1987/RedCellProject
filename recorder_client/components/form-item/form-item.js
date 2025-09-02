@@ -202,6 +202,11 @@ Component({
         value: value,
         type: this.properties.type
       });
+      // 同时触发change事件，确保与页面事件处理兼容
+      this.triggerEvent('change', {
+        value: value,
+        type: this.properties.type
+      });
     },
 
     /**

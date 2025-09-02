@@ -287,19 +287,19 @@
 
 /* 渐变按钮 */
 .custom-button.button-gradient {
-  background: linear-gradient(45deg, #007AFF, #5AC8FA);
+  background: #007AFF;
   color: #ffffff;
 }
 
 .custom-button.button-gradient:not([disabled]):active {
-  background: linear-gradient(45deg, #0056CC, #32A3F5);
+  background: #0056CC;
 }
 
 /* 阴影按钮 */
 .custom-button.button-shadow {
-  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
+  box-shadow: 0 2rpx 8rpx rgba(0, 122, 255, 0.3);
 }
 
 .custom-button.button-shadow:not([disabled]):active {
-  box-shadow: 0 2rpx 8rpx rgba(0, 122, 255, 0.4);
+  box-shadow: 0 1rpx 4rpx rgba(0, 122, 255, 0.4);
 }

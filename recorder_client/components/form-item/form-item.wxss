@@ -128,17 +128,52 @@
 }
 
 /* 单选框组样式 */
+radio-group {
+  display: flex;
+  flex-direction: row;
+  gap: 32rpx;
+  flex-wrap: wrap;
+}
+
 .radio-item {
   display: flex;
   align-items: center;
-  padding: 16rpx 0;
+  padding: 20rpx 32rpx;
+  background: #f8f9fa;
+  border: 2rpx solid #e5e5e7;
+  border-radius: 25rpx;
   cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 200rpx;
+  justify-content: center;
+}
+
+.radio-item:active {
+  transform: scale(0.98);
+  background: #e8f4fd;
+  border-color: #007aff;
+}
+
+.radio-item radio {
+  margin-right: 12rpx;
 }
 
 .radio-text {
-  margin-left: 16rpx;
-  font-size: 32rpx;
+  font-size: 28rpx;
   color: #1a1a1a;
+  font-weight: 500;
+}
+
+/* 选中状态的单选框样式 */
+.radio-item-checked {
+  background: linear-gradient(135deg, #007aff, #0056d6) !important;
+  border-color: #007aff !important;
+  box-shadow: 0 4rpx 8rpx rgba(0, 122, 255, 0.3);
+}
+
+.radio-item-checked .radio-text {
+  color: #fff !important;
 }
 
 /* 复选框组样式 */

@@ -189,11 +189,14 @@ Page({
    * 下一步
    */
   onNextStep() {
-    const currentStep = Math.min(this.data.steps.length - 1, this.data.currentStep + 1);
-    
+    console.log('点击下一步，当前步骤:', this.data.currentStep); // 调试日志
     // 验证当前步骤
     if (this.validateCurrentStep()) {
+      const currentStep = Math.min(this.data.steps.length - 1, this.data.currentStep + 1);
       this.setData({ currentStep });
+      console.log('验证通过，跳转到步骤:', currentStep); // 调试日志
+    } else {
+      console.log('验证失败，保持当前步骤'); // 调试日志
     }
   },
 
@@ -203,6 +206,8 @@ Page({
   onInputChange(event) {
     const { field } = event.currentTarget.dataset;
     const value = event.detail.value;
+    
+    console.log('表单输入变更:', field, value); // 调试日志
     
     this.setData({
       [`formData.${field}`]: value,
@@ -234,6 +239,19 @@ Page({
       default:
         return;
     }
+    
+    this.setData({
+      [`formData.${field}`]: value,
+      [`errors.${field}`]: null
+    });
+  },
+
+  /**
+   * 单选框变更
+   */
+  onRadioChange(event) {
+    const { field } = event.currentTarget.dataset;
+    const value = event.detail.value;
     
     this.setData({
       [`formData.${field}`]: value,
@@ -372,21 +390,25 @@ Page({
     const { currentStep, formData } = this.data;
     const errors = {};
     
+    console.log('验证步骤:', currentStep, '表单数据:', formData); // 调试日志
+    
     switch (currentStep) {
       case 0: // 基本信息
-        if (!formData.name.trim()) {
+        if (!formData.name || !formData.name.trim()) {
           errors.name = '请输入姓名';
+          console.log('姓名验证失败:', formData.name); // 调试日志
         }
         if (!formData.age || isNaN(formData.age) || formData.age < 0 || formData.age > 150) {
           errors.age = '请输入有效年龄';
+          console.log('年龄验证失败:', formData.age); // 调试日志
         }
         break;
         
       case 1: // 联系方式
-        if (formData.phone && !/^1[3-9]\\d{9}$/.test(formData.phone)) {
+        if (formData.phone && !/^1[3-9]\d{9}$/.test(formData.phone)) {
           errors.phone = '请输入正确的手机号';
         }
-        if (formData.idCard && !/^\\d{17}[\\dX]$/.test(formData.idCard)) {
+        if (formData.idCard && !/^\d{17}[\dX]$/.test(formData.idCard)) {
           errors.idCard = '请输入正确的身份证号';
         }
         break;

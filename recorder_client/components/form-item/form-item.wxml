@@ -95,7 +95,7 @@
       bindchange="onRadioChange"
     >
       <label 
-        class="radio-item" 
+        class="radio-item {{item.value === value ? 'radio-item-checked' : ''}}" 
         wx:for="{{radioOptions}}" 
         wx:key="{{item.value}}"
       >

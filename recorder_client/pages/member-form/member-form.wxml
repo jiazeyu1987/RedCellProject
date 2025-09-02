@@ -33,24 +33,7 @@
           <text class="step-desc">请填写成员的基本信息</text>
         </view>
         
-        <!-- 头像上传 -->
-        <view class="avatar-section">
-          <view class="avatar-container" bind:tap="onChooseAvatar">
-            <image 
-              wx:if="{{formData.avatar}}"
-              class="avatar-image" 
-              src="{{formData.avatar}}"
-              mode="aspectFill" />
-            <view wx:else class="avatar-placeholder">
-              <text class="iconfont icon-camera"></text>
-              <text class="placeholder-text">添加头像</text>
-            </view>
-            
-            <view wx:if="{{uploadingAvatar}}" class="upload-loading">
-              <view class="loading-spinner"></view>
-            </view>
-          </view>
-        </view>
+
         
         <!-- 基本信息表单 -->
         <view class="form-section">
@@ -77,21 +60,19 @@
           
           <form-item 
             label="性别"
-            type="picker"
-            value="{{genderOptions[getPickerIndex('gender', formData.gender)].label}}"
-            range="{{genderOptions}}"
-            rangeKey="label"
+            type="radio"
+            value="{{formData.gender}}"
+            radioOptions="{{genderOptions}}"
             data-field="gender"
-            bind:change="onPickerChange" />
+            bind:change="onRadioChange" />
           
           <form-item 
             label="家庭关系"
-            type="picker"
-            value="{{formData.relationship || '请选择关系'}}"
-            range="{{relationshipOptions}}"
-            rangeKey="label"
+            type="input"
+            value="{{formData.relationship}}"
+            placeholder="请输入家庭关系"
             data-field="relationship"
-            bind:change="onPickerChange" />
+            bind:change="onInputChange" />
         </view>
       </view>
       
@@ -326,7 +307,7 @@
       <view class="step-nav">
         <button 
           wx:if="{{currentStep > 0}}"
-          class="nav-btn prev-btn"
+          class="modern-btn nav-btn prev-btn"
           bind:tap="onPrevStep">
           <text class="iconfont icon-arrow-left"></text>
           <text>上一步</text>
@@ -334,7 +315,7 @@
         
         <button 
           wx:if="{{currentStep < steps.length - 1}}"
-          class="nav-btn next-btn"
+          class="modern-btn nav-btn next-btn"
           bind:tap="onNextStep">
           <text>下一步</text>
           <text class="iconfont icon-arrow-right"></text>
@@ -344,24 +325,27 @@
       <!-- 主要操作按钮 -->
       <view class="main-actions">
         <button 
-          class="action-btn cancel-btn"
+          class="modern-btn action-btn cancel-btn"
           bind:tap="onCancel">
-          取消
+          <text class="iconfont icon-close"></text>
+          <text>取消</text>
         </button>
         
         <button 
           wx:if="{{mode === 'add'}}"
-          class="action-btn reset-btn"
+          class="modern-btn action-btn reset-btn"
           bind:tap="onReset">
-          重置
+          <text class="iconfont icon-refresh"></text>
+          <text>重置</text>
         </button>
         
         <button 
-          class="action-btn submit-btn"
+          class="modern-btn action-btn submit-btn"
           loading="{{submitting}}"
           disabled="{{submitting}}"
           bind:tap="onSubmit">
-          {{mode === 'add' ? '添加成员' : '保存修改'}}
+          <text class="iconfont icon-check" wx:if="{{!submitting}}"></text>
+          <text>{{mode === 'add' ? '添加成员' : '保存修改'}}</text>
         </button>
       </view>
     </view>
