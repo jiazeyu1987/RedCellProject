@@ -182,6 +182,52 @@ Component({
       this.setData({
         disabled: disabled
       });
+    },
+
+    /**
+     * 更新按钮样式类
+     */
+    updateButtonClass() {
+      let buttonClass = 'custom-button';
+      
+      // 类型样式
+      if (this.properties.type) {
+        buttonClass += ` button-${this.properties.type}`;
+      }
+      
+      // 尺寸样式
+      if (this.properties.size) {
+        buttonClass += ` button-${this.properties.size}`;
+      }
+      
+      // 形状样式
+      if (this.properties.shape && this.properties.shape !== 'default') {
+        buttonClass += ` button-${this.properties.shape}`;
+      }
+      
+      // 块级按钮
+      if (this.properties.block) {
+        buttonClass += ' button-block';
+      }
+      
+      // 幽灵按钮
+      if (this.properties.ghost) {
+        buttonClass += ' button-ghost';
+      }
+      
+      // 渐变按钮
+      if (this.properties.gradient) {
+        buttonClass += ' button-gradient';
+      }
+      
+      // 阴影按钮
+      if (this.properties.shadow) {
+        buttonClass += ' button-shadow';
+      }
+
+      this.setData({
+        buttonClass: buttonClass
+      });
     }
   },
 
@@ -201,51 +247,6 @@ Component({
     'type, size, shape, block, ghost, gradient, shadow': function() {
       this.updateButtonClass();
     }
-  },
-
-  /**
-   * 更新按钮样式类
-   */
-  updateButtonClass() {
-    let buttonClass = 'custom-button';
-    
-    // 类型样式
-    if (this.properties.type) {
-      buttonClass += ` button-${this.properties.type}`;
-    }
-    
-    // 尺寸样式
-    if (this.properties.size) {
-      buttonClass += ` button-${this.properties.size}`;
-    }
-    
-    // 形状样式
-    if (this.properties.shape && this.properties.shape !== 'default') {
-      buttonClass += ` button-${this.properties.shape}`;
-    }
-    
-    // 块级按钮
-    if (this.properties.block) {
-      buttonClass += ' button-block';
-    }
-    
-    // 幽灵按钮
-    if (this.properties.ghost) {
-      buttonClass += ' button-ghost';
-    }
-    
-    // 渐变按钮
-    if (this.properties.gradient) {
-      buttonClass += ' button-gradient';
-    }
-    
-    // 阴影按钮
-    if (this.properties.shadow) {
-      buttonClass += ' button-shadow';
-    }
-
-    this.setData({
-      buttonClass: buttonClass
-    });
   }
+
 });

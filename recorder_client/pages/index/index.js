@@ -706,7 +706,7 @@ Page({
     
     const actionMap = {
       startService: '/pages/service/start-service',
-      patientFiles: '/pages/patients/patients', 
+      patientFiles: '/pages/health-archive/health-archive', 
       schedule: '/pages/schedule/schedule',
       payment: '/pages/payment/payment'
     };

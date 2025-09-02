@@ -4,6 +4,16 @@
     "pages/login/login",
     "pages/forgot-password/forgot-password",
     "pages/bind-phone/bind-phone",
+    "pages/health-archive/health-archive",
+    "pages/health-archive-detail/health-archive-detail",
+    "pages/family-members/family-members",
+    "pages/member-detail/member-detail",
+    "pages/member-form/member-form",
+    "pages/health-record-form/health-record-form",
+    "pages/health-monitoring/health-monitoring",
+    "pages/relationship-map/relationship-map",
+    "pages/schedule/schedule",
+    "pages/user-settings/user-settings",
     "pages/logs/logs"
   ],
 

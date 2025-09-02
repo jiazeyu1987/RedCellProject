@@ -1,0 +1,952 @@
+/* 患者详情页面样式 */
+
+.member-detail-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding-bottom: 20rpx;
+}
+
+/* 头部信息卡片 */
+.header-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40rpx 30rpx;
+  margin-bottom: 20rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(10deg); }
+}
+
+/* 头像区域 */
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.avatar-container {
+  position: relative;
+  width: 140rpx;
+  height: 140rpx;
+  margin-bottom: 20rpx;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 4rpx solid rgba(255,255,255,0.3);
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
+
+.avatar.uploading {
+  opacity: 0.6;
+}
+
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: white;
+  font-size: 36rpx;
+}
+
+.avatar-container:active .avatar-overlay {
+  opacity: 1;
+}
+
+.upload-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.loading-spinner {
+  width: 40rpx;
+  height: 40rpx;
+  border: 4rpx solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.online-status {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+.online-status.active {
+  background: rgba(52, 199, 89, 0.2);
+  color: #34c759;
+}
+
+.online-status.inactive {
+  background: rgba(255, 59, 48, 0.2);
+  color: #ff3b30;
+}
+
+/* 基本信息 */
+.basic-info {
+  color: white;
+  text-align: center;
+}
+
+.name-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20rpx;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.member-name {
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-right: 16rpx;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12rpx;
+  font-size: 28rpx;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.info-label {
+  opacity: 0.8;
+}
+
+.info-value {
+  font-weight: 500;
+}
+
+.info-separator {
+  margin: 0 16rpx;
+  opacity: 0.6;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40rpx;
+  gap: 20rpx;
+}
+
+.action-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  padding: 20rpx 10rpx;
+  border-radius: 16rpx;
+  font-size: 24rpx;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.action-btn.primary {
+  background: rgba(255,255,255,0.25);
+  color: white;
+  backdrop-filter: blur(10rpx);
+}
+
+.action-btn.secondary {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  backdrop-filter: blur(10rpx);
+}
+
+.action-btn:active {
+  transform: scale(0.95);
+}
+
+.action-btn .iconfont {
+  font-size: 32rpx;
+}
+
+/* Tab导航 */
+.tab-navigation {
+  background: white;
+  display: flex;
+  padding: 0 20rpx;
+  margin-bottom: 20rpx;
+  border-radius: 16rpx 16rpx 0 0;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx 16rpx;
+  position: relative;
+  transition: all 0.3s ease;
+  gap: 8rpx;
+}
+
+.tab-item.active {
+  color: #007aff;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 4rpx;
+  background: #007aff;
+  border-radius: 2rpx;
+}
+
+.tab-item .iconfont {
+  font-size: 32rpx;
+}
+
+.tab-title {
+  font-size: 24rpx;
+}
+
+/* Tab内容 */
+.tab-content {
+  padding: 0 20rpx;
+}
+
+/* 信息section */
+.info-section {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  gap: 12rpx;
+}
+
+.section-title .iconfont {
+  font-size: 36rpx;
+  color: #007aff;
+}
+
+.edit-btn {
+  margin-left: auto;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 12rpx;
+  padding: 12rpx;
+  font-size: 24rpx;
+  color: #007aff;
+}
+
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* 编辑模式按钮 */
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20rpx;
+  margin-top: 30rpx;
+  padding-top: 30rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.cancel-btn {
+  background: #f0f0f0;
+  color: #666;
+  border: none;
+  border-radius: 12rpx;
+  padding: 16rpx 32rpx;
+  font-size: 28rpx;
+}
+
+.save-btn {
+  background: #007aff;
+  color: white;
+  border: none;
+  border-radius: 12rpx;
+  padding: 16rpx 32rpx;
+  font-size: 28rpx;
+}
+
+/* 备注信息 */
+.notes-content {
+  font-size: 28rpx;
+  line-height: 1.6;
+  color: #666;
+}
+
+.empty-text {
+  color: #999;
+  font-style: italic;
+}
+
+/* 健康档案Tab */
+.health-overview {
+  margin-bottom: 20rpx;
+}
+
+.health-status-card {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.status-indicator {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-indicator.status-healthy {
+  background: #34c759;
+}
+
+.status-indicator.status-chronic {
+  background: #ff9500;
+}
+
+.status-indicator.status-critical {
+  background: #ff3b30;
+}
+
+.status-info {
+  flex: 1;
+}
+
+.status-title {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.status-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.edit-health-btn {
+  background: #f0f0f0;
+  border: none;
+  border-radius: 12rpx;
+  padding: 16rpx;
+  color: #007aff;
+  font-size: 28rpx;
+}
+
+/* 健康section */
+.health-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.health-section {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.section-count {
+  font-size: 24rpx;
+  color: #666;
+  background: #f0f0f0;
+  padding: 8rpx 12rpx;
+  border-radius: 12rpx;
+}
+
+.health-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.health-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  border-left: 4rpx solid #ddd;
+}
+
+.health-item.medication {
+  border-left-color: #007aff;
+}
+
+.health-item.allergy {
+  border-left-color: #ff3b30;
+  background: #fff5f5;
+}
+
+.item-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.item-status {
+  font-size: 24rpx;
+  color: #007aff;
+}
+
+.item-warning {
+  font-size: 24rpx;
+}
+
+.empty-item {
+  text-align: center;
+  padding: 40rpx;
+  color: #999;
+}
+
+/* 健康指标 */
+.health-detail {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-top: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.health-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  gap: 12rpx;
+}
+
+.metric-label {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.metric-value {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 服务历史Tab */
+.service-summary {
+  margin-bottom: 20rpx;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.summary-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.summary-stats {
+  display: flex;
+  justify-content: space-around;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.stat-number {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #007aff;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 服务列表 */
+.service-list {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.list-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.list-count {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.service-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: background-color 0.3s ease;
+}
+
+.service-item:last-child {
+  border-bottom: none;
+}
+
+.service-item:active {
+  background-color: #f8f9fa;
+}
+
+.service-info {
+  flex: 1;
+}
+
+.service-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.service-name {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.service-details {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 8rpx;
+}
+
+.service-time,
+.service-duration {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.service-notes {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+.service-arrow {
+  margin-left: 20rpx;
+  color: #ccc;
+}
+
+.empty-service {
+  text-align: center;
+  padding: 60rpx;
+  color: #999;
+}
+
+/* 关系管理Tab */
+.relationship-overview {
+  margin-bottom: 20rpx;
+}
+
+.overview-card {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.overview-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.overview-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.member-count {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.manage-btn {
+  background: #007aff;
+  color: white;
+  border: none;
+  border-radius: 12rpx;
+  padding: 12rpx 20rpx;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+/* 关系图谱 */
+.relationship-map {
+  background: white;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.map-container {
+  height: 400rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-placeholder {
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 关系列表 */
+.relationship-list {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.relationship-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.relationship-item:last-child {
+  border-bottom: none;
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.member-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+}
+
+.member-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.member-name {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.member-relation {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.relation-actions {
+  display: flex;
+  gap: 12rpx;
+}
+
+.relation-btn {
+  background: #f0f0f0;
+  color: #666;
+  border: none;
+  border-radius: 8rpx;
+  padding: 8rpx 12rpx;
+  font-size: 22rpx;
+}
+
+.empty-relationship {
+  text-align: center;
+  padding: 60rpx;
+  color: #999;
+}
+
+/* 智能推荐 */
+.relationship-recommendations {
+  background: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-top: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.05);
+}
+
+.recommendations-header {
+  margin-bottom: 24rpx;
+}
+
+.recommendations-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.recommendation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.recommendation-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.recommendation-confidence {
+  font-size: 24rpx;
+  color: #007aff;
+}
+
+/* 操作菜单 */
+.action-menu {
+  padding: 20rpx;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 32rpx 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: background-color 0.3s ease;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:active {
+  background-color: #f8f9fa;
+}
+
+.menu-item.danger {
+  color: #ff3b30;
+}
+
+.menu-item .iconfont {
+  font-size: 36rpx;
+}
+
+.menu-text {
+  font-size: 32rpx;
+}
+
+/* 家庭档案管理 */
+.family-archive-manager {
+  padding: 20rpx;
+}
+
+.archive-operations {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.operation-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  padding: 32rpx;
+  background: #f8f9fa;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  font-size: 32rpx;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.operation-btn:active {
+  background-color: #e8e8e8;
+}
+
+.operation-btn .iconfont {
+  font-size: 36rpx;
+}
+
+/* 响应式适配 */
+@media (max-width: 375px) {
+  .header-card {
+    padding: 30rpx 20rpx;
+  }
+  
+  .avatar-container {
+    width: 120rpx;
+    height: 120rpx;
+  }
+  
+  .member-name {
+    font-size: 42rpx;
+  }
+  
+  .info-row {
+    font-size: 24rpx;
+  }
+  
+  .action-buttons {
+    gap: 12rpx;
+  }
+  
+  .action-btn {
+    padding: 16rpx 8rpx;
+    font-size: 22rpx;
+  }
+  
+  .health-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .member-detail-container {
+    background-color: #1c1c1e;
+  }
+  
+  .info-section,
+  .health-status-card,
+  .summary-card,
+  .service-list,
+  .relationship-list,
+  .relationship-map,
+  .relationship-recommendations {
+    background: #2c2c2e;
+  }
+  
+  .section-title,
+  .status-value,
+  .list-title,
+  .service-name,
+  .member-name,
+  .recommendations-title {
+    color: #ffffff;
+  }
+  
+  .info-label,
+  .status-title,
+  .list-count,
+  .service-time,
+  .service-duration,
+  .member-relation {
+    color: #8e8e93;
+  }
+  
+  .health-item,
+  .metric-item,
+  .recommendation-item {
+    background: #3a3a3c;
+  }
+}

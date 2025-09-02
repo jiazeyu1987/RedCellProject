@@ -1,0 +1,310 @@
+/* 容器样式 */
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 页面标题 */
+.page-header {
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 区块样式 */
+.section {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+/* 表单区块样式 */
+.form-section {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.form-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 30rpx;
+  display: block;
+  border-bottom: 2rpx solid #e0e0e0;
+  padding-bottom: 20rpx;
+}
+
+/* 子区块样式 */
+.subsection {
+  margin-top: 40rpx;
+  padding-top: 30rpx;
+  border-top: 1rpx solid #e0e0e0;
+}
+
+.subsection-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #666;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+/* 表单组样式 */
+.form-group {
+  margin-bottom: 30rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 16rpx;
+  font-weight: 500;
+}
+
+/* 输入框样式 */
+.input {
+  height: 80rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  color: #333;
+  background-color: #fff;
+}
+
+.input:focus {
+  border-color: #007AFF;
+}
+
+.input-wrapper {
+  height: 80rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+}
+
+.input-wrapper input {
+  border: none;
+  height: auto;
+  padding: 0;
+  flex: 1;
+}
+
+/* 文本域样式 */
+.textarea {
+  min-height: 120rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  color: #333;
+  background-color: #fff;
+  line-height: 1.5;
+}
+
+.textarea:focus {
+  border-color: #007AFF;
+}
+
+/* 选择器样式 */
+.picker {
+  height: 80rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 28rpx;
+  color: #333;
+  background-color: #fff;
+}
+
+.picker-arrow {
+  color: #999;
+  font-size: 24rpx;
+}
+
+/* 滑块样式 */
+.slider {
+  margin: 20rpx 0;
+}
+
+/* 开关样式 */
+switch {
+  transform: scale(0.8);
+}
+
+/* 提交区域样式 */
+.submit-section {
+  padding: 40rpx 0;
+  margin-top: 40rpx;
+}
+
+.submit-btn {
+  width: 100%;
+  height: 88rpx;
+  background: linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%);
+  color: #fff;
+  border: none;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(0, 122, 255, 0.3);
+}
+
+.submit-btn:disabled {
+  background: #ccc;
+  box-shadow: none;
+}
+
+.submit-btn:active {
+  transform: scale(0.98);
+  transition: transform 0.1s;
+}
+
+/* 运动记录特定样式 */
+.exercise-form {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+  color: #fff;
+}
+
+.exercise-form .form-title {
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.exercise-form .subsection {
+  border-top-color: rgba(255, 255, 255, 0.3);
+}
+
+.exercise-form .subsection-title {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* 睡眠记录特定样式 */
+.sleep-form {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}
+
+.sleep-form .form-title {
+  color: #fff;
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.sleep-form .subsection {
+  border-top-color: rgba(255, 255, 255, 0.3);
+}
+
+.sleep-form .subsection-title {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 750rpx) {
+  .container {
+    padding: 15rpx;
+  }
+  
+  .form-section {
+    padding: 20rpx;
+  }
+  
+  .page-title {
+    font-size: 32rpx;
+  }
+  
+  .form-title {
+    font-size: 28rpx;
+  }
+}
+
+/* 动画效果 */
+.form-section {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 健康状态指示器 */
+.health-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-top: 10rpx;
+}
+
+.health-indicator .status-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background-color: #4CAF50;
+}
+
+.health-indicator .status-text {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 数据卡片样式 */
+.data-card {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin: 20rpx 0;
+  color: #fff;
+}
+
+.data-card .card-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+}
+
+.data-card .card-value {
+  font-size: 48rpx;
+  font-weight: bold;
+}
+
+.data-card .card-unit {
+  font-size: 24rpx;
+  opacity: 0.8;
+  margin-left: 10rpx;
+}

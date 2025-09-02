@@ -1,0 +1,192 @@
+<!--health-archive-detail.wxml-->
+<view class="container" wx:if="{{!loading && !isError}}">
+  <!-- 成员基本信息 -->
+  <view class="member-info-section">
+    <view class="member-header">
+      <image class="member-avatar" src="{{memberInfo.avatar || '/images/default-avatar.png'}}" mode="cover"></image>
+      <view class="member-details">
+        <text class="member-name">{{memberInfo.name}}</text>
+        <text class="member-relation">{{memberInfo.relationship}}</text>
+        <text class="member-age">{{memberInfo.age}}岁 • {{memberInfo.gender === 'male' ? '男' : '女'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Tab 选项卡 -->
+  <view class="tabs-section">
+    <view class="tabs-wrapper">
+      <view wx:for="{{tabs}}" wx:key="key" 
+            class="tab-item {{currentTab === item.key ? 'active' : ''}}"
+            bindtap="switchTab" data-tab="{{item.key}}">
+        <text class="tab-icon">{{item.icon}}</text>
+        <text class="tab-title">{{item.title}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Tab 内容区域 -->
+  <view class="tab-content">
+    
+    <!-- 概览 Tab -->
+    <view wx:if="{{currentTab === 'overview'}}" class="overview-content">
+      <!-- 健康状态总览 -->
+      <view class="health-overview-card">
+        <view class="card-header">
+          <text class="card-title">健康状态</text>
+        </view>
+        <view class="health-stats">
+          <view class="stat-item">
+            <text class="stat-label">血压</text>
+            <text class="stat-value">{{healthData.vitalSigns.current.bloodPressure.systolic || '--'}}/{{healthData.vitalSigns.current.bloodPressure.diastolic || '--'}}</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-label">心率</text>
+            <text class="stat-value">{{healthData.vitalSigns.current.heartRate.value || '--'}} bpm</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-label">体温</text>
+            <text class="stat-value">{{healthData.vitalSigns.current.bodyTemperature.value || '--'}}°C</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 风险评估 -->
+      <view wx:if="{{riskAssessment}}" class="risk-assessment-card">
+        <view class="card-header">
+          <text class="card-title">风险评估</text>
+          <text class="risk-level risk-{{riskAssessment.overallRisk.level}}">
+            {{riskAssessment.overallRisk.description}}
+          </text>
+        </view>
+        <view class="risk-content" bindtap="viewRiskDetail">
+          <text class="risk-score">评分: {{riskAssessment.overallRisk.score}}</text>
+          <text class="view-detail">查看详情 ></text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 生命体征 Tab -->
+    <view wx:if="{{currentTab === 'vital'}}" class="vital-content">
+      <view class="vital-signs-list">
+        <view class="vital-item">
+          <text class="vital-label">血压</text>
+          <text class="vital-value">{{healthData.vitalSigns.current.bloodPressure.systolic || '--'}}/{{healthData.vitalSigns.current.bloodPressure.diastolic || '--'}} mmHg</text>
+          <text class="vital-time">{{healthData.vitalSigns.current.bloodPressure.measureTime || '未记录'}}</text>
+        </view>
+        <view class="vital-item">
+          <text class="vital-label">心率</text>
+          <text class="vital-value">{{healthData.vitalSigns.current.heartRate.value || '--'}} bpm</text>
+          <text class="vital-time">{{healthData.vitalSigns.current.heartRate.measureTime || '未记录'}}</text>
+        </view>
+        <view class="vital-item">
+          <text class="vital-label">体温</text>
+          <text class="vital-value">{{healthData.vitalSigns.current.bodyTemperature.value || '--'}}°C</text>
+          <text class="vital-time">{{healthData.vitalSigns.current.bodyTemperature.measureTime || '未记录'}}</text>
+        </view>
+        <view class="vital-item">
+          <text class="vital-label">呼吸频率</text>
+          <text class="vital-value">{{healthData.vitalSigns.current.respiratoryRate.value || '--'}} 次/分</text>
+          <text class="vital-time">{{healthData.vitalSigns.current.respiratoryRate.measureTime || '未记录'}}</text>
+        </view>
+        <view class="vital-item">
+          <text class="vital-label">血氧饱和度</text>
+          <text class="vital-value">{{healthData.vitalSigns.current.oxygenSaturation.value || '--'}}%</text>
+          <text class="vital-time">{{healthData.vitalSigns.current.oxygenSaturation.measureTime || '未记录'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 医疗记录 Tab -->
+    <view wx:if="{{currentTab === 'medical'}}" class="medical-content">
+      <!-- 就诊记录 -->
+      <view class="medical-section">
+        <text class="section-title">就诊记录</text>
+        <view wx:if="{{medicalRecords.consultations.length === 0}}" class="empty-state">
+          <text class="empty-text">暂无就诊记录</text>
+        </view>
+        <view wx:else class="record-list">
+          <view wx:for="{{medicalRecords.consultations}}" wx:key="id" class="record-item">
+            <text class="record-date">{{item.recordDate}}</text>
+            <text class="record-hospital">{{item.hospital}}</text>
+            <text class="record-department">{{item.department}}</text>
+            <text class="record-diagnosis">{{item.diagnosis}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 诊断记录 -->
+      <view class="medical-section">
+        <text class="section-title">诊断记录</text>
+        <view wx:if="{{medicalRecords.diagnoses.length === 0}}" class="empty-state">
+          <text class="empty-text">暂无诊断记录</text>
+        </view>
+        <view wx:else class="record-list">
+          <view wx:for="{{medicalRecords.diagnoses}}" wx:key="id" class="record-item">
+            <text class="record-date">{{item.diagnosisDate}}</text>
+            <text class="record-doctor">{{item.doctor}}</text>
+            <text class="record-diagnosis">{{item.primaryDiagnosis}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 检查报告 Tab -->
+    <view wx:if="{{currentTab === 'reports'}}" class="reports-content">
+      <view wx:if="{{examinationReports.length === 0}}" class="empty-state">
+        <text class="empty-text">暂无检查报告</text>
+      </view>
+      <view wx:else class="reports-list">
+        <view wx:for="{{examinationReports}}" wx:key="id" class="report-item">
+          <text class="report-date">{{item.reportDate}}</text>
+          <text class="report-type">{{item.testType}}</text>
+          <text class="report-hospital">{{item.hospital}}</text>
+          <text class="report-status">{{item.status}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 用药记录 Tab -->
+    <view wx:if="{{currentTab === 'medications'}}" class="medications-content">
+      <!-- 当前用药 -->
+      <view class="medication-section">
+        <text class="section-title">当前用药</text>
+        <view wx:if="{{healthData.medications.current.length === 0}}" class="empty-state">
+          <text class="empty-text">暂无当前用药</text>
+        </view>
+        <view wx:else class="medication-list">
+          <view wx:for="{{healthData.medications.current}}" wx:key="id" class="medication-item">
+            <text class="medication-name">{{item.medicationName}}</text>
+            <text class="medication-dosage">{{item.dosage}}</text>
+            <text class="medication-frequency">{{item.frequency}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 历史用药 -->
+      <view class="medication-section">
+        <text class="section-title">历史用药</text>
+        <view wx:if="{{healthData.medications.history.length === 0}}" class="empty-state">
+          <text class="empty-text">暂无历史用药记录</text>
+        </view>
+        <view wx:else class="medication-list">
+          <view wx:for="{{healthData.medications.history}}" wx:key="id" class="medication-item">
+            <text class="medication-name">{{item.medicationName}}</text>
+            <text class="medication-period">{{item.startDate}} - {{item.endDate}}</text>
+            <text class="medication-reason">{{item.reason}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 加载状态 -->
+<view wx:if="{{loading}}" class="loading-container">
+  <text class="loading-text">加载中...</text>
+</view>
+
+<!-- 错误状态 -->
+<view wx:if="{{isError}}" class="error-container">
+  <text class="error-text">{{errorMessage}}</text>
+  <button class="retry-button" bindtap="initPage">重试</button>
+</view>

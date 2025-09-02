@@ -1,0 +1,298 @@
+<!--成员筛选器组件-->
+<view class="member-filter {{visible ? 'visible' : 'hidden'}}" wx:if="{{visible}}">
+  <!-- 筛选头部 -->
+  <view class="filter-header">
+    <view class="filter-title">
+      <icon class="filter-title-icon" type="filter" size="16" color="#007AFF"/>
+      <text class="filter-title-text">筛选条件</text>
+      <view wx:if="{{selectedCount > 0}}" class="selected-badge">{{selectedCount}}</view>
+    </view>
+    
+    <view class="filter-actions">
+      <view class="clear-button" bindtap="onClearAll" wx:if="{{selectedCount > 0}}">
+        <icon class="clear-icon" type="clear" size="14" color="#ff3b30"/>
+        <text class="clear-text">清空</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 快速筛选预设 -->
+  <view class="quick-filters">
+    <view class="quick-filter-title">快速筛选:</view>
+    <view class="quick-filter-options">
+      <view 
+        class="quick-filter-option"
+        bindtap="onQuickFilter"
+        data-preset="elderly_critical"
+      >
+        <icon class="quick-icon" type="warning" size="12" color="#ff3b30"/>
+        <text class="quick-text">重症老人</text>
+      </view>
+      <view 
+        class="quick-filter-option"
+        bindtap="onQuickFilter"
+        data-preset="daily_service"
+      >
+        <icon class="quick-icon" type="clock" size="12" color="#007AFF"/>
+        <text class="quick-text">每日服务</text>
+      </view>
+      <view 
+        class="quick-filter-option"
+        bindtap="onQuickFilter"
+        data-preset="healthy_adult"
+      >
+        <icon class="quick-icon" type="heart" size="12" color="#34c759"/>
+        <text class="quick-text">健康成人</text>
+      </view>
+      <view 
+        class="quick-filter-option"
+        bindtap="onQuickFilter"
+        data-preset="chronic_elderly"
+      >
+        <icon class="quick-icon" type="medical" size="12" color="#ff9500"/>
+        <text class="quick-text">慢病老人</text>
+      </view>
+      <view 
+        class="quick-filter-option"
+        bindtap="onQuickFilter"
+        data-preset="high_priority"
+      >
+        <icon class="quick-icon" type="warning" size="12" color="#ff3b30"/>
+        <text class="quick-text">高优先级</text>
+      </view>
+      <view 
+        class="quick-filter-option"
+        bindtap="onQuickFilter"
+        data-preset="family_core"
+      >
+        <icon class="quick-icon" type="family" size="12" color="#007AFF"/>
+        <text class="quick-text">核心家庭</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 搜索框和高级筛选 -->
+  <view class="search-advanced-section">
+    <!-- 搜索框 -->
+    <view class="search-box">
+      <icon class="search-icon" type="search" size="14" color="#999"/>
+      <input 
+        class="search-input" 
+        placeholder="搜索成员姓名、电话..."
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+      />
+      <view wx:if="{{searchKeyword}}" class="search-clear" bindtap="onSearchInput" data-value="">
+        <icon type="clear" size="12" color="#999"/>
+      </view>
+    </view>
+    
+    <!-- 高级筛选切换 -->
+    <view class="advanced-toggle" bindtap="onToggleAdvancedMode">
+      <text class="advanced-text">高级筛选</text>
+      <icon class="advanced-arrow {{advancedMode ? 'expanded' : ''}}" type="arrow-down" size="12" color="#007AFF"/>
+    </view>
+  </view>
+  
+  <!-- 高级筛选区域 -->
+  <view wx:if="{{advancedMode}}" class="advanced-filters">
+    <!-- 年龄范围筛选 -->
+    <view class="advanced-filter-item">
+      <view class="filter-item-header">
+        <text class="filter-item-title">年龄范围</text>
+        <switch class="filter-switch" 
+               checked="{{ageRangeFilter.enabled}}" 
+               bindchange="onAgeRangeToggle"/>
+      </view>
+      
+      <view wx:if="{{ageRangeFilter.enabled}}" class="age-range-container">
+        <view class="age-range-labels">
+          <text class="age-label">{{ageRangeFilter.selectedMin}}岁</text>
+          <text class="age-label">{{ageRangeFilter.selectedMax}}岁</text>
+        </view>
+        <slider 
+          class="age-range-slider"
+          min="{{ageRangeFilter.min}}"
+          max="{{ageRangeFilter.max}}"
+          value="{{ageRangeFilter.selectedMin}}"
+          bindchange="onAgeRangeChange"
+          activeColor="#007AFF"
+          backgroundColor="#e9ecef"
+        />
+        <view class="age-range-actions">
+          <button class="apply-btn" size="mini" type="primary" bindtap="onApplyAgeRange">应用</button>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 筛选历史 -->
+    <view wx:if="{{filterHistory.length > 0}}" class="filter-history">
+      <view class="history-header">
+        <text class="history-title">筛选历史</text>
+        <button class="clear-history-btn" size="mini" bindtap="onClearHistory">清空</button>
+      </view>
+      
+      <view class="history-list">
+        <view 
+          wx:for="{{filterHistory}}" 
+          wx:key="timestamp"
+          class="history-item"
+          bindtap="onApplyHistoryFilter"
+          data-index="{{index}}"
+        >
+          <view class="history-content">
+            <text class="history-name">{{item.name}}</text>
+            <text class="history-time">{{item.timestamp}}</text>
+          </view>
+          <view class="history-delete" 
+                bindtap="onDeleteHistoryFilter" 
+                data-index="{{index}}">
+            <icon type="clear" size="12" color="#999"/>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 筛选选项组 -->
+  <view class="filter-groups">
+    <view wx:for="{{filterGroups}}" wx:key="key" class="filter-group">
+      <!-- 组标题 -->
+      <view 
+        class="group-header"
+        bindtap="onGroupToggle"
+        data-group="{{item.key}}"
+      >
+        <view class="group-title">
+          <icon class="group-icon" type="{{item.icon}}" size="14" color="#666"/>
+          <text class="group-text">{{item.title}}</text>
+          <view wx:if="{{getGroupSelectedCount(item.key) > 0}}" class="group-badge">
+            {{getGroupSelectedCount(item.key)}}
+          </view>
+        </view>
+        <icon 
+          class="group-arrow {{collapsed[item.key] ? 'collapsed' : ''}}" 
+          type="arrow-down" 
+          size="12" 
+          color="#999"
+        />
+      </view>
+      
+      <!-- 选项列表 -->
+      <view class="group-options {{collapsed[item.key] ? 'collapsed' : ''}}" wx:if="{{!collapsed[item.key]}}">
+        <view 
+          wx:for="{{filterOptions[item.key]}}" 
+          wx:for-item="option" 
+          wx:key="value"
+          class="filter-option {{isOptionSelected(item.key, option.value) ? 'selected' : ''}}"
+          bindtap="onFilterOptionTap"
+          data-type="{{item.key}}"
+          data-value="{{option.value}}"
+        >
+          <!-- 选项图标 -->
+          <view class="option-icon-container">
+            <icon 
+              class="option-icon" 
+              type="{{option.icon}}" 
+              size="16" 
+              color="{{isOptionSelected(item.key, option.value) ? '#fff' : (option.color || '#666')}}"
+            />
+          </view>
+          
+          <!-- 选项文本 -->
+          <text class="option-text">{{option.label}}</text>
+          
+          <!-- 选中状态指示 -->
+          <view wx:if="{{isOptionSelected(item.key, option.value)}}" class="option-check">
+            <icon class="check-icon" type="success" size="14" color="#fff"/>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 筛选结果预览 -->
+  <view wx:if="{{selectedCount > 0}}" class="filter-preview">
+    <view class="preview-header">
+      <view class="preview-title">当前筛选条件:</view>
+      <button class="reset-btn" size="mini" bindtap="onResetFilters">重置</button>
+    </view>
+    
+    <view class="preview-tags">
+      <!-- 年龄范围 -->
+      <view wx:if="{{filters.ageRange}}" class="preview-tag age">
+        <text class="tag-text">
+          {{filters.ageRange === 'child' ? '儿童' : filters.ageRange === 'adult' ? '成人' : '老人'}}
+        </text>
+        <icon class="tag-close" type="clear" size="10" 
+              bindtap="onFilterOptionTap" 
+              data-type="ageRange" 
+              data-value="{{filters.ageRange}}"/>
+      </view>
+      
+      <!-- 性别 -->
+      <view wx:if="{{filters.gender}}" class="preview-tag gender">
+        <text class="tag-text">{{filters.gender === 'male' ? '男性' : '女性'}}</text>
+        <icon class="tag-close" type="clear" size="10" 
+              bindtap="onFilterOptionTap" 
+              data-type="gender" 
+              data-value="{{filters.gender}}"/>
+      </view>
+      
+      <!-- 健康状态 -->
+      <view wx:if="{{filters.healthStatus}}" class="preview-tag health">
+        <text class="tag-text">
+          {{filters.healthStatus === 'healthy' ? '健康' : filters.healthStatus === 'chronic' ? '慢性病' : '重症'}}
+        </text>
+        <icon class="tag-close" type="clear" size="10" 
+              bindtap="onFilterOptionTap" 
+              data-type="healthStatus" 
+              data-value="{{filters.healthStatus}}"/>
+      </view>
+      
+      <!-- 服务频率 -->
+      <view wx:if="{{filters.serviceFrequency}}" class="preview-tag frequency">
+        <text class="tag-text">
+          {{filters.serviceFrequency === 'daily' ? '每日' : filters.serviceFrequency === 'weekly' ? '每周' : '每月'}}服务
+        </text>
+        <icon class="tag-close" type="clear" size="10" 
+              bindtap="onFilterOptionTap" 
+              data-type="serviceFrequency" 
+              data-value="{{filters.serviceFrequency}}"/>
+      </view>
+      
+      <!-- 家庭关系 -->
+      <view wx:if="{{filters.relationship}}" class="preview-tag relationship">
+        <text class="tag-text">
+          {{filters.relationship === 'parent' ? '父母' : filters.relationship === 'child' ? '子女' : filters.relationship === 'spouse' ? '配偶' : filters.relationship === 'sibling' ? '兄弟姐妹' : filters.relationship === 'grandparent' ? '祖父母' : '其他'}}
+        </text>
+        <icon class="tag-close" type="clear" size="10" 
+              bindtap="onFilterOptionTap" 
+              data-type="relationship" 
+              data-value="{{filters.relationship}}"/>
+      </view>
+      
+      <!-- 优先级 -->
+      <view wx:if="{{filters.priority}}" class="preview-tag priority">
+        <text class="tag-text">
+          {{filters.priority === 'high' ? '高优先级' : filters.priority === 'medium' ? '中优先级' : '低优先级'}}
+        </text>
+        <icon class="tag-close" type="clear" size="10" 
+              bindtap="onFilterOptionTap" 
+              data-type="priority" 
+              data-value="{{filters.priority}}"/>
+      </view>
+      
+      <!-- 服务状态 -->
+      <view wx:if="{{filters.serviceStatus}}" class="preview-tag status">
+        <text class="tag-text">
+          {{filters.serviceStatus === 'active' ? '活跃' : filters.serviceStatus === 'inactive' ? '非活跃' : '暂停'}}
+        </text>
+        <icon class="tag-close" type="clear" size="10" 
+              bindtap="onFilterOptionTap" 
+              data-type="serviceStatus" 
+              data-value="{{filters.serviceStatus}}"/>
+      </view>
+    </view>
+  </view>
+</view>

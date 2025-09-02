@@ -1,0 +1,354 @@
+/* 家庭成员列表页面样式 */
+.family-members-page {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding-bottom: 120rpx; /* 为底部按钮留出空间 */
+}
+
+/* 搜索筛选区域 */
+.search-filter-section {
+  background: #fff;
+  padding: 24rpx;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.search-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #f5f6fa;
+  border-radius: 24rpx;
+  padding: 0 24rpx;
+  height: 72rpx;
+  position: relative;
+}
+
+.search-icon {
+  margin-right: 16rpx;
+  color: #999;
+}
+
+.search-input {
+  flex: 1;
+  height: 100%;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.search-input::placeholder {
+  color: #999;
+  font-size: 26rpx;
+}
+
+.clear-search {
+  position: absolute;
+  right: 24rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 8rpx;
+}
+
+.filter-button {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f6fa;
+  border-radius: 24rpx;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.filter-button.active {
+  background: #007AFF;
+  color: #fff;
+}
+
+.filter-button.active .filter-icon {
+  color: #fff;
+}
+
+.filter-dot {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  width: 12rpx;
+  height: 12rpx;
+  background: #ff3b30;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+/* 成员列表内容 */
+.members-content {
+  flex: 1;
+}
+
+/* 家庭关系图谱区域 */
+.relationship-map-section {
+  background: #fff;
+  margin: 16rpx 24rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.section-icon {
+  color: #4A90E2;
+}
+
+.title-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.map-action {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  background: rgba(74, 144, 226, 0.1);
+  transition: all 0.3s ease;
+}
+
+.map-action:active {
+  background: rgba(74, 144, 226, 0.2);
+  transform: scale(0.98);
+}
+
+.action-text {
+  font-size: 26rpx;
+  color: #4A90E2;
+  font-weight: 500;
+}
+
+.action-arrow {
+  color: #4A90E2;
+}
+
+.map-preview {
+  height: 300rpx;
+  position: relative;
+  background: #f8f9fa;
+}
+
+.map-preview .preview-map {
+  height: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* 排序区域 */
+.sort-section {
+  background: #fff;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+}
+
+.sort-label {
+  font-size: 28rpx;
+  color: #666;
+  margin-right: 24rpx;
+  white-space: nowrap;
+}
+
+.sort-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24rpx;
+}
+
+.sort-option {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 20rpx;
+  background: #f5f6fa;
+  border-radius: 20rpx;
+  font-size: 26rpx;
+  color: #666;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.sort-option.active {
+  background: #007AFF;
+  color: #fff;
+}
+
+.sort-arrow {
+  margin-left: 8rpx;
+  transition: transform 0.3s ease;
+}
+
+.sort-arrow.desc {
+  transform: rotate(180deg);
+}
+
+/* 成员列表 */
+.members-list {
+  padding: 0 24rpx;
+}
+
+/* 加载状态 */
+.loading-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx;
+  gap: 16rpx;
+}
+
+.loading-spinner {
+  width: 32rpx;
+  height: 32rpx;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007AFF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.no-more {
+  text-align: center;
+  padding: 40rpx;
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 底部添加按钮 */
+.add-member-button {
+  position: fixed;
+  bottom: 40rpx;
+  right: 40rpx;
+  width: 120rpx;
+  height: 120rpx;
+  background: linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%);
+  border-radius: 60rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(0, 122, 255, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.add-member-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.4);
+}
+
+.add-icon {
+  margin-bottom: 4rpx;
+}
+
+.add-text {
+  font-size: 20rpx;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* 响应式适配 */
+@media (max-width: 375px) {
+  .search-filter-section {
+    padding: 20rpx;
+  }
+  
+  .sort-section {
+    padding: 20rpx;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16rpx;
+  }
+  
+  .sort-label {
+    margin-right: 0;
+    margin-bottom: 16rpx;
+  }
+  
+  .sort-options {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .sort-option {
+    flex: 1;
+    justify-content: center;
+    min-width: 0;
+  }
+}
+
+/* 暗黑模式适配 */
+@media (prefers-color-scheme: dark) {
+  .family-members-page {
+    background-color: #1c1c1e;
+  }
+  
+  .search-filter-section,
+  .sort-section {
+    background: #2c2c2e;
+    border-bottom-color: #38383a;
+  }
+  
+  .search-box,
+  .filter-button,
+  .sort-option {
+    background: #3a3a3c;
+  }
+  
+  .search-input {
+    color: #fff;
+  }
+  
+  .search-input::placeholder {
+    color: #8e8e93;
+  }
+  
+  .sort-label,
+  .loading-text,
+  .no-more {
+    color: #8e8e93;
+  }
+  
+  .sort-option {
+    color: #8e8e93;
+  }
+}

@@ -1,0 +1,462 @@
+<!--患者详情页面-->
+<view class="member-detail-container">
+  <!-- 加载状态 -->
+  <loading-skeleton wx:if="{{loading}}" />
+  
+  <!-- 错误状态 -->
+  <error-state 
+    wx:elif="{{isError}}" 
+    message="{{errorMessage}}" 
+    bindretry="onRetry" 
+  />
+  
+  <!-- 正常内容 -->
+  <view wx:else class="detail-content">
+    <!-- 头部信息卡片 -->
+    <view class="header-card">
+      <!-- 头像区域 -->
+      <view class="avatar-section">
+        <view class="avatar-container" bindtap="onAvatarTap">
+          <image 
+            class="avatar {{uploadingAvatar ? 'uploading' : ''}}" 
+            src="{{memberDetail.avatar || '/images/avatar-default.png'}}" 
+            mode="aspectFill"
+          />
+          <view wx:if="{{uploadingAvatar}}" class="upload-loading">
+            <view class="loading-spinner"></view>
+          </view>
+          <view class="avatar-overlay">
+            <text class="iconfont icon-camera"></text>
+          </view>
+        </view>
+        <view class="online-status {{memberDetail.isActive ? 'active' : 'inactive'}}">
+          <text class="status-text">{{memberDetail.isActive ? '在线' : '离线'}}</text>
+        </view>
+      </view>
+      
+      <!-- 基本信息 -->
+      <view class="basic-info">
+        <view class="name-section">
+          <text class="member-name">{{memberDetail.name}}</text>
+          <status-tag 
+            type="{{memberDetail.healthStatus}}" 
+            text="{{formatDisplayText(memberDetail.healthStatus, 'healthStatus')}}"
+          />
+        </view>
+        <view class="info-row">
+          <text class="info-label">年龄：</text>
+          <text class="info-value">{{memberDetail.age}}岁</text>
+          <text class="info-separator">|</text>
+          <text class="info-label">性别：</text>
+          <text class="info-value">{{formatDisplayText(memberDetail.gender, 'gender')}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">关系：</text>
+          <text class="info-value">{{memberDetail.relationship}}</text>
+          <text class="info-separator">|</text>
+          <text class="info-label">服务频率：</text>
+          <text class="info-value">{{formatDisplayText(memberDetail.serviceFrequency, 'serviceFrequency')}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">最近服务：</text>
+          <text class="info-value">{{memberDetail.lastServiceTime || '暂无'}}</text>
+        </view>
+      </view>
+      
+      <!-- 操作按钮 -->
+      <view class="action-buttons">
+        <button class="action-btn primary" bindtap="makePhoneCall">
+          <text class="iconfont icon-phone"></text>
+          <text>拨打电话</text>
+        </button>
+        <button class="action-btn secondary" bindtap="sendMessage">
+          <text class="iconfont icon-message"></text>
+          <text>发送短信</text>
+        </button>
+        <button class="action-btn secondary" bindtap="showActionMenu">
+          <text class="iconfont icon-more"></text>
+          <text>更多</text>
+        </button>
+      </view>
+    </view>
+    
+    <!-- Tab导航 -->
+    <view class="tab-navigation">
+      <view 
+        wx:for="{{tabs}}" 
+        wx:key="key"
+        class="tab-item {{currentTab === item.key ? 'active' : ''}}"
+        data-tab="{{item.key}}"
+        bindtap="onTabChange"
+      >
+        <text class="iconfont icon-{{item.icon}}"></text>
+        <text class="tab-title">{{item.title}}</text>
+      </view>
+    </view>
+    
+    <!-- Tab内容 -->
+    <view class="tab-content">
+      <!-- 基本信息Tab -->
+      <view wx:if="{{currentTab === 'basic'}}" class="basic-tab">
+        <view class="info-section">
+          <view class="section-title">
+            <text class="iconfont icon-user"></text>
+            <text>个人信息</text>
+            <button wx:if="{{!isEditing}}" class="edit-btn" bindtap="startEdit">
+              <text class="iconfont icon-edit"></text>
+            </button>
+          </view>
+          
+          <view class="info-grid">
+            <form-item 
+              label="姓名" 
+              value="{{isEditing ? editData.name : memberDetail.name}}"
+              editable="{{isEditing}}"
+              field="name"
+              bind:change="onEditDataChange"
+            />
+            <form-item 
+              label="手机号" 
+              value="{{isEditing ? editData.phone : formatDisplayText(memberDetail.phone, 'phone')}}"
+              editable="{{isEditing}}"
+              field="phone"
+              bind:change="onEditDataChange"
+            />
+            <form-item 
+              label="身份证" 
+              value="{{isEditing ? editData.idCard : formatDisplayText(memberDetail.idCard, 'idCard')}}"
+              editable="{{isEditing}}"
+              field="idCard"
+              bind:change="onEditDataChange"
+            />
+            <form-item 
+              label="地址" 
+              value="{{isEditing ? editData.address : memberDetail.address}}"
+              editable="{{isEditing}}"
+              field="address"
+              bind:change="onEditDataChange"
+            />
+            <form-item 
+              label="紧急联系人" 
+              value="{{isEditing ? editData.emergencyContact : memberDetail.emergencyContact}}"
+              editable="{{isEditing}}"
+              field="emergencyContact"
+              bind:change="onEditDataChange"
+            />
+            <form-item 
+              label="关系" 
+              value="{{isEditing ? editData.relationship : memberDetail.relationship}}"
+              editable="{{isEditing}}"
+              field="relationship"
+              type="select"
+              options="{{relationshipTypes}}"
+              bind:change="onEditDataChange"
+            />
+          </view>
+          
+          <!-- 编辑模式按钮 -->
+          <view wx:if="{{isEditing}}" class="edit-actions">
+            <button class="cancel-btn" bindtap="cancelEdit">取消</button>
+            <button class="save-btn" bindtap="saveEdit">保存</button>
+          </view>
+        </view>
+        
+        <!-- 备注信息 -->
+        <view class="info-section">
+          <view class="section-title">
+            <text class="iconfont icon-note"></text>
+            <text>备注信息</text>
+          </view>
+          <view class="notes-content">
+            <text wx:if="{{memberDetail.notes}}">{{memberDetail.notes}}</text>
+            <text wx:else class="empty-text">暂无备注</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 健康档案Tab -->
+      <view wx:if="{{currentTab === 'health'}}" class="health-tab">
+        <view class="health-overview">
+          <view class="health-status-card">
+            <view class="status-indicator status-{{memberDetail.healthStatus}}"></view>
+            <view class="status-info">
+              <text class="status-title">健康状态</text>
+              <text class="status-value">{{formatDisplayText(memberDetail.healthStatus, 'healthStatus')}}</text>
+            </view>
+            <button class="edit-health-btn" bindtap="onHealthRecordEdit">
+              <text class="iconfont icon-edit"></text>
+            </button>
+          </view>
+        </view>
+        
+        <view class="health-sections">
+          <!-- 病史记录 -->
+          <view class="health-section">
+            <view class="section-header">
+              <text class="section-title">病史记录</text>
+              <text class="section-count">{{memberDetail.medicalHistory.length}}项</text>
+            </view>
+            <view class="health-list">
+              <view 
+                wx:for="{{memberDetail.medicalHistory}}" 
+                wx:key="*this"
+                class="health-item"
+              >
+                <text class="item-text">{{item}}</text>
+              </view>
+              <view wx:if="{{!memberDetail.medicalHistory.length}}" class="empty-item">
+                <text class="empty-text">暂无病史记录</text>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 当前用药 -->
+          <view class="health-section">
+            <view class="section-header">
+              <text class="section-title">当前用药</text>
+              <text class="section-count">{{memberDetail.currentMedications.length}}种</text>
+            </view>
+            <view class="health-list">
+              <view 
+                wx:for="{{memberDetail.currentMedications}}" 
+                wx:key="*this"
+                class="health-item medication"
+              >
+                <text class="item-text">{{item}}</text>
+                <text class="item-status">服用中</text>
+              </view>
+              <view wx:if="{{!memberDetail.currentMedications.length}}" class="empty-item">
+                <text class="empty-text">暂无用药记录</text>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 过敏史 -->
+          <view class="health-section">
+            <view class="section-header">
+              <text class="section-title">过敏史</text>
+              <text class="section-count">{{memberDetail.allergyHistory.length}}项</text>
+            </view>
+            <view class="health-list">
+              <view 
+                wx:for="{{memberDetail.allergyHistory}}" 
+                wx:key="*this"
+                class="health-item allergy"
+              >
+                <text class="item-text">{{item}}</text>
+                <text class="item-warning">⚠️</text>
+              </view>
+              <view wx:if="{{!memberDetail.allergyHistory.length}}" class="empty-item">
+                <text class="empty-text">暂无过敏史</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 健康档案详细信息 -->
+        <view wx:if="{{healthRecord}}" class="health-detail">
+          <view class="section-title">
+            <text class="iconfont icon-heart"></text>
+            <text>健康详情</text>
+          </view>
+          <view class="health-metrics">
+            <view class="metric-item">
+              <text class="metric-label">血压</text>
+              <text class="metric-value">{{healthRecord.bloodPressure || '--'}}</text>
+            </view>
+            <view class="metric-item">
+              <text class="metric-label">心率</text>
+              <text class="metric-value">{{healthRecord.heartRate || '--'}}次/分</text>
+            </view>
+            <view class="metric-item">
+              <text class="metric-label">体温</text>
+              <text class="metric-value">{{healthRecord.temperature || '--'}}°C</text>
+            </view>
+            <view class="metric-item">
+              <text class="metric-label">血糖</text>
+              <text class="metric-value">{{healthRecord.bloodSugar || '--'}}mmol/L</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 服务历史Tab -->
+      <view wx:if="{{currentTab === 'service'}}" class="service-tab">
+        <view class="service-summary">
+          <view class="summary-card">
+            <text class="summary-title">服务总览</text>
+            <view class="summary-stats">
+              <view class="stat-item">
+                <text class="stat-number">{{serviceHistory.length}}</text>
+                <text class="stat-label">总服务次数</text>
+              </view>
+              <view class="stat-item">
+                <text class="stat-number">{{memberDetail.serviceFrequency === 'daily' ? '每日' : memberDetail.serviceFrequency === 'weekly' ? '每周' : '每月'}}</text>
+                <text class="stat-label">服务频率</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <view class="service-list">
+          <view class="list-header">
+            <text class="list-title">服务记录</text>
+            <text class="list-count">共{{serviceHistory.length}}条</text>
+          </view>
+          
+          <view 
+            wx:for="{{serviceHistory}}" 
+            wx:key="id"
+            class="service-item"
+            data-record="{{item}}"
+            bindtap="onServiceHistoryTap"
+          >
+            <view class="service-info">
+              <view class="service-header">
+                <text class="service-name">{{item.serviceName}}</text>
+                <status-tag type="{{item.status}}" text="{{item.statusText}}" />
+              </view>
+              <view class="service-details">
+                <text class="service-time">{{item.serviceTime}}</text>
+                <text class="service-duration">时长: {{item.duration}}分钟</text>
+              </view>
+              <view wx:if="{{item.notes}}" class="service-notes">
+                <text>{{item.notes}}</text>
+              </view>
+            </view>
+            <view class="service-arrow">
+              <text class="iconfont icon-arrow-right"></text>
+            </view>
+          </view>
+          
+          <view wx:if="{{!serviceHistory.length}}" class="empty-service">
+            <text class="empty-text">暂无服务记录</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 关系管理Tab -->
+      <view wx:if="{{currentTab === 'relationship'}}" class="relationship-tab">
+        <view class="relationship-overview">
+          <view class="overview-card">
+            <text class="overview-title">家庭关系</text>
+            <view class="overview-stats">
+              <text class="member-count">家庭成员: {{familyRelationships.length}}人</text>
+              <button class="manage-btn" bindtap="showFamilyArchiveManager">
+                <text class="iconfont icon-settings"></text>
+                <text>管理</text>
+              </button>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 关系图谱显示区域 -->
+        <view class="relationship-map">
+          <view class="map-container">
+            <!-- 这里可以集成family-relationship-map组件 -->
+            <view class="map-placeholder">
+              <text class="placeholder-text">关系图谱加载中...</text>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 关系列表 -->
+        <view class="relationship-list">
+          <view class="list-header">
+            <text class="list-title">家庭成员</text>
+          </view>
+          
+          <view 
+            wx:for="{{familyRelationships}}" 
+            wx:key="id"
+            class="relationship-item"
+          >
+            <view class="member-info">
+              <image class="member-avatar" src="{{item.avatar || '/images/avatar-default.png'}}" />
+              <view class="member-details">
+                <text class="member-name">{{item.name}}</text>
+                <text class="member-relation">{{item.relationship}}</text>
+              </view>
+            </view>
+            <view class="relation-actions">
+              <button 
+                class="relation-btn"
+                data-relationship="配偶"
+                bindtap="onRelationshipSelect"
+              >
+                配偶
+              </button>
+              <button 
+                class="relation-btn"
+                data-relationship="子女"
+                bindtap="onRelationshipSelect"
+              >
+                子女
+              </button>
+            </view>
+          </view>
+          
+          <view wx:if="{{!familyRelationships.length}}" class="empty-relationship">
+            <text class="empty-text">暂无家庭成员</text>
+          </view>
+        </view>
+        
+        <!-- 智能推荐 -->
+        <view wx:if="{{relationshipRecommendations.length}}" class="relationship-recommendations">
+          <view class="recommendations-header">
+            <text class="recommendations-title">智能推荐关系</text>
+          </view>
+          <view 
+            wx:for="{{relationshipRecommendations}}" 
+            wx:key="id"
+            class="recommendation-item"
+          >
+            <text class="recommendation-text">{{item.suggestion}}</text>
+            <text class="recommendation-confidence">置信度: {{item.confidence}}%</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 操作菜单弹窗 -->
+  <modal
+    show="{{actionMenuVisible}}"
+    title="操作菜单"
+    bind:close="hideActionMenu"
+  >
+    <view class="action-menu">
+      <view 
+        wx:for="{{actionMenuItems}}" 
+        wx:key="key"
+        class="menu-item {{item.danger ? 'danger' : ''}}"
+        data-action="{{item.key}}"
+        bindtap="onActionMenuTap"
+      >
+        <text class="iconfont icon-{{item.icon}}"></text>
+        <text class="menu-text">{{item.title}}</text>
+      </view>
+    </view>
+  </modal>
+  
+  <!-- 家庭档案管理弹窗 -->
+  <modal
+    show="{{showFamilyArchiveModal}}"
+    title="家庭档案管理"
+    bind:close="hideFamilyArchiveManager"
+  >
+    <view class="family-archive-manager">
+      <!-- 家庭档案操作内容 -->
+      <view class="archive-operations">
+        <button class="operation-btn" bindtap="createFamilyArchive">
+          <text class="iconfont icon-add"></text>
+          <text>创建新家庭</text>
+        </button>
+        <button class="operation-btn" bindtap="mergeFamilyArchives">
+          <text class="iconfont icon-merge"></text>
+          <text>合并家庭</text>
+        </button>
+      </view>
+    </view>
+  </modal>
+</view>

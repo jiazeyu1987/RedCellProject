@@ -2156,13 +2156,13 @@ class TimeAdjustPermissionService {
 
 module.exports = TimeAdjustPermissionService;
 
-  /**
-   * 更新全局统计信息
-   * @param {string} userId 用户ID
-   * @param {Object} adjustmentRecord 调整记录
-   * @returns {Promise<boolean>} 是否更新成功
-   */
-  static async updateGlobalStatistics(userId, adjustmentRecord) {
+/**
+ * 更新全局统计信息
+ * @param {string} userId 用户ID
+ * @param {Object} adjustmentRecord 调整记录
+ * @returns {Promise<boolean>} 是否更新成功
+ */
+TimeAdjustPermissionService.updateGlobalStatistics = async function(userId, adjustmentRecord) {
     try {
       const globalStatsKey = `${CONFIG.STORAGE_KEYS.USER_ADJUSTMENTS}_global_${userId}`;
       let globalStats = wx.getStorageSync(globalStatsKey) || {
@@ -2216,11 +2216,11 @@ module.exports = TimeAdjustPermissionService;
     }
   }
   
-  /**
-   * 触发调整相关事件
-   * @param {Object} adjustmentRecord 调整记录
-   */
-  static triggerAdjustmentEvents(adjustmentRecord) {
+/**
+ * 触发调整相关事件
+ * @param {Object} adjustmentRecord 调整记录
+ */
+TimeAdjustPermissionService.triggerAdjustmentEvents = function(adjustmentRecord) {
     try {
       // 发送自定义事件
       if (typeof getApp === 'function') {
@@ -2256,13 +2256,13 @@ module.exports = TimeAdjustPermissionService;
     }
   }
   
-  /**
-   * 获取调整数据分析报告
-   * @param {string} userId 用户ID
-   * @param {Object} options 分析选项
-   * @returns {Promise<Object>} 分析报告
-   */
-  static async getAdjustmentAnalysisReport(userId, options = {}) {
+/**
+ * 获取调整数据分析报告
+ * @param {string} userId 用户ID
+ * @param {Object} options 分析选项
+ * @returns {Promise<Object>} 分析报告
+ */
+TimeAdjustPermissionService.getAdjustmentAnalysisReport = async function(userId, options = {}) {
     try {
       const {
         timeRange = 'month', // day, week, month, quarter, year
@@ -2362,13 +2362,13 @@ module.exports = TimeAdjustPermissionService;
     }
   }
   
-  /**
-   * 检查时间范围调整限制（增强版）
-   * @param {Object} userInfo 用户信息
-   * @param {Object} adjustData 调整数据
-   * @returns {Object} 时间范围检查结果
-   */
-  static checkTimeRangeAdjustLimits(userInfo, adjustData) {
+/**
+ * 检查时间范围调整限制（增强版）
+ * @param {Object} userInfo 用户信息
+ * @param {Object} adjustData 调整数据
+ * @returns {Object} 时间范围检查结果
+ */
+TimeAdjustPermissionService.checkTimeRangeAdjustLimits = function(userInfo, adjustData) {
     const result = {
       valid: true,
       violations: [],
@@ -2405,9 +2405,7 @@ module.exports = TimeAdjustPermissionService;
     const newHour = newTime.getHours();
     const isWorkingHours = newHour >= 8 && newHour <= 18;
     
-}
-
-module.exports = TimeAdjustPermissionService;
+    if (!isWorkingHours && permissions.level !== 'emergency') {
       const restrictionLevel = this.getTimeRestrictionLevel(newHour, permissions.level);
       
       if (restrictionLevel === 'forbidden') {
@@ -2439,13 +2437,13 @@ module.exports = TimeAdjustPermissionService;
     return result;
   }
   
-  /**
-   * 获取时间限制级别
-   * @param {number} hour 小时数
-   * @param {string} permissionLevel 权限级别
-   * @returns {string} 限制级别
-   */
-  static getTimeRestrictionLevel(hour, permissionLevel) {
+/**
+ * 获取时间限制级别
+ * @param {number} hour 小时数
+ * @param {string} permissionLevel 权限级别
+ * @returns {string} 限制级别
+ */
+TimeAdjustPermissionService.getTimeRestrictionLevel = function(hour, permissionLevel) {
     const restrictions = {
       'normal': {
         forbidden: [22, 23, 0, 1, 2, 3, 4, 5, 6], // 22:00-06:00 禁止
@@ -2472,13 +2470,13 @@ module.exports = TimeAdjustPermissionService;
     return 'allowed';
   }
   
-  /**
-   * 实现调整次数限制功能
-   * @param {Object} userInfo 用户信息
-   * @param {Object} adjustData 调整数据
-   * @returns {Promise<Object>} 次数限制检查结果
-   */
-  static async implementAdjustmentCountLimits(userInfo, adjustData) {
+/**
+ * 实现调整次数限制功能
+ * @param {Object} userInfo 用户信息
+ * @param {Object} adjustData 调整数据
+ * @returns {Promise<Object>} 次数限制检查结果
+ */
+TimeAdjustPermissionService.implementAdjustmentCountLimits = async function(userInfo, adjustData) {
     const result = {
       canAdjust: false,
       remainingCount: 0,

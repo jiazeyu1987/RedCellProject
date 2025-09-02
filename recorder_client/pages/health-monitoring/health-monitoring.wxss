@@ -1,0 +1,470 @@
+/* 容器样式 */
+.container {
+  padding: 0;
+  background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+}
+
+/* 页面标题 */
+.page-header {
+  background: linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%);
+  padding: 60rpx 30rpx 40rpx;
+  text-align: center;
+  color: #fff;
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+/* 标签页样式 */
+.tabs {
+  display: flex;
+  background: #fff;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.tab-item {
+  flex: 1;
+  position: relative;
+  padding: 30rpx 0;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.tab-item.active {
+  color: #007AFF;
+}
+
+.tab-text {
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 4rpx;
+  background: #007AFF;
+  border-radius: 2rpx;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tab-item.active .tab-indicator {
+  opacity: 1;
+}
+
+/* 筛选条件 */
+.filters {
+  background: #fff;
+  padding: 20rpx 30rpx;
+  display: flex;
+  gap: 20rpx;
+  overflow-x: auto;
+  border-bottom: 1rpx solid #e0e0e0;
+}
+
+.filter-item {
+  flex-shrink: 0;
+  min-width: 160rpx;
+}
+
+.filter-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 20rpx;
+  background: #f8f9fa;
+  border-radius: 20rpx;
+  border: 1rpx solid #e0e0e0;
+}
+
+.filter-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-right: 10rpx;
+}
+
+.filter-value {
+  font-size: 24rpx;
+  color: #333;
+  flex: 1;
+  text-align: center;
+}
+
+.filter-arrow {
+  font-size: 20rpx;
+  color: #999;
+}
+
+/* 内容区域 */
+.content-section {
+  padding: 30rpx;
+}
+
+/* 统计卡片网格 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+  margin-bottom: 40rpx;
+}
+
+.stat-card {
+  padding: 30rpx;
+  border-radius: 16rpx;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  filter: brightness(1.1);
+  z-index: -1;
+}
+
+.stat-label {
+  display: block;
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 15rpx;
+}
+
+.stat-value {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 8rpx;
+}
+
+.stat-unit {
+  font-size: 20rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 运动卡片颜色 */
+.exercise-primary {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+}
+
+.exercise-secondary {
+  background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+}
+
+.exercise-accent {
+  background: linear-gradient(135deg, #45B7D1 0%, #96C93D 100%);
+}
+
+.exercise-info {
+  background: linear-gradient(135deg, #FFA726 0%, #FB8C00 100%);
+}
+
+/* 睡眠卡片颜色 */
+.sleep-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.sleep-secondary {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.sleep-accent {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.sleep-info {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+/* 记录区域 */
+.record-section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.add-btn {
+  padding: 12rpx 24rpx;
+  background: linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%);
+  color: #fff;
+  border: none;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  line-height: 1;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 80rpx 0;
+  color: #999;
+}
+
+.empty-text {
+  display: block;
+  font-size: 28rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-action {
+  padding: 20rpx 40rpx;
+  background: linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%);
+  color: #fff;
+  border: none;
+  border-radius: 25rpx;
+  font-size: 28rpx;
+}
+
+/* 记录列表 */
+.record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.record-item {
+  padding: 30rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid #e0e0e0;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.record-item:active {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+}
+
+.exercise-record {
+  border-left: 4rpx solid #FF6B6B;
+}
+
+.sleep-record {
+  border-left: 4rpx solid #667eea;
+}
+
+.record-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.record-type {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.record-date {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.record-content {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.record-stats {
+  display: flex;
+  gap: 30rpx;
+}
+
+.record-stat {
+  text-align: center;
+}
+
+.record-stat-label {
+  display: block;
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.record-stat-value {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.record-analysis {
+  text-align: right;
+}
+
+.analysis-label {
+  display: block;
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.analysis-score {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #4CAF50;
+}
+
+/* 底部操作栏 */
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 20rpx 30rpx;
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 20rpx;
+  z-index: 100;
+}
+
+.action-btn {
+  flex: 1;
+  height: 80rpx;
+  border: none;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%);
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
+}
+
+.action-btn.secondary {
+  background: #f8f9fa;
+  color: #666;
+  border: 1rpx solid #e0e0e0;
+}
+
+.action-btn:active {
+  transform: scale(0.98);
+}
+
+/* 加载状态 */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-content {
+  background: #fff;
+  padding: 40rpx;
+  border-radius: 16rpx;
+  text-align: center;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 动画效果 */
+.stat-card {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.record-item {
+  animation: fadeInLeft 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 750rpx) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .record-stats {
+    flex-direction: column;
+    gap: 15rpx;
+  }
+  
+  .record-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20rpx;
+  }
+  
+  .bottom-actions {
+    padding: 15rpx 20rpx;
+  }
+}
+
+/* 滚动优化 */
+.container {
+  scroll-behavior: smooth;
+}
+
+/* 触摸反馈 */
+.tab-item:active,
+.filter-item:active,
+.add-btn:active,
+.empty-action:active {
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}

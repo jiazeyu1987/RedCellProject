@@ -1,0 +1,388 @@
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">健康记录</text>
+  </view>
+
+  <!-- 记录类型选择 -->
+  <view class="section">
+    <text class="section-title">记录类型</text>
+    <picker bindchange="onRecordTypeChange" value="{{recordType}}" range-key="label" range="{{recordTypeOptions}}">
+      <view class="picker">
+        {{recordType === 'vital' ? '生命体征' : recordType === 'exercise' ? '运动记录' : recordType === 'sleep' ? '睡眠记录' : '其他记录'}}
+        <text class="picker-arrow">></text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 运动记录表单 -->
+  <view wx:if="{{recordType === 'exercise'}}" class="form-section">
+    <text class="form-title">运动记录</text>
+    
+    <!-- 基本信息 -->
+    <view class="form-group">
+      <text class="label">记录时间</text>
+      <picker mode="date" value="{{formData.recordTime}}" bindchange="onInputChange" data-field="recordTime">
+        <view class="input-wrapper">
+          <input type="text" value="{{formData.recordTime}}" placeholder="选择记录时间" disabled />
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <text class="label">运动类型</text>
+      <picker bindchange="onSelectChange" data-field="exercise.type" value="{{formData.exercise.type}}" range-key="label" range="{{exerciseTypeOptions}}">
+        <view class="picker">
+          {{formData.exercise.type || '请选择运动类型'}}
+          <text class="picker-arrow">></text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <text class="label">运动时长(分钟)</text>
+      <input class="input" type="number" placeholder="请输入运动时长" value="{{formData.exercise.duration}}" bindchange="onInputChange" data-field="exercise.duration" />
+    </view>
+
+    <view class="form-group">
+      <text class="label">运动强度</text>
+      <picker bindchange="onSelectChange" data-field="exercise.intensity" value="{{formData.exercise.intensity}}" range-key="label" range="{{exerciseIntensityOptions}}">
+        <view class="picker">
+          {{formData.exercise.intensity || '请选择运动强度'}}
+          <text class="picker-arrow">></text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <text class="label">消耗卡路里</text>
+      <input class="input" type="number" placeholder="预估消耗卡路里" value="{{formData.exercise.calories}}" bindchange="onInputChange" data-field="exercise.calories" />
+    </view>
+
+    <view class="form-group">
+      <text class="label">运动距离(公里)</text>
+      <input class="input" type="digit" placeholder="运动距离" value="{{formData.exercise.distance}}" bindchange="onInputChange" data-field="exercise.distance" />
+    </view>
+
+    <view class="form-group">
+      <text class="label">步数</text>
+      <input class="input" type="number" placeholder="步数" value="{{formData.exercise.steps}}" bindchange="onInputChange" data-field="exercise.steps" />
+    </view>
+
+    <!-- 运动环境 -->
+    <view class="subsection">
+      <text class="subsection-title">运动环境</text>
+      
+      <view class="form-group">
+        <text class="label">运动地点</text>
+        <picker bindchange="onSelectChange" data-field="exerciseContext.location" value="{{formData.exerciseContext.location}}" range-key="label" range="{{exerciseLocationOptions}}">
+          <view class="picker">
+            {{formData.exerciseContext.location || '请选择运动地点'}}
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">天气情况</text>
+        <input class="input" type="text" placeholder="天气情况" value="{{formData.exerciseContext.weather}}" bindchange="onInputChange" data-field="exerciseContext.weather" />
+      </view>
+
+      <view class="form-group">
+        <text class="label">环境温度(°C)</text>
+        <input class="input" type="number" placeholder="环境温度" value="{{formData.exerciseContext.temperature}}" bindchange="onInputChange" data-field="exerciseContext.temperature" />
+      </view>
+
+      <view class="form-group">
+        <text class="label">运动伙伴</text>
+        <input class="input" type="text" placeholder="运动伙伴" value="{{formData.exerciseContext.companion}}" bindchange="onInputChange" data-field="exerciseContext.companion" />
+      </view>
+    </view>
+
+    <!-- 身体状态 -->
+    <view class="subsection">
+      <text class="subsection-title">身体状态</text>
+      
+      <view class="form-group">
+        <text class="label">运动前心率</text>
+        <input class="input" type="number" placeholder="运动前心率" value="{{formData.physicalState.preExerciseHeartRate}}" bindchange="onInputChange" data-field="physicalState.preExerciseHeartRate" />
+      </view>
+
+      <view class="form-group">
+        <text class="label">运动后心率</text>
+        <input class="input" type="number" placeholder="运动后心率" value="{{formData.physicalState.postExerciseHeartRate}}" bindchange="onInputChange" data-field="physicalState.postExerciseHeartRate" />
+      </view>
+
+      <view class="form-group">
+        <text class="label">平均心率</text>
+        <input class="input" type="number" placeholder="平均心率" value="{{formData.physicalState.avgHeartRate}}" bindchange="onInputChange" data-field="physicalState.avgHeartRate" />
+      </view>
+
+      <view class="form-group">
+        <text class="label">能量水平</text>
+        <picker bindchange="onSelectChange" data-field="physicalState.energyLevel" value="{{formData.physicalState.energyLevel}}" range-key="label" range="{{energyLevelOptions}}">
+          <view class="picker">
+            {{formData.physicalState.energyLevel || '请选择能量水平'}}
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 运动表现 -->
+    <view class="subsection">
+      <text class="subsection-title">运动表现</text>
+      
+      <view class="form-group">
+        <text class="label">主观感受强度(1-10)</text>
+        <slider class="slider" min="1" max="10" value="{{formData.performance.perceived_exertion}}" bindchange="onSliderChange" data-field="performance.perceived_exertion" show-value />
+      </view>
+
+      <view class="form-group">
+        <text class="label">完成度(%)</text>
+        <slider class="slider" min="0" max="100" value="{{formData.performance.completion_rate}}" bindchange="onSliderChange" data-field="performance.completion_rate" show-value />
+      </view>
+
+      <view class="form-group">
+        <text class="label">个人最佳</text>
+        <switch checked="{{formData.performance.personal_record}}" bindchange="onSwitchChange" data-field="performance.personal_record" />
+      </view>
+
+      <view class="form-group">
+        <text class="label">成就描述</text>
+        <input class="input" type="text" placeholder="本次运动的成就" value="{{formData.performance.achievement}}" bindchange="onInputChange" data-field="performance.achievement" />
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="label">运动备注</text>
+      <textarea class="textarea" placeholder="记录运动过程中的感受和注意事项" value="{{formData.notes}}" bindchange="onInputChange" data-field="notes" />
+    </view>
+  </view>
+
+  <!-- 睡眠记录表单 -->
+  <view wx:if="{{recordType === 'sleep'}}" class="form-section">
+    <text class="form-title">睡眠记录</text>
+    
+    <!-- 基本信息 -->
+    <view class="form-group">
+      <text class="label">记录日期</text>
+      <picker mode="date" value="{{formData.recordDate}}" bindchange="onInputChange" data-field="recordDate">
+        <view class="input-wrapper">
+          <input type="text" value="{{formData.recordDate}}" placeholder="选择记录日期" disabled />
+        </view>
+      </picker>
+    </view>
+
+    <!-- 睡眠时间 -->
+    <view class="subsection">
+      <text class="subsection-title">睡眠时间</text>
+      
+      <view class="form-group">
+        <text class="label">上床时间</text>
+        <picker mode="time" value="{{formData.sleepTime.bedTime}}" bindchange="onInputChange" data-field="sleepTime.bedTime">
+          <view class="input-wrapper">
+            <input type="text" value="{{formData.sleepTime.bedTime}}" placeholder="选择上床时间" disabled />
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">入睡时间</text>
+        <picker mode="time" value="{{formData.sleepTime.sleepTime}}" bindchange="onInputChange" data-field="sleepTime.sleepTime">
+          <view class="input-wrapper">
+            <input type="text" value="{{formData.sleepTime.sleepTime}}" placeholder="选择入睡时间" disabled />
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">起床时间</text>
+        <picker mode="time" value="{{formData.sleepTime.wakeUpTime}}" bindchange="onInputChange" data-field="sleepTime.wakeUpTime">
+          <view class="input-wrapper">
+            <input type="text" value="{{formData.sleepTime.wakeUpTime}}" placeholder="选择起床时间" disabled />
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">睡眠时长(小时)</text>
+        <input class="input" type="digit" placeholder="总睡眠时长" value="{{formData.sleepTime.duration}}" bindchange="onInputChange" data-field="sleepTime.duration" />
+      </view>
+
+      <view class="form-group">
+        <text class="label">入睡潜伏期(分钟)</text>
+        <input class="input" type="number" placeholder="从上床到入睡的时间" value="{{formData.sleepTime.sleepLatency}}" bindchange="onInputChange" data-field="sleepTime.sleepLatency" />
+      </view>
+    </view>
+
+    <!-- 睡眠质量 -->
+    <view class="subsection">
+      <text class="subsection-title">睡眠质量</text>
+      
+      <view class="form-group">
+        <text class="label">整体睡眠质量</text>
+        <picker bindchange="onSelectChange" data-field="sleepQuality.overall" value="{{formData.sleepQuality.overall}}" range-key="label" range="{{sleepQualityOptions}}">
+          <view class="picker">
+            {{formData.sleepQuality.overall || '请选择睡眠质量'}}
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">深睡眠时长(小时)</text>
+        <input class="input" type="digit" placeholder="深睡眠时长" value="{{formData.sleepQuality.deepSleep}}" bindchange="onInputChange" data-field="sleepQuality.deepSleep" />
+      </view>
+
+      <view class="form-group">
+        <text class="label">浅睡眠时长(小时)</text>
+        <input class="input" type="digit" placeholder="浅睡眠时长" value="{{formData.sleepQuality.lightSleep}}" bindchange="onInputChange" data-field="sleepQuality.lightSleep" />
+      </view>
+
+      <view class="form-group">
+        <text class="label">夜间觉醒次数</text>
+        <input class="input" type="number" placeholder="夜间觉醒次数" value="{{formData.sleepQuality.awakening}}" bindchange="onInputChange" data-field="sleepQuality.awakening" />
+      </view>
+
+      <view class="form-group">
+        <text class="label">睡眠恢复感</text>
+        <picker bindchange="onSelectChange" data-field="sleepQuality.restfulness" value="{{formData.sleepQuality.restfulness}}" range-key="label" range="{{sleepQualityOptions}}">
+          <view class="picker">
+            {{formData.sleepQuality.restfulness || '请选择恢复感'}}
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 睡眠环境 -->
+    <view class="subsection">
+      <text class="subsection-title">睡眠环境</text>
+      
+      <view class="form-group">
+        <text class="label">室内温度(°C)</text>
+        <input class="input" type="number" placeholder="室内温度" value="{{formData.sleepEnvironment.room_temperature}}" bindchange="onInputChange" data-field="sleepEnvironment.room_temperature" />
+      </view>
+
+      <view class="form-group">
+        <text class="label">噪音水平</text>
+        <picker bindchange="onSelectChange" data-field="sleepEnvironment.noise_level" value="{{formData.sleepEnvironment.noise_level}}" range-key="label" range="{{noiseLevelOptions}}">
+          <view class="picker">
+            {{formData.sleepEnvironment.noise_level || '请选择噪音水平'}}
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">光线水平</text>
+        <picker bindchange="onSelectChange" data-field="sleepEnvironment.light_level" value="{{formData.sleepEnvironment.light_level}}" range-key="label" range="{{lightLevelOptions}}">
+          <view class="picker">
+            {{formData.sleepEnvironment.light_level || '请选择光线水平'}}
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">床铺舒适度</text>
+        <picker bindchange="onSelectChange" data-field="sleepEnvironment.bed_comfort" value="{{formData.sleepEnvironment.bed_comfort}}" range-key="label" range="{{comfortLevelOptions}}">
+          <view class="picker">
+            {{formData.sleepEnvironment.bed_comfort || '请选择舒适度'}}
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 睡前状态 -->
+    <view class="subsection">
+      <text class="subsection-title">睡前状态</text>
+      
+      <view class="form-group">
+        <text class="label">压力水平</text>
+        <picker bindchange="onSelectChange" data-field="preSleepState.stress_level" value="{{formData.preSleepState.stress_level}}" range-key="label" range="{{stressLevelOptions}}">
+          <view class="picker">
+            {{formData.preSleepState.stress_level || '请选择压力水平'}}
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">摄入咖啡因</text>
+        <switch checked="{{formData.preSleepState.caffeine_intake}}" bindchange="onSwitchChange" data-field="preSleepState.caffeine_intake" />
+      </view>
+
+      <view class="form-group">
+        <text class="label">饮酒</text>
+        <switch checked="{{formData.preSleepState.alcohol_intake}}" bindchange="onSwitchChange" data-field="preSleepState.alcohol_intake" />
+      </view>
+
+      <view class="form-group">
+        <text class="label">睡前屏幕时间(分钟)</text>
+        <input class="input" type="number" placeholder="睡前使用电子设备时间" value="{{formData.preSleepState.screen_time}}" bindchange="onInputChange" data-field="preSleepState.screen_time" />
+      </view>
+    </view>
+
+    <!-- 醒后状态 -->
+    <view class="subsection">
+      <text class="subsection-title">醒后状态</text>
+      
+      <view class="form-group">
+        <text class="label">晨起心情</text>
+        <picker bindchange="onSelectChange" data-field="postSleepState.morning_mood" value="{{formData.postSleepState.morning_mood}}" range-key="label" range="{{morningMoodOptions}}">
+          <view class="picker">
+            {{formData.postSleepState.morning_mood || '请选择晨起心情'}}
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">能量水平</text>
+        <picker bindchange="onSelectChange" data-field="postSleepState.energy_level" value="{{formData.postSleepState.energy_level}}" range-key="label" range="{{energyLevelOptions}}">
+          <view class="picker">
+            {{formData.postSleepState.energy_level || '请选择能量水平'}}
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">警觉性</text>
+        <picker bindchange="onSelectChange" data-field="postSleepState.alertness" value="{{formData.postSleepState.alertness}}" range-key="label" range="{{alertnessOptions}}">
+          <view class="picker">
+            {{formData.postSleepState.alertness || '请选择警觉性'}}
+            <text class="picker-arrow">></text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="label">睡眠备注</text>
+      <textarea class="textarea" placeholder="记录睡眠过程中的特殊情况" value="{{formData.notes}}" bindchange="onInputChange" data-field="notes" />
+    </view>
+
+    <view class="form-group">
+      <text class="label">梦境描述</text>
+      <textarea class="textarea" placeholder="梦境内容描述(可选)" value="{{formData.dream_description}}" bindchange="onInputChange" data-field="dream_description" />
+    </view>
+  </view>
+
+  <!-- 其他记录类型的表单... -->
+  <view wx:if="{{recordType === 'vital'}}" class="form-section">
+    <!-- 生命体征表单内容 -->
+    <text class="form-title">生命体征记录</text>
+    <!-- 这里可以保留原有的生命体征表单内容 -->
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-section">
+    <button class="submit-btn" bindtap="onSubmit" loading="{{submitting}}" disabled="{{submitting}}">
+      {{submitting ? '保存中...' : '保存记录'}}
+    </button>
+  </view>
+</view>

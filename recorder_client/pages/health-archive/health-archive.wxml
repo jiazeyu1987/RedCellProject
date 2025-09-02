@@ -1,0 +1,347 @@
+<!--健康档案列表页面-->
+<view class="health-archive-container">
+  <!-- 头部搜索区域 -->
+  <view class="header-section">
+    <view class="search-bar">
+      <text class="iconfont icon-search search-icon"></text>
+      <input
+        class="search-input"
+        placeholder="搜索成员姓名、手机号..."
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        confirm-type="search"
+      />
+      <text
+        wx:if="{{searchKeyword}}"
+        class="iconfont icon-close clear-search"
+        bindtap="clearSearch"
+      ></text>
+    </view>
+  </view>
+
+  <!-- 操作栏 -->
+  <view class="action-bar">
+    <view class="filter-section">
+      <button 
+        class="filter-btn {{showFilters ? 'active' : ''}}"
+        bindtap="toggleFilters"
+      >
+        <text class="iconfont icon-filter"></text>
+        <text>筛选</text>
+      </button>
+    </view>
+    
+    <view class="right-actions">
+      <button 
+        class="add-member-btn"
+        bindtap="addNewMember"
+      >
+        <text class="iconfont icon-plus"></text>
+        <text>新增成员</text>
+      </button>
+      
+      <button 
+        class="view-mode-btn"
+        bindtap="toggleViewMode"
+      >
+        <text class="iconfont {{viewMode === 'grid' ? 'icon-list' : 'icon-grid'}}"></text>
+        <text>{{viewMode === 'grid' ? '列表' : '网格'}}</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 统计信息卡片 -->
+  <view class="statistics-card">
+    <view class="stats-title">健康档案概览</view>
+    <view class="stats-grid">
+      <view class="stat-item">
+        <view class="stat-number">{{statistics.total}}</view>
+        <view class="stat-label">总档案</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number">{{statistics.healthyCount}}</view>
+        <view class="stat-label">健康</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number">{{statistics.highRiskCount}}</view>
+        <view class="stat-label">高风险</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number">{{statistics.chronicCount}}</view>
+        <view class="stat-label">慢性病</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number">{{statistics.criticalCount}}</view>
+        <view class="stat-label">重症</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number">{{statistics.needsAttentionCount}}</view>
+        <view class="stat-label">需关注</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 筛选器面板 -->
+  <view class="filter-panel" wx:if="{{showFilters}}">
+    <!-- 健康状态筛选 -->
+    <view class="filter-group">
+      <view class="filter-title">健康状态</view>
+      <view class="filter-options">
+        <view
+          wx:for="{{healthStatusOptions}}"
+          wx:key="value"
+          class="filter-option {{currentFilters.healthStatus === item.value ? 'active' : ''}}"
+          data-field="healthStatus"
+          data-value="{{item.value}}"
+          bindtap="onFilterChange"
+        >
+          {{item.label}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 风险等级筛选 -->
+    <view class="filter-group">
+      <view class="filter-title">风险等级</view>
+      <view class="filter-options">
+        <view
+          wx:for="{{riskLevelOptions}}"
+          wx:key="value"
+          class="filter-option {{currentFilters.riskLevel === item.value ? 'active' : ''}}"
+          data-field="riskLevel"
+          data-value="{{item.value}}"
+          bindtap="onFilterChange"
+        >
+          {{item.label}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 布尔筛选选项 -->
+    <view class="filter-group">
+      <view class="filter-title">其他条件</view>
+      <view class="boolean-filter">
+        <view
+          class="boolean-option"
+          data-field="hasRecentReports"
+          bindtap="toggleBooleanFilter"
+        >
+          <view class="checkbox {{currentFilters.hasRecentReports ? 'checked' : ''}}">
+            <text wx:if="{{currentFilters.hasRecentReports}}" class="iconfont icon-check"></text>
+          </view>
+          <text>有最近报告</text>
+        </view>
+        
+        <view
+          class="boolean-option"
+          data-field="needsAttention"
+          bindtap="toggleBooleanFilter"
+        >
+          <view class="checkbox {{currentFilters.needsAttention ? 'checked' : ''}}">
+            <text wx:if="{{currentFilters.needsAttention}}" class="iconfont icon-check"></text>
+          </view>
+          <text>需要关注</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 清空筛选按钮 -->
+    <button class="clear-filters-btn" bindtap="clearFilters">
+      清空筛选条件
+    </button>
+  </view>
+
+  <!-- 档案列表 -->
+  <view class="archive-list">
+    <!-- 网格视图 -->
+    <view 
+      wx:if="{{viewMode === 'grid' && !loading && !isEmpty && !isError}}"
+      class="archive-grid"
+    >
+      <view
+        wx:for="{{filteredArchives}}"
+        wx:key="memberId"
+        class="archive-card"
+        bindtap="viewHealthArchive"
+        data-member-id="{{item.memberId}}"
+      >
+        <!-- 需要关注标识 -->
+        <view wx:if="{{item.needsAttention}}" class="attention-badge"></view>
+        
+        <!-- 健康状态标签 -->
+        <view class="health-status {{item.memberInfo.healthStatus || 'healthy'}}">
+          {{item.memberInfo.healthStatus === 'healthy' ? '健康' : 
+            item.memberInfo.healthStatus === 'chronic' ? '慢性病' : '重症'}}
+        </view>
+
+        <!-- 成员基本信息 -->
+        <view class="member-info">
+          <view class="member-avatar">
+            <image wx:if="{{item.memberInfo.avatar}}" src="{{item.memberInfo.avatar}}" />
+            <text wx:else>{{item.memberInfo.name.charAt(0)}}</text>
+          </view>
+          <view class="member-details">
+            <view class="member-name">{{item.memberInfo.name}}</view>
+            <view class="member-age">{{item.memberInfo.age}}岁 · {{item.memberInfo.gender === 'male' ? '男' : '女'}}</view>
+          </view>
+        </view>
+
+        <!-- 生命体征 -->
+        <view class="vital-signs" wx:if="{{item.healthData && item.healthData.vitalSigns}}">
+          <view 
+            wx:if="{{item.healthData.vitalSigns.current.bloodPressure.systolic}}"
+            class="vital-item"
+          >
+            <view class="vital-label">血压</view>
+            <view class="vital-value {{item.healthData.vitalSigns.current.bloodPressure.systolic >= 140 ? 'abnormal' : ''}}">
+              {{item.healthData.vitalSigns.current.bloodPressure.systolic}}/{{item.healthData.vitalSigns.current.bloodPressure.diastolic}}
+            </view>
+          </view>
+          
+          <view 
+            wx:if="{{item.healthData.vitalSigns.current.heartRate.value}}"
+            class="vital-item"
+          >
+            <view class="vital-label">心率</view>
+            <view class="vital-value {{item.healthData.vitalSigns.current.heartRate.value > 100 ? 'abnormal' : ''}}">
+              {{item.healthData.vitalSigns.current.heartRate.value}} bpm
+            </view>
+          </view>
+        </view>
+
+        <!-- 风险评估 -->
+        <view class="risk-assessment" wx:if="{{item.riskAssessment}}">
+          <view class="risk-level {{item.riskAssessment.overallRisk.level}}">
+            {{item.riskAssessment.overallRisk.description}}
+          </view>
+          <view class="risk-score">评分: {{item.riskAssessment.overallRisk.score}}</view>
+        </view>
+
+        <!-- 操作按钮 -->
+        <view class="card-actions" catchtap="true">
+          <button 
+            class="action-btn primary-btn"
+            data-member-id="{{item.memberId}}"
+            bindtap="addHealthRecord"
+            data-type="vital"
+          >
+            添加记录
+          </button>
+          <button 
+            class="action-btn secondary-btn"
+            data-member-id="{{item.memberId}}"
+            bindtap="viewRiskAssessment"
+          >
+            风险评估
+          </button>
+        </view>
+
+        <!-- 最后更新时间 -->
+        <view class="last-update" wx:if="{{item.lastUpdateTime}}">
+          更新: {{item.lastUpdateTime}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 列表视图 -->
+    <view 
+      wx:if="{{viewMode === 'list' && !loading && !isEmpty && !isError}}"
+      class="archive-list-view"
+    >
+      <view
+        wx:for="{{filteredArchives}}"
+        wx:key="memberId"
+        class="archive-card"
+        bindtap="viewHealthArchive"
+        data-member-id="{{item.memberId}}"
+      >
+        <!-- 需要关注标识 -->
+        <view wx:if="{{item.needsAttention}}" class="attention-badge"></view>
+
+        <!-- 成员基本信息 -->
+        <view class="member-info">
+          <view class="member-avatar">
+            <image wx:if="{{item.memberInfo.avatar}}" src="{{item.memberInfo.avatar}}" />
+            <text wx:else>{{item.memberInfo.name.charAt(0)}}</text>
+          </view>
+          <view class="member-details">
+            <view class="member-name">{{item.memberInfo.name}}</view>
+            <view class="member-age">{{item.memberInfo.age}}岁</view>
+          </view>
+        </view>
+
+        <!-- 健康摘要 -->
+        <view class="health-summary">
+          <!-- 健康状态 -->
+          <view class="health-status {{item.memberInfo.healthStatus || 'healthy'}}">
+            {{item.memberInfo.healthStatus === 'healthy' ? '健康' : 
+              item.memberInfo.healthStatus === 'chronic' ? '慢性病' : '重症'}}
+          </view>
+
+          <!-- 生命体征 -->
+          <view class="vital-signs" wx:if="{{item.healthData && item.healthData.vitalSigns}}">
+            <view 
+              wx:if="{{item.healthData.vitalSigns.current.bloodPressure.systolic}}"
+              class="vital-item"
+            >
+              <view class="vital-value {{item.healthData.vitalSigns.current.bloodPressure.systolic >= 140 ? 'abnormal' : ''}}">
+                {{item.healthData.vitalSigns.current.bloodPressure.systolic}}/{{item.healthData.vitalSigns.current.bloodPressure.diastolic}}
+              </view>
+            </view>
+            
+            <view 
+              wx:if="{{item.healthData.vitalSigns.current.heartRate.value}}"
+              class="vital-item"
+            >
+              <view class="vital-value {{item.healthData.vitalSigns.current.heartRate.value > 100 ? 'abnormal' : ''}}">
+                {{item.healthData.vitalSigns.current.heartRate.value}}
+              </view>
+            </view>
+          </view>
+
+          <!-- 风险等级 -->
+          <view wx:if="{{item.riskAssessment}}" class="risk-level {{item.riskAssessment.overallRisk.level}}">
+            {{item.riskAssessment.overallRisk.description}}
+          </view>
+        </view>
+
+        <!-- 操作按钮 -->
+        <view class="card-actions" catchtap="true">
+          <button 
+            class="action-btn secondary-btn"
+            data-member-id="{{item.memberId}}"
+            bindtap="refreshArchive"
+          >
+            刷新
+          </button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="loading-icon">
+      <view class="loading-spinner"></view>
+    </view>
+    <view class="loading-text">正在加载健康档案...</view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{isEmpty && !loading}}">
+    <text class="iconfont icon-empty empty-icon"></text>
+    <view class="empty-text">暂无健康档案</view>
+    <view class="empty-subtitle">添加家庭成员后开始管理健康档案</view>
+    <button class="add-member-btn-primary" bindtap="addNewMember">
+      <text class="iconfont icon-plus"></text>
+      <text>添加成员</text>
+    </button>
+  </view>
+
+  <!-- 错误状态 -->
+  <view class="error-state" wx:if="{{isError}}">
+    <text class="iconfont icon-error error-icon"></text>
+    <view class="error-text">{{errorMessage}}</view>
+    <button class="retry-btn" bindtap="refreshData">重新加载</button>
+  </view>
+</view>

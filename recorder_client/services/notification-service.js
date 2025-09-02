@@ -157,6 +157,7 @@ class NotificationService {
    * @returns {Object} 通知对象
    */
   createNotification(options) {
+    const {
       type,
       title,
       content,

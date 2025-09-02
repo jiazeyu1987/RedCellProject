@@ -1,0 +1,15 @@
+{
+  "navigationBarTitleText": "成员详情",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f8f9fa",
+  "navigationBarBackgroundColor": "#ffffff",
+  "navigationBarTextStyle": "black",
+  "usingComponents": {
+    "loading-skeleton": "/components/loading-skeleton/loading-skeleton",
+    "error-state": "/components/error-state/error-state",
+    "status-tag": "/components/status-tag/status-tag",
+    "button": "/components/button/button",
+    "modal": "/components/modal/modal",
+    "form-item": "/components/form-item/form-item"
+  }
+}

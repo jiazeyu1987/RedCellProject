@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "button": "../button/button",
+    "modal": "../modal/modal"
+  }
+}

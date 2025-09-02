@@ -1,0 +1,183 @@
+<!--家庭成员列表页面-->
+<view class="family-members-page">
+  <!-- 顶部搜索和筛选区域 -->
+  <view class="search-filter-section">
+    <!-- 搜索框 -->
+    <view class="search-container">
+      <view class="search-box">
+        <icon class="search-icon" type="search" size="16" color="#999"/>
+        <input
+          class="search-input"
+          type="text"
+          placeholder="搜索成员姓名、电话、身份证"
+          value="{{searchKeyword}}"
+          bindinput="onSearchInput"
+          bindconfirm="onSearchConfirm"
+        />
+        <view wx:if="{{searchKeyword}}" class="clear-search" bindtap="clearAllFilters">
+          <icon type="clear" size="14" color="#999"/>
+        </view>
+      </view>
+      
+      <!-- 筛选按钮 -->
+      <view class="filter-button {{showFilters ? 'active' : ''}}" bindtap="toggleFilters">
+        <icon class="filter-icon" type="setting" size="16"/>
+        <view wx:if="{{currentFilters.ageRange || currentFilters.gender || currentFilters.healthStatus || currentFilters.serviceFrequency}}" class="filter-dot"></view>
+      </view>
+    </view>
+    
+    <!-- 筛选器 -->
+    <member-filter
+      wx:if="{{showFilters}}"
+      filters="{{currentFilters}}"
+      bind:filterchange="onFilterChange"
+      bind:clear="clearAllFilters"
+    />
+  </view>
+  
+  <!-- 统计信息卡片 -->
+  <member-statistics 
+    statistics="{{statistics}}" 
+    bind:statclick="onStatisticsClick"
+    bind:quickfilter="onQuickFilter"
+  />
+  
+  <!-- 家庭关系图谱入口 -->
+  <view class="relationship-map-section" wx:if="{{filteredList.length > 1}}">
+    <view class="section-header">
+      <view class="section-title">
+        <icon class="section-icon" type="setting" size="16" color="#4A90E2"/>
+        <text class="title-text">家庭关系图谱</text>
+      </view>
+      <view class="map-action" bindtap="showRelationshipMap">
+        <text class="action-text">查看图谱</text>
+        <icon class="action-arrow" type="arrow" size="12" color="#4A90E2"/>
+      </view>
+    </view>
+    <view class="map-preview">
+      <family-relationship-map
+        id="familyRelationshipMap"
+        relationshipData="{{relationshipMapData}}"
+        mode="view"
+        showActions="{{false}}"
+        selectedMemberId="{{selectedMemberId}}"
+        customClass="preview-map"
+        bind:nodeSelect="onMapNodeSelect"
+        bind:relationshipAdd="onRelationshipAdd"
+        bind:relationshipRemove="onRelationshipRemove"
+      />
+    </view>
+  </view>
+  
+  <!-- 成员列表内容 -->
+  <view class="members-content">
+    <!-- 排序选项 -->
+    <view class="sort-section">
+      <view class="sort-label">排序方式：</view>
+      <view class="sort-options">
+        <view 
+          class="sort-option {{sortBy === 'name' ? 'active' : ''}}"
+          bindtap="onSortOptionTap"
+          data-sort-by="name"
+          data-sort-order="{{sortBy === 'name' && sortOrder === 'asc' ? 'desc' : 'asc'}}"
+        >
+          姓名
+          <icon wx:if="{{sortBy === 'name'}}" 
+                class="sort-arrow {{sortOrder}}" 
+                type="{{sortOrder === 'asc' ? 'up' : 'down'}}" 
+                size="12"/>
+        </view>
+        <view 
+          class="sort-option {{sortBy === 'age' ? 'active' : ''}}"
+          bindtap="onSortOptionTap"
+          data-sort-by="age"
+          data-sort-order="{{sortBy === 'age' && sortOrder === 'asc' ? 'desc' : 'asc'}}"
+        >
+          年龄
+          <icon wx:if="{{sortBy === 'age'}}" 
+                class="sort-arrow {{sortOrder}}" 
+                type="{{sortOrder === 'asc' ? 'up' : 'down'}}" 
+                size="12"/>
+        </view>
+        <view 
+          class="sort-option {{sortBy === 'lastService' ? 'active' : ''}}"
+          bindtap="onSortOptionTap"
+          data-sort-by="lastService"
+          data-sort-order="{{sortBy === 'lastService' && sortOrder === 'asc' ? 'desc' : 'asc'}}"
+        >
+          最近服务
+          <icon wx:if="{{sortBy === 'lastService'}}" 
+                class="sort-arrow {{sortOrder}}" 
+                type="{{sortOrder === 'asc' ? 'up' : 'down'}}" 
+                size="12"/>
+        </view>
+        <view 
+          class="sort-option {{sortBy === 'frequency' ? 'active' : ''}}"
+          bindtap="onSortOptionTap"
+          data-sort-by="frequency"
+          data-sort-order="{{sortBy === 'frequency' && sortOrder === 'asc' ? 'desc' : 'asc'}}"
+        >
+          服务频率
+          <icon wx:if="{{sortBy === 'frequency'}}" 
+                class="sort-arrow {{sortOrder}}" 
+                type="{{sortOrder === 'asc' ? 'up' : 'down'}}" 
+                size="12"/>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 成员列表 -->
+    <view class="members-list" wx:if="{{!loading && !isEmpty && !isError}}">
+      <member-card
+        wx:for="{{filteredList}}"
+        wx:key="id"
+        member="{{item}}"
+        bind:tap="onMemberCardTap"
+        bind:contact="onQuickContact"
+        bind:appointment="onQuickAppointment"
+        bind:healthrecord="onQuickHealthRecord"
+        bind:servicehistory="onQuickServiceHistory"
+        data-member="{{item}}"
+      />
+    </view>
+    
+    <!-- 加载状态 -->
+    <loading-skeleton wx:if="{{loading && filteredList.length === 0}}" />
+    
+    <!-- 空状态 -->
+    <empty-state 
+      wx:if="{{isEmpty && !loading}}"
+      title="暂无家庭成员"
+      description="还没有添加任何家庭成员，点击下方按钮添加第一个成员"
+      icon="user-o"
+      action-text="添加成员"
+      bind:action="onAddMember"
+    />
+    
+    <!-- 错误状态 -->
+    <error-state
+      wx:if="{{isError && !loading}}"
+      title="加载失败"
+      description="网络连接异常，请检查网络后重试"
+      action-text="重新加载"
+      bind:action="loadMemberList"
+    />
+    
+    <!-- 加载更多状态 -->
+    <view wx:if="{{loading && filteredList.length > 0}}" class="loading-more">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+    
+    <!-- 没有更多数据提示 -->
+    <view wx:if="{{!hasMore && filteredList.length > 0}}" class="no-more">
+      已显示全部 {{filteredList.length}} 个成员
+    </view>
+  </view>
+  
+  <!-- 底部添加按钮 -->
+  <view class="add-member-button" bindtap="onAddMember">
+    <icon class="add-icon" type="plus" size="20" color="#fff"/>
+    <text class="add-text">添加成员</text>
+  </view>
+</view>

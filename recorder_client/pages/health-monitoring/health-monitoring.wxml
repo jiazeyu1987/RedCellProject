@@ -1,0 +1,201 @@
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">{{memberName}}的健康监测</text>
+  </view>
+
+  <!-- 标签页 -->
+  <view class="tabs">
+    <view class="tab-item {{currentTab === 'exercise' ? 'active' : ''}}" bindtap="onTabChange" data-value="exercise">
+      <text class="tab-text">运动记录</text>
+      <view class="tab-indicator"></view>
+    </view>
+    <view class="tab-item {{currentTab === 'sleep' ? 'active' : ''}}" bindtap="onTabChange" data-value="sleep">
+      <text class="tab-text">睡眠记录</text>
+      <view class="tab-indicator"></view>
+    </view>
+  </view>
+
+  <!-- 筛选条件 -->
+  <view class="filters">
+    <picker class="filter-item" bindchange="onFilterChange" data-type="dateRange" value="{{filters.dateRange}}" range="{{['最近7天', '最近30天', '最近90天']}}" range-key="label">
+      <view class="filter-content">
+        <text class="filter-label">时间范围</text>
+        <text class="filter-value">{{filters.dateRange === '7days' ? '最近7天' : filters.dateRange === '30days' ? '最近30天' : '最近90天'}}</text>
+        <text class="filter-arrow">></text>
+      </view>
+    </picker>
+    
+    <view wx:if="{{currentTab === 'exercise'}}" class="filter-item">
+      <picker bindchange="onFilterChange" data-type="exerciseType" value="{{filters.exerciseType}}" range="{{['全部', '跑步', '散步', '骑行', '游泳', '力量训练', '瑜伽']}}" range-key="label">
+        <view class="filter-content">
+          <text class="filter-label">运动类型</text>
+          <text class="filter-value">{{filters.exerciseType || '全部'}}</text>
+          <text class="filter-arrow">></text>
+        </view>
+      </picker>
+    </view>
+    
+    <view wx:if="{{currentTab === 'sleep'}}" class="filter-item">
+      <picker bindchange="onFilterChange" data-type="sleepQuality" value="{{filters.sleepQuality}}" range="{{['全部', '优秀', '好', '一般', '差', '非常差']}}" range-key="label">
+        <view class="filter-content">
+          <text class="filter-label">睡眠质量</text>
+          <text class="filter-value">{{filters.sleepQuality || '全部'}}</text>
+          <text class="filter-arrow">></text>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 运动数据展示 -->
+  <view wx:if="{{currentTab === 'exercise'}}" class="content-section">
+    <!-- 运动统计卡片 -->
+    <view class="stats-grid">
+      <view class="stat-card exercise-primary">
+        <text class="stat-label">总锻炼次数</text>
+        <text class="stat-value">{{exerciseStats.totalWorkouts}}</text>
+        <text class="stat-unit">次</text>
+      </view>
+      <view class="stat-card exercise-secondary">
+        <text class="stat-label">总运动时长</text>
+        <text class="stat-value">{{exerciseStats.totalDuration}}</text>
+        <text class="stat-unit">分钟</text>
+      </view>
+      <view class="stat-card exercise-accent">
+        <text class="stat-label">消耗卡路里</text>
+        <text class="stat-value">{{exerciseStats.totalCalories}}</text>
+        <text class="stat-unit">大卡</text>
+      </view>
+      <view class="stat-card exercise-info">
+        <text class="stat-label">周运动频率</text>
+        <text class="stat-value">{{exerciseStats.weeklyFrequency}}</text>
+        <text class="stat-unit">次/周</text>
+      </view>
+    </view>
+
+    <!-- 运动记录列表 -->
+    <view class="record-section">
+      <view class="section-header">
+        <text class="section-title">运动记录</text>
+        <button class="add-btn" bindtap="addExerciseRecord">+ 添加</button>
+      </view>
+      
+      <view wx:if="{{exerciseRecords.length === 0}}" class="empty-state">
+        <text class="empty-text">暂无运动记录</text>
+        <button class="empty-action" bindtap="addExerciseRecord">立即添加</button>
+      </view>
+      
+      <view wx:else class="record-list">
+        <view wx:for="{{exerciseRecords}}" wx:key="id" class="record-item exercise-record" bindtap="viewExerciseDetail" data-index="{{index}}">
+          <view class="record-header">
+            <text class="record-type">{{item.exercise.type}}</text>
+            <text class="record-date">{{item.recordTime}}</text>
+          </view>
+          <view class="record-content">
+            <view class="record-stats">
+              <view class="record-stat">
+                <text class="record-stat-label">时长</text>
+                <text class="record-stat-value">{{item.exercise.duration}}分钟</text>
+              </view>
+              <view class="record-stat">
+                <text class="record-stat-label">强度</text>
+                <text class="record-stat-value">{{item.exercise.intensity}}</text>
+              </view>
+              <view wx:if="{{item.exercise.calories}}" class="record-stat">
+                <text class="record-stat-label">卡路里</text>
+                <text class="record-stat-value">{{item.exercise.calories}}大卡</text>
+              </view>
+            </view>
+            <view wx:if="{{item.analysis && item.analysis.quality_score}}" class="record-analysis">
+              <text class="analysis-label">运动评分</text>
+              <text class="analysis-score">{{item.analysis.quality_score}}分</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 睡眠数据展示 -->
+  <view wx:if="{{currentTab === 'sleep'}}" class="content-section">
+    <!-- 睡眠统计卡片 -->
+    <view class="stats-grid">
+      <view class="stat-card sleep-primary">
+        <text class="stat-label">记录天数</text>
+        <text class="stat-value">{{sleepStats.totalNights}}</text>
+        <text class="stat-unit">天</text>
+      </view>
+      <view class="stat-card sleep-secondary">
+        <text class="stat-label">平均睡眠</text>
+        <text class="stat-value">{{sleepStats.avgDuration}}</text>
+        <text class="stat-unit">小时</text>
+      </view>
+      <view class="stat-card sleep-accent">
+        <text class="stat-label">质量评分</text>
+        <text class="stat-value">{{sleepStats.avgQualityScore}}</text>
+        <text class="stat-unit">分</text>
+      </view>
+      <view class="stat-card sleep-info">
+        <text class="stat-label">平均入睡</text>
+        <text class="stat-value">{{sleepStats.avgSleepLatency}}</text>
+        <text class="stat-unit">分钟</text>
+      </view>
+    </view>
+
+    <!-- 睡眠记录列表 -->
+    <view class="record-section">
+      <view class="section-header">
+        <text class="section-title">睡眠记录</text>
+        <button class="add-btn" bindtap="addSleepRecord">+ 添加</button>
+      </view>
+      
+      <view wx:if="{{sleepRecords.length === 0}}" class="empty-state">
+        <text class="empty-text">暂无睡眠记录</text>
+        <button class="empty-action" bindtap="addSleepRecord">立即添加</button>
+      </view>
+      
+      <view wx:else class="record-list">
+        <view wx:for="{{sleepRecords}}" wx:key="id" class="record-item sleep-record" bindtap="viewSleepDetail" data-index="{{index}}">
+          <view class="record-header">
+            <text class="record-type">睡眠记录</text>
+            <text class="record-date">{{item.recordDate}}</text>
+          </view>
+          <view class="record-content">
+            <view class="record-stats">
+              <view class="record-stat">
+                <text class="record-stat-label">时长</text>
+                <text class="record-stat-value">{{item.sleepTime.duration}}小时</text>
+              </view>
+              <view class="record-stat">
+                <text class="record-stat-label">质量</text>
+                <text class="record-stat-value">{{item.sleepQuality.overall}}</text>
+              </view>
+              <view class="record-stat">
+                <text class="record-stat-label">入睡</text>
+                <text class="record-stat-value">{{item.sleepTime.sleepLatency}}分钟</text>
+              </view>
+            </view>
+            <view wx:if="{{item.analysis && item.analysis.quality_score}}" class="record-analysis">
+              <text class="analysis-label">质量评分</text>
+              <text class="analysis-score">{{item.analysis.quality_score}}分</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-actions">
+    <button class="action-btn secondary" bindtap="onShareData">分享数据</button>
+    <button wx:if="{{currentTab === 'exercise'}}" class="action-btn primary" bindtap="addExerciseRecord">添加运动</button>
+    <button wx:if="{{currentTab === 'sleep'}}" class="action-btn primary" bindtap="addSleepRecord">添加睡眠</button>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-overlay">
+    <view class="loading-content">
+      <text class="loading-text">加载中...</text>
+    </view>
+  </view>
+</view>

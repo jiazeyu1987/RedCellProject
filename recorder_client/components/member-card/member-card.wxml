@@ -1,0 +1,144 @@
+<!--家庭成员卡片组件-->
+<view class="member-card {{cardStyle}}" bindtap="onCardTap">
+  <!-- 卡片主要内容 -->
+  <view class="member-main">
+    <!-- 左侧头像和状态 -->
+    <view class="member-avatar-section">
+      <view class="avatar-container">
+        <image 
+          class="member-avatar" 
+          src="{{displayData.avatar || '/images/avatar-default.png'}}"
+          mode="aspectFill"
+          binderror="onAvatarError"
+        />
+        <!-- 在线状态指示器 -->
+        <view class="status-indicator {{displayData.isActive ? 'active' : 'inactive'}}"></view>
+        <!-- 年龄组标识 -->
+        <view class="age-group-badge {{ageGroup}}">
+          <text class="age-group-text">
+            {{ageGroup === 'child' ? '童' : ageGroup === 'adult' ? '成' : '老'}}
+          </text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 中间信息区域 -->
+    <view class="member-info">
+      <!-- 基础信息行 -->
+      <view class="info-row basic-info">
+        <view class="member-name">{{displayData.name}}</view>
+        <view class="member-age">{{displayData.age}}岁</view>
+        <view class="member-gender">
+          <icon class="gender-icon" type="{{displayData.gender === 'male' ? 'man' : 'woman'}}" size="14"/>
+        </view>
+        <view class="member-relationship">{{displayData.relationship}}</view>
+      </view>
+      
+      <!-- 联系信息行 -->
+      <view class="info-row contact-info">
+        <view class="contact-item">
+          <icon class="contact-icon" type="phone" size="12" color="#666"/>
+          <text class="contact-text">{{displayData.phoneDisplay}}</text>
+        </view>
+        <view class="contact-item">
+          <icon class="contact-icon" type="location" size="12" color="#666"/>
+          <text class="contact-text">{{displayData.address}}</text>
+        </view>
+      </view>
+      
+      <!-- 健康状态行 -->
+      <view class="info-row health-info">
+        <view class="health-status" style="color: {{displayData.healthStatusInfo.color}}">
+          <icon class="health-icon" type="{{displayData.healthStatusInfo.icon}}" size="12"/>
+          <text class="health-text">{{displayData.healthStatusInfo.text}}</text>
+        </view>
+        
+        <view class="service-frequency" style="color: {{displayData.frequencyInfo.color}}">
+          <icon class="frequency-icon" type="clock" size="12"/>
+          <text class="frequency-text">{{displayData.frequencyInfo.text}}服务</text>
+        </view>
+        
+        <view class="last-service">
+          <text class="last-service-text">{{relativeTime}}</text>
+        </view>
+      </view>
+      
+      <!-- 详细信息（仅在详细模式下显示） -->
+      <view wx:if="{{cardStyle === 'detailed'}}" class="info-row detail-info">
+        <!-- 医疗信息 -->
+        <view wx:if="{{displayData.medicalHistory && displayData.medicalHistory.length > 0}}" class="medical-info">
+          <view class="medical-label">病史:</view>
+          <view class="medical-tags">
+            <text wx:for="{{displayData.medicalHistory}}" wx:key="index" class="medical-tag">
+              {{item}}
+            </text>
+          </view>
+        </view>
+        
+        <!-- 过敏信息 -->
+        <view wx:if="{{displayData.allergyHistory && displayData.allergyHistory.length > 0}}" class="allergy-info">
+          <view class="allergy-label">过敏:</view>
+          <view class="allergy-tags">
+            <text wx:for="{{displayData.allergyHistory}}" wx:key="index" class="allergy-tag">
+              {{item}}
+            </text>
+          </view>
+        </view>
+        
+        <!-- 用药信息 -->
+        <view wx:if="{{displayData.currentMedications && displayData.currentMedications.length > 0}}" class="medication-info">
+          <view class="medication-label">用药:</view>
+          <view class="medication-tags">
+            <text wx:for="{{displayData.currentMedications}}" wx:key="index" class="medication-tag">
+              {{item}}
+            </text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 右侧操作区域 -->
+    <view class="member-actions" wx:if="{{showQuickActions}}">
+      <!-- 快捷操作按钮 -->
+      <view class="quick-actions">
+        <view class="action-button contact" bindtap="onContactTap">
+          <icon class="action-icon" type="phone" size="16" color="#007AFF"/>
+        </view>
+        <view class="action-button appointment" bindtap="onAppointmentTap">
+          <icon class="action-icon" type="calendar" size="16" color="#5AC8FA"/>
+        </view>
+        <view class="action-button health" bindtap="onHealthRecordTap">
+          <icon class="action-icon" type="heart" size="16" color="#34C759"/>
+        </view>
+        <view class="action-button history" bindtap="onServiceHistoryTap">
+          <icon class="action-icon" type="list" size="16" color="#FF9500"/>
+        </view>
+      </view>
+      
+      <!-- 详情箭头 -->
+      <view class="detail-arrow">
+        <icon class="arrow-icon" type="arrow-right" size="14" color="#C7C7CC"/>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 卡片底部额外信息（紧凑模式下隐藏） -->
+  <view wx:if="{{cardStyle !== 'compact'}}" class="member-footer">
+    <view class="footer-item">
+      <text class="footer-label">紧急联系人:</text>
+      <text class="footer-value">{{displayData.emergencyContact}}</text>
+    </view>
+    <view class="footer-item">
+      <text class="footer-label">最近服务:</text>
+      <text class="footer-value">{{displayData.lastServiceDisplay}}</text>
+    </view>
+  </view>
+  
+  <!-- 优先级指示器 -->
+  <view wx:if="{{displayData.healthStatus === 'critical'}}" class="priority-indicator critical">
+    <icon class="priority-icon" type="warning" size="12" color="#fff"/>
+  </view>
+  <view wx:elif="{{displayData.serviceFrequency === 'daily'}}" class="priority-indicator high">
+    <icon class="priority-icon" type="clock" size="12" color="#fff"/>
+  </view>
+</view>

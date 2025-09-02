@@ -89,13 +89,7 @@
       <scroll-view class="quick-filters-scroll" scroll-x="{{true}}" show-scrollbar="{{false}}">
         <view class="quick-filters-list">
           <view wx:for="{{quickFilters}}" wx:key="key"
-                class="quick-filter-item {{
-                  (item.key === 'today' && currentFilters.time === 'today') ||
-                  (item.key === 'pending' && currentFilters.status === 'pending') ||
-                  (item.key === 'urgent' && currentFilters.priority === 'urgent') ||
-                  (item.key === 'overdue' && currentFilters.time === 'overdue')
-                  ? 'active' : ''
-                }}"
+                class="quick-filter-item {{(item.key === 'today' && currentFilters.time === 'today') || (item.key === 'pending' && currentFilters.status === 'pending') || (item.key === 'urgent' && currentFilters.priority === 'urgent') || (item.key === 'overdue' && currentFilters.time === 'overdue') ? 'active' : ''}}"
                 data-key="{{item.key}}"
                 bindtap="onQuickFilter">
             <text class="filter-icon">{{item.icon}}</text>
