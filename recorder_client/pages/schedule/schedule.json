@@ -1,7 +1,8 @@
 {
+  "navigationBarTitleText": "日程管理",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50,
   "usingComponents": {
-    "navigation-bar": "../../components/navigation-bar/navigation-bar",
-    "schedule-card": "../../components/schedule-card/schedule-card",
     "schedule-filter": "../../components/schedule-filter/schedule-filter",
     "modal": "../../components/modal/modal",
     "time-adjust-modal": "../../components/time-adjust-modal/time-adjust-modal",

@@ -1,4 +1,325 @@
-/* 日程管理页面样式 */
+.schedule-page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 20rpx;
+}
+
+.page-header {
+  background-color: #fff;
+  padding: 40rpx 30rpx;
+  margin-bottom: 20rpx;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.page-content {
+  padding: 0 10rpx;
+}
+
+.test-section {
+  background-color: #fff;
+  padding: 40rpx 30rpx;
+  margin-bottom: 20rpx;
+  border-radius: 20rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.test-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #007aff;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.test-subtitle {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+}
+
+.stats-section {
+  background-color: #fff;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.stats-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 30rpx;
+}
+
+.stats-grid {
+  display: flex;
+  justify-content: space-between;
+}
+
+.stat-item {
+  text-align: center;
+  flex: 1;
+}
+
+.stat-number {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #007aff;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #666;
+  display: block;
+}
+
+.schedule-list {
+  background-color: #fff;
+  padding: 30rpx;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.list-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 30rpx;
+}
+
+.loading {
+  text-align: center;
+  padding: 60rpx 0;
+  color: #999;
+  font-size: 28rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-text {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.schedule-items {
+  /* 日程列表项目样式 */
+}
+
+.schedule-item {
+  padding: 20rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.schedule-item:last-child {
+  border-bottom: none;
+}
+
+.schedule-info {
+  flex: 1;
+}
+
+.patient-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.schedule-time {
+  font-size: 24rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 5rpx;
+}
+
+.schedule-status {
+  font-size: 22rpx;
+  color: #007aff;
+  display: inline-block;
+  padding: 4rpx 12rpx;
+  background-color: #e8f4ff;
+  border-radius: 10rpx;
+}
+
+/* 空状态和错误状态样式 */
+.empty-state, .error-state {
+  text-align: center;
+  padding: 100rpx 40rpx;
+  background-color: #fff;
+  border-radius: 20rpx;
+  margin: 20rpx 0;
+}
+
+.empty-icon, .error-icon {
+  font-size: 80rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.empty-title, .error-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 15rpx;
+}
+
+.empty-subtitle, .error-message {
+  font-size: 26rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 30rpx;
+  line-height: 1.4;
+}
+
+.empty-action {
+  display: inline-block;
+  padding: 20rpx 40rpx;
+  background-color: #007aff;
+  color: #fff;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+}
+
+.error-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20rpx;
+}
+
+.error-btn {
+  padding: 16rpx 32rpx;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+}
+
+.retry-btn {
+  background-color: #007aff;
+  color: #fff;
+}
+
+.close-btn {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+/* 批量操作面板 */
+.batch-actions-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  padding: 20rpx;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.batch-info {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.batch-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.batch-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10rpx 20rpx;
+  background-color: #f8f8f8;
+  border-radius: 15rpx;
+  min-width: 100rpx;
+}
+
+.batch-icon {
+  font-size: 24rpx;
+  margin-bottom: 8rpx;
+}
+
+.batch-text {
+  font-size: 20rpx;
+  color: #333;
+}
+
+/* 浮动按钮 */
+.fab-container {
+  position: fixed;
+  right: 40rpx;
+  bottom: 120rpx;
+  z-index: 100;
+}
+
+.fab-btn {
+  width: 100rpx;
+  height: 100rpx;
+  background-color: #007aff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 20rpx rgba(0, 122, 255, 0.4);
+}
+
+.fab-icon {
+  color: #fff;
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+/* 加载状态 */
+.loading-more, .no-more {
+  text-align: center;
+  padding: 40rpx 0;
+  color: #999;
+  font-size: 24rpx;
+}
+
+.loading-spinner {
+  width: 40rpx;
+  height: 40rpx;
+  border: 4rpx solid #f0f0f0;
+  border-top: 4rpx solid #007aff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20rpx;
+}
+
+.loading-spinner.small {
+  width: 30rpx;
+  height: 30rpx;
+  border-width: 3rpx;
+  margin-bottom: 15rpx;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
 .schedule-page {
   background: #f5f5f5;

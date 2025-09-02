@@ -199,6 +199,11 @@ const ScheduleAPI = {
     });
   },
   
+  // 获取可用时间段
+  getAvailableTimeSlots: (params) => {
+    return http.get('/schedule/available-slots', params);
+  },
+  
   // 同步日程数据
   syncScheduleData: (lastSyncTime) => {
     return http.post('/schedule/sync', {

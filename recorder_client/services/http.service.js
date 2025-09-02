@@ -293,6 +293,145 @@ class HttpService {
               status: 'active'
             }
           },
+          // 日程列表
+          '/schedule/list': {
+            code: 0,
+            success: true,
+            message: '获取日程列表成功',
+            data: {
+              list: [
+                {
+                  id: 'mock_001',
+                  patientName: '张三',
+                  serviceName: '居家护理',
+                  startTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+                  endTime: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
+                  address: '北京市朝阳区三里屯小区12号楼301室',
+                  status: 'pending',
+                  priority: 'normal',
+                  serviceType: 'regular',
+                  contactPhone: '138****5678',
+                  notes: '患者需要血压测量和用药指导',
+                  patientAge: 65,
+                  patientGender: '男',
+                  createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+                  estimatedDuration: 60
+                },
+                {
+                  id: 'mock_002',
+                  patientName: '李四',
+                  serviceName: '康复理疗',
+                  startTime: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+                  endTime: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
+                  address: '北京市海淀区中关村大街55号',
+                  status: 'confirmed',
+                  priority: 'high',
+                  serviceType: 'follow_up',
+                  contactPhone: '139****1234',
+                  notes: '需要带物理治疗设备',
+                  patientAge: 45,
+                  patientGender: '女',
+                  createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+                  estimatedDuration: 90
+                },
+                {
+                  id: 'mock_003',
+                  patientName: '王五',
+                  serviceName: '健康检查',
+                  startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+                  endTime: new Date(Date.now() + 25 * 60 * 60 * 1000).toISOString(),
+                  address: '北京市东城区建国门外大街100号',
+                  status: 'completed',
+                  priority: 'normal',
+                  serviceType: 'initial',
+                  contactPhone: '150****9876',
+                  notes: '定期健康检查，包括血常规和尿常规',
+                  patientAge: 72,
+                  patientGender: '男',
+                  createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
+                  estimatedDuration: 45,
+                  completedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+                },
+                {
+                  id: 'mock_004',
+                  patientName: '赵六',
+                  serviceName: '精神健康咨询',
+                  startTime: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+                  endTime: new Date(Date.now()).toISOString(),
+                  address: '北京市西城区复兴门内大街200号',
+                  status: 'overdue',
+                  priority: 'urgent',
+                  serviceType: 'consultation',
+                  contactPhone: '187****3456',
+                  notes: '患者有焦虑症状，需要心理指导',
+                  patientAge: 38,
+                  patientGender: '女',
+                  createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(),
+                  estimatedDuration: 60
+                },
+                {
+                  id: 'mock_005',
+                  patientName: '孙七',
+                  serviceName: '伤口换药',
+                  startTime: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
+                  endTime: new Date(Date.now() + 6.5 * 60 * 60 * 1000).toISOString(),
+                  address: '北京市丰台区丰科路18号院',
+                  status: 'pending',
+                  priority: 'high',
+                  serviceType: 'emergency',
+                  contactPhone: '156****7890',
+                  notes: '车祸外伤后需定期换药',
+                  patientAge: 28,
+                  patientGender: '男',
+                  createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+                  estimatedDuration: 30
+                }
+              ],
+              total: 5,
+              page: 1,
+              limit: 20
+            }
+          },
+          // 日程统计信息
+          '/schedule/statistics': {
+            code: 0,
+            success: true,
+            message: '获取统计信息成功',
+            data: {
+              total: 25,
+              today: 8,
+              pending: 5,
+              overdue: 2,
+              completed: 18,
+              inProgress: 0,
+              cancelled: 0,
+              urgent: 3
+            }
+          },
+          // 详细统计信息
+          '/schedule/statistics/detailed': {
+            code: 0,
+            success: true,
+            message: '获取详细统计成功',
+            data: {
+              thisWeek: 25,
+              thisMonth: 120,
+              avgDuration: 45,
+              completionRate: 72
+            }
+          },
+          // 统计趋势数据
+          '/schedule/statistics/trend': {
+            code: 0,
+            success: true,
+            message: '获取趋势数据成功',
+            data: {
+              trend: {
+                direction: 'up',
+                percentage: 12
+              }
+            }
+          },
           // 默认响应
           'default': {
             code: 0,

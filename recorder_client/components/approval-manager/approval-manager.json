@@ -1,8 +1,8 @@
 {
   "component": true,
   "usingComponents": {
-    "custom-card": "../card/card",
-    "custom-button": "../button/button",
+    "card": "../card/card",
+    "button": "../button/button",
     "status-tag": "../status-tag/status-tag"
   }
 }

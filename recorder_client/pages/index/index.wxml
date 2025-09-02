@@ -115,15 +115,15 @@
 
   <!-- 快捷操作按钮 -->
   <view class="quick-actions">
-    <view class="action-button" bind:tap="goToSchedule">
+    <view class="action-button" bindtap="goToSchedule">
       <text class="action-icon">📅</text>
       <text class="action-text">日程管理</text>
     </view>
-    <view class="action-button" bind:tap="goToPatients">
+    <view class="action-button" bindtap="goToPatients">
       <text class="action-icon">👥</text>
       <text class="action-text">患者管理</text>
     </view>
-    <view class="action-button" bind:tap="goToSettings">
+    <view class="action-button" bindtap="goToSettings">
       <text class="action-icon">⚙️</text>
       <text class="action-text">设置</text>
     </view>

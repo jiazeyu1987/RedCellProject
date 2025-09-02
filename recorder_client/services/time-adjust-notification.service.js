@@ -3,14 +3,14 @@
  * 专门处理时间调整相关的通知功能
  */
 
-import { 
+const { 
   NOTIFICATION_TYPES,
   NOTIFICATION_PRIORITY,
   NOTIFICATION_CHANNELS 
-} from '../constants/notification-config.js';
+} = require('../constants/notification-config.js');
 
-import { TEMPLATE_TYPES } from '../constants/template-types.js';
-import NotificationService from './notification-service.js';
+const { TEMPLATE_TYPES } = require('../constants/template-types.js');
+const NotificationService = require('./notification-service.js');
 
 class TimeAdjustNotificationService {
   constructor() {
@@ -1799,4 +1799,4 @@ class TimeAdjustNotificationService {
   }
 }
 
-export default TimeAdjustNotificationService;
+module.exports = TimeAdjustNotificationService;

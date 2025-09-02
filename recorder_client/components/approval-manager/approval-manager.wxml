@@ -66,7 +66,7 @@
     <scroll-view class="task-list" scroll-y>
       <view class="task-item" wx:for="{{approvalTasks}}" wx:key="id" 
             data-request-id="{{item.id}}" bind:tap="viewTaskDetail">
-        <custom-card>
+        <card>
           <view class="task-content">
             <!-- 头部信息 -->
             <view class="task-header">
@@ -109,26 +109,26 @@
               <text class="created-time">{{formatTime(item.createdAt)}}</text>
               
               <view class="action-buttons">
-                <custom-button 
+                <button 
                   type="primary" 
                   size="small" 
                   text="快速批准"
                   data-request-id="{{item.id}}"
                   bind:tap="quickApprove"
                   wx:if="{{item.urgentLevel !== 'urgent'}}"
-                ></custom-button>
+                ></button>
                 
-                <custom-button 
+                <button 
                   type="default" 
                   size="small" 
                   text="查看详情"
                   data-request-id="{{item.id}}"
                   bind:tap="viewTaskDetail"
-                ></custom-button>
+                ></button>
               </view>
             </view>
           </view>
-        </custom-card>
+        </card>
       </view>
 
       <!-- 空状态 -->
@@ -149,7 +149,7 @@
     <!-- 任务信息 -->
     <view class="detail-section">
       <view class="section-title">申请信息</view>
-      <custom-card>
+      <card>
         <view class="detail-content">
           <view class="detail-row">
             <text class="label">申请人:</text>
@@ -179,13 +179,13 @@
             <text class="value impact-score" style="color: {{currentTask.impactScore > 60 ? '#f5222d' : '#52c41a'}}">{{currentTask.impactScore}}分</text>
           </view>
         </view>
-      </custom-card>
+      </card>
     </view>
 
     <!-- 审批流程 -->
     <view class="detail-section">
       <view class="section-title">审批流程</view>
-      <custom-card>
+      <card>
         <view class="workflow-steps">
           <view class="step-item {{index < currentTask.currentStep ? 'completed' : (index === currentTask.currentStep - 1 ? 'current' : 'pending')}}" 
                 wx:for="{{currentTask.workflow.steps}}" wx:key="step">
@@ -198,13 +198,13 @@
             </view>
           </view>
         </view>
-      </custom-card>
+      </card>
     </view>
 
     <!-- 审批历史 -->
     <view class="detail-section" wx:if="{{currentTask.approvalHistory.length > 0}}">
       <view class="section-title">审批历史</view>
-      <custom-card>
+      <card>
         <view class="history-list">
           <view class="history-item" wx:for="{{currentTask.approvalHistory}}" wx:key="timestamp">
             <view class="history-header">
@@ -219,13 +219,13 @@
             <text class="history-time">{{formatTime(item.timestamp)}}</text>
           </view>
         </view>
-      </custom-card>
+      </card>
     </view>
 
     <!-- 审批操作 -->
     <view class="detail-section" wx:if="{{currentTask.status === 'pending_approval'}}">
       <view class="section-title">审批操作</view>
-      <custom-card>
+      <card>
         <view class="approval-form">
           <!-- 审批决定 -->
           <view class="decision-options">
@@ -260,15 +260,15 @@
 
           <!-- 提交按钮 -->
           <view class="submit-section">
-            <custom-button 
+            <button 
               type="primary" 
               text="提交审批"
               disabled="{{!decision}}"
               bind:tap="handleApproval"
-            ></custom-button>
+            ></button>
           </view>
         </view>
-      </custom-card>
+      </card>
     </view>
   </view>
 

@@ -3,7 +3,7 @@
  * 负责管理时间调整相关的权限控制、限制检查和审批流程
  */
 
-const RolePermissionManager = require('../utils/role-permission.js');
+const { RolePermissionManager } = require('../utils/role-permission.js');
 const { TIME_ADJUST_CONFIG, TimeAdjustUtils } = require('../constants/time-adjust-config.js');
 const CONFIG = require('../constants/config.js');
 

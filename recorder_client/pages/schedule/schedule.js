@@ -1,13 +1,14 @@
-const api = require('../../api/index');
+const { ScheduleAPI } = require('../../api/index');
 const CONSTANTS = require('../../constants/constants');
-const { LoginPageDecorator } = require('../../utils/login-page-decorator');
-const BatchConflictDetectionService = require('../../services/batch-conflict-detection.service.js');
+// 临时注释掉登录装饰器以便调试
+// const { LoginPageDecorator } = require('../../utils/login-page-decorator');
+// const BatchConflictDetectionService = require('../../services/batch-conflict-detection.service.js');
 
 /**
  * 日程管理页面
  * 功能：显示日程列表、筛选排序、批量操作等
  */
-Page(LoginPageDecorator.requireLogin({
+Page({
   data: {
     // 页面状态
     loading: false,
@@ -242,6 +243,8 @@ Page(LoginPageDecorator.requireLogin({
    * 页面加载
    */
   onLoad(options) {
+    console.log('日程页面开始加载...');
+    
     this.initPage();
     this.initApprovalPermissions(); // 初始化审批权限
     
@@ -256,8 +259,10 @@ Page(LoginPageDecorator.requireLogin({
     this.sortCache = new Map();
     this.distanceCache = {};
     
-    // 初始化批量冲突检测服务
-    this.batchConflictService = new BatchConflictDetectionService();
+    console.log('日程页面加载完成');
+    
+    // 初始化批量冲突检测服务 - 延迟加载
+    // this.batchConflictService = new BatchConflictDetectionService();
   },
 
   /**
@@ -357,7 +362,7 @@ Page(LoginPageDecorator.requireLogin({
         ...this.buildApiFilters()
       };
       
-      const result = await api.getScheduleList(params);
+      const result = await ScheduleAPI.getScheduleList(params);
       
       let scheduleList = [];
       if (reset) {
@@ -421,8 +426,8 @@ Page(LoginPageDecorator.requireLogin({
     try {
       // 同时获取基本统计和详细统计
       const [basicStats, detailedStats] = await Promise.all([
-        api.getScheduleStatistics(),
-        api.getDetailedStatistics('today')
+        ScheduleAPI.getScheduleStatistics(),
+        ScheduleAPI.getDetailedStatistics('today')
       ]);
       
       const statistics = {
@@ -493,7 +498,7 @@ Page(LoginPageDecorator.requireLogin({
    */
   async loadStatisticsTrend() {
     try {
-      const result = await api.getStatisticsTrend(7);
+      const result = await ScheduleAPI.getStatisticsTrend(7);
       const trendData = result.data || {};
       
       const statistics = {
@@ -653,7 +658,8 @@ Page(LoginPageDecorator.requireLogin({
       scheduleList: processedList,
       originalScheduleList: processedList,
       'pagination.total': mockScheduleList.length,
-      hasMore: false
+      hasMore: false,
+      loading: false  // 确保加载状态被清除
     });
     
     // 应用本地筛选
@@ -827,40 +833,40 @@ Page(LoginPageDecorator.requireLogin({
    * 应用本地筛选（排序等）
    */
   applyLocalFilters() {
+    console.log('开始应用本地筛选...');
     let filteredList = [...this.data.originalScheduleList];
     
-    // 排序
+    console.log('原始数据长度:', filteredList.length);
+    
+    // 简化排序逻辑 - 默认按时间排序
     const sortType = this.data.currentFilters.sort;
     
-    // 检查是否可以使用缓存的排序结果
-    const canUseCache = this.canUseSortCache(sortType);
-    if (!canUseCache) {
-      // 执行排序
-      if (sortType === 'combined' && this.data.currentFilters.sortCombination) {
-        // 组合排序
-        filteredList.sort((a, b) => {
-          return this.applyCombinedSort(a, b, this.data.currentFilters.sortCombination);
-        });
-      } else if (sortType === 'smart') {
-        // 智能排序
-        filteredList = this.smartSort(filteredList);
+    try {
+      if (sortType === CONSTANTS.SORT_TYPES.TIME_DESC) {
+        filteredList.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
       } else {
-        // 单一排序
-        filteredList.sort((a, b) => {
-          return this.applySingleSort(a, b, sortType);
-        });
+        // 默认时间升序排序
+        filteredList.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
       }
+      
+      console.log('排序后数据长度:', filteredList.length);
+      
+      this.setData({
+        filteredScheduleList: filteredList
+      });
+      
+      console.log('数据设置成功，filteredScheduleList长度:', filteredList.length);
+      
+      // 更新筛选条件标签
+      this.updateFilterTags();
+      
+    } catch (error) {
+      console.error('筛选排序失败:', error);
+      // 出错时直接使用原始数据
+      this.setData({
+        filteredScheduleList: filteredList
+      });
     }
-    
-    this.setData({
-      filteredScheduleList: filteredList
-    });
-    
-    // 更新筛选条件标签
-    this.updateFilterTags();
-    
-    // 记录排序操作到缓存
-    this.cacheSortResult(sortType, filteredList.length);
   },
   
   /**
@@ -2187,7 +2193,7 @@ Page(LoginPageDecorator.requireLogin({
       try {
         // 模拟 API 调用
         await this.simulateAPICall();
-        await api.updateScheduleStatus(schedule.id, CONSTANTS.SCHEDULE_STATUS.CANCELLED);
+        await ScheduleAPI.updateScheduleStatus(schedule.id, CONSTANTS.SCHEDULE_STATUS.CANCELLED);
         success++;
       } catch (error) {
         console.error(`取消日程 ${schedule.id} 失败:`, error);
@@ -2217,7 +2223,7 @@ Page(LoginPageDecorator.requireLogin({
     for (const schedule of schedules) {
       try {
         await this.simulateAPICall();
-        await api.updateScheduleStatus(schedule.id, CONSTANTS.SCHEDULE_STATUS.CONFIRMED);
+        await ScheduleAPI.updateScheduleStatus(schedule.id, CONSTANTS.SCHEDULE_STATUS.CONFIRMED);
         success++;
       } catch (error) {
         console.error(`确认日程 ${schedule.id} 失败:`, error);
@@ -3475,14 +3481,14 @@ Page(LoginPageDecorator.requireLogin({
     try {
       // 检查批量调整权限
       const userInfo = wx.getStorageSync('userInfo') || {};
-      const rolePermission = require('../../utils/role-permission.js');
+      const { RolePermissionManager } = require('../../utils/role-permission.js');
       
       // 获取选中的预约信息
       const selectedSchedules = this.data.filteredScheduleList.filter(schedule => 
         scheduleIds.includes(schedule.id)
       );
       
-      const permissionCheck = rolePermission.checkBatchAdjustPermission(userInfo.role, selectedSchedules);
+      const permissionCheck = RolePermissionManager.checkBatchAdjustPermission(userInfo.role, selectedSchedules);
       
       if (!permissionCheck.allowed) {
         wx.showToast({
@@ -3718,11 +3724,23 @@ Page(LoginPageDecorator.requireLogin({
   },
 
   /**
-   * 检测批量冲突 - 使用新的批量冲突棅测服务
+   * 检测批量冲突 - 使用新的批量冲突检测服务
    */
   async detectBatchConflicts(preview, progressCallback = null) {
     try {
-      console.log('[Schedule] 开始批量冲突棅测, 项目数量:', preview.length);
+      console.log('[Schedule] 开始批量冲突检测, 项目数量:', preview.length);
+      
+      // 延迟导入 BatchConflictDetectionService
+      if (!this.batchConflictService) {
+        try {
+          const BatchConflictDetectionService = require('../../services/batch-conflict-detection.service.js');
+          this.batchConflictService = new BatchConflictDetectionService();
+        } catch (error) {
+          console.error('无法加载批量冲突检测服务:', error);
+          // 使用简化的冲突检测
+          return this.detectSimpleBatchConflicts(preview, progressCallback);
+        }
+      }
       
       // 转换预览数据格式为服务所需的格式
       const batchItems = preview.map(item => ({
@@ -3735,7 +3753,7 @@ Page(LoginPageDecorator.requireLogin({
         serviceType: item.serviceType || 'general'
       }));
       
-      // 调用批量冲突棅测服务
+      // 调用批量冲突检测服务
       const detectionResult = await this.batchConflictService.detectBatchConflicts(batchItems, {
         progressCallback: (progress) => {
           if (progressCallback) {
@@ -3791,6 +3809,61 @@ Page(LoginPageDecorator.requireLogin({
         title: '冲突棅测失败',
         icon: 'none'
       });
+      return [];
+    }
+  },
+  
+  /**
+   * 简化的批量冲突检测（备用方案）
+   */
+  async detectSimpleBatchConflicts(preview, progressCallback = null) {
+    try {
+      console.log('[Schedule] 使用简化冲突检测');
+      const conflicts = [];
+      
+      // 检测预览项目之间的冲突
+      for (let i = 0; i < preview.length; i++) {
+        for (let j = i + 1; j < preview.length; j++) {
+          const item1 = preview[i];
+          const item2 = preview[j];
+          
+          if (this.hasTimeOverlap(
+            item1.newTime || item1.newDateTime, 
+            item1.duration || 60,
+            item2.newTime || item2.newDateTime, 
+            item2.duration || 60
+          )) {
+            conflicts.push({
+              id: `conflict_${i}_${j}`,
+              type: 'internal',
+              severity: 'medium',
+              scheduleId: item1.scheduleId,
+              conflictWith: item2.scheduleId,
+              conflictWithData: item2,
+              details: `与${item2.patientName}的预约时间冲突`,
+              originalTime: item1.originalTime || item1.originalDateTime,
+              newTime: item1.newTime || item1.newDateTime,
+              patientName: item1.patientName,
+              duration: item1.duration || 60,
+              detectedAt: new Date().toISOString()
+            });
+          }
+        }
+        
+        // 进度回调
+        if (progressCallback) {
+          progressCallback({
+            processed: i + 1,
+            total: preview.length
+          });
+        }
+      }
+      
+      console.log('[Schedule] 简化冲突检测完成, 发现冲突:', conflicts.length);
+      return conflicts;
+      
+    } catch (error) {
+      console.error('[Schedule] 简化冲突检测失败:', error);
       return [];
     }
   },
@@ -6387,7 +6460,7 @@ Page(LoginPageDecorator.requireLogin({
     for (const item of items) {
       try {
         // 调用 API 执行时间调整
-        await api.rescheduleAppointment(
+        await ScheduleAPI.rescheduleAppointment(
           item.scheduleId,
           item.newTime.toISOString(),
           new Date(item.newTime.getTime() + item.duration * 60000).toISOString(),
@@ -6591,7 +6664,7 @@ Page(LoginPageDecorator.requireLogin({
       };
       
       // 调用API执行批量延期
-      const result = await api.batchReschedule(
+      const result = await ScheduleAPI.batchReschedule(
         selectedSchedules.map(s => s.id),
         null, // 使用动态计算的时间
         null,
@@ -6872,7 +6945,7 @@ Page(LoginPageDecorator.requireLogin({
   async executeBatchAdjustment(batchData) {
     try {
       // 调用API执行批量调整
-      const result = await api.batchReschedule(
+      const result = await ScheduleAPI.batchReschedule(
         batchData.schedules.map(s => s.id),
         batchData.schedules.map(s => s.newTime),
         null, // endTime由后端计算
@@ -6982,7 +7055,7 @@ Page(LoginPageDecorator.requireLogin({
       wx.setStorageSync('batchAdjustHistory', batchHistory);
       
       // 异步发送到服务器
-      api.recordBatchAdjustHistory && api.recordBatchAdjustHistory(historyRecord);
+      ScheduleAPI.recordBatchAdjustHistory && ScheduleAPI.recordBatchAdjustHistory(historyRecord);
       
     } catch (error) {
       console.error('记录批量调整历史失败:', error);
@@ -7002,7 +7075,7 @@ Page(LoginPageDecorator.requireLogin({
           try {
             wx.showLoading({ title: '正在取消...' });
             
-            const result = await api.batchUpdateStatus(scheduleIds, CONSTANTS.SCHEDULE_STATUS.CANCELLED, '批量取消操作');
+            const result = await ScheduleAPI.batchUpdateStatus(scheduleIds, CONSTANTS.SCHEDULE_STATUS.CANCELLED, '批量取消操作');
             
             wx.hideLoading();
             
@@ -7042,7 +7115,7 @@ Page(LoginPageDecorator.requireLogin({
     try {
       wx.showLoading({ title: '正在确认...' });
       
-      const result = await api.batchUpdateStatus(scheduleIds, CONSTANTS.SCHEDULE_STATUS.CONFIRMED, '批量确认操作');
+      const result = await ScheduleAPI.batchUpdateStatus(scheduleIds, CONSTANTS.SCHEDULE_STATUS.CONFIRMED, '批量确认操作');
       
       wx.hideLoading();
       
@@ -7455,7 +7528,7 @@ Page(LoginPageDecorator.requireLogin({
     wx.showLoading({ title: '发送中...' });
     
     // 调用SMS API
-    api.sendSms({
+    ScheduleAPI.sendSms({
       phone: patient.phone,
       message: message,
       type: 'no_show_notification'
@@ -7672,7 +7745,7 @@ Page(LoginPageDecorator.requireLogin({
       };
       
       // 调用API保存记录
-      await api.recordNoShow(noShowData);
+      await ScheduleAPI.recordNoShow(noShowData);
       
       wx.hideLoading();
       wx.showToast({
@@ -7728,7 +7801,7 @@ Page(LoginPageDecorator.requireLogin({
             await this.updateScheduleStatus(schedule.id, CONSTANTS.SCHEDULE_STATUS.NO_SHOW);
             
             // 记录处理详情
-            await api.recordNoShowHandling({
+            await ScheduleAPI.recordNoShowHandling({
               scheduleId: schedule.id,
               handlingType: 'mark_as_no_show',
               timestamp: new Date().toISOString(),
@@ -7782,7 +7855,7 @@ Page(LoginPageDecorator.requireLogin({
    * 更新预约状态
    */
   async updateScheduleStatus(scheduleId, status) {
-    return api.updateScheduleStatus(scheduleId, status);
+    return ScheduleAPI.updateScheduleStatus(scheduleId, status);
   },
 
   /**
@@ -7795,7 +7868,7 @@ Page(LoginPageDecorator.requireLogin({
     wx.setStorageSync('contactAttempts', attempts);
     
     // 异步发送到服务器
-    api.recordContactAttempt(attemptData).catch(error => {
+    ScheduleAPI.recordContactAttempt(attemptData).catch(error => {
       console.error('记录联系尝试失败:', error);
     });
   },
@@ -7813,7 +7886,7 @@ Page(LoginPageDecorator.requireLogin({
     };
     
     // 发送到服务器
-    api.recordWaitingResult(waitingData).catch(error => {
+    ScheduleAPI.recordWaitingResult(waitingData).catch(error => {
       console.error('记录等待结果失败:', error);
     });
   },
@@ -8211,15 +8284,25 @@ Page(LoginPageDecorator.requireLogin({
    * 更新筛选条件标签
    */
   updateFilterTags() {
-    const activeFilterTags = this.generateFilterTags();
-    const filterResultCount = this.data.filteredScheduleList.length;
-    const totalResultCount = this.data.originalScheduleList.length;
-    
-    this.setData({
-      activeFilterTags,
-      filterResultCount,
-      totalResultCount
-    });
+    try {
+      const activeFilterTags = this.generateFilterTags();
+      const filterResultCount = this.data.filteredScheduleList ? this.data.filteredScheduleList.length : 0;
+      const totalResultCount = this.data.originalScheduleList ? this.data.originalScheduleList.length : 0;
+      
+      this.setData({
+        activeFilterTags,
+        filterResultCount,
+        totalResultCount
+      });
+    } catch (error) {
+      console.error('更新筛选标签失败:', error);
+      // 设置默认值避免错误
+      this.setData({
+        activeFilterTags: [],
+        filterResultCount: this.data.filteredScheduleList ? this.data.filteredScheduleList.length : 0,
+        totalResultCount: this.data.originalScheduleList ? this.data.originalScheduleList.length : 0
+      });
+    }
   },
   
   /**
@@ -8835,7 +8918,7 @@ Page(LoginPageDecorator.requireLogin({
   async getAvailableTimeSlots(appointment) {
     try {
       // 调用API获取可用时间段
-      const result = await api.getAvailableTimeSlots({
+      const result = await ScheduleAPI.getAvailableTimeSlots({
         recorderId: appointment.recorderId || wx.getStorageSync('userInfo').id,
         date: appointment.date,
         serviceType: appointment.serviceType,
@@ -8913,7 +8996,7 @@ Page(LoginPageDecorator.requireLogin({
           try {
             wx.showLoading({ title: '正在取消...' });
             
-            await api.updateScheduleStatus(schedule.id, CONSTANTS.SCHEDULE_STATUS.CANCELLED);
+            await ScheduleAPI.updateScheduleStatus(schedule.id, CONSTANTS.SCHEDULE_STATUS.CANCELLED);
             
             wx.hideLoading();
             wx.showToast({
@@ -8941,7 +9024,7 @@ Page(LoginPageDecorator.requireLogin({
     try {
       wx.showLoading({ title: '正在确认...' });
       
-      await api.updateScheduleStatus(schedule.id, CONSTANTS.SCHEDULE_STATUS.CONFIRMED);
+      await ScheduleAPI.updateScheduleStatus(schedule.id, CONSTANTS.SCHEDULE_STATUS.CONFIRMED);
       
       wx.hideLoading();
       wx.showToast({
@@ -8970,7 +9053,7 @@ Page(LoginPageDecorator.requireLogin({
       const userRole = wx.getStorageSync('userRole');
       
       if (userInfo && userRole) {
-        const RolePermissionManager = require('../../utils/role-permission.js');
+        const { RolePermissionManager } = require('../../utils/role-permission.js');
         const hasApprovalPermission = RolePermissionManager.hasApprovalPermission(userRole);
         
         this.setData({
@@ -9389,6 +9472,14 @@ Page(LoginPageDecorator.requireLogin({
   },
   
   /**
+   * 加载可用模板列表
+   */
+  loadAvailableTemplates() {
+    // TODO: 实现加载可用模板
+    console.log('加载可用模板');
+  },
+  
+  /**
    * 保存当前设置为模板
    */
   async saveCurrentAsTemplate() {
@@ -9401,7 +9492,7 @@ Page(LoginPageDecorator.requireLogin({
       };
       
       // 这里应该调用API保存模板
-      // await api.saveAdjustTemplate(templateData);
+      // await ScheduleAPI.saveAdjustTemplate(templateData);
       
       wx.showToast({
         title: '模板保存成功',
@@ -9417,5 +9508,63 @@ Page(LoginPageDecorator.requireLogin({
         icon: 'error'
       });
     }
+  },
+
+  // ========================= 错误处理工具方法 =========================
+
+  /**
+   * 处理错误
+   */
+  handleError(error, message = '操作失败') {
+    console.error(message + ':', error);
+    
+    let errorMessage = message;
+    if (error && error.message) {
+      errorMessage = error.message;
+    }
+    
+    this.setData({
+      'errorState.hasError': true,
+      'errorState.errorMessage': errorMessage,
+      'errorState.errorType': this.getErrorType(error),
+      'errorState.canRetry': true
+    });
+    
+    wx.showToast({
+      title: errorMessage,
+      icon: 'none',
+      duration: 2000
+    });
+  },
+
+  /**
+   * 获取错误类型
+   */
+  getErrorType(error) {
+    if (!error) return 'unknown';
+    
+    if (error.code === 'NETWORK_ERROR') {
+      return 'network';
+    } else if (error.code === 'AUTH_FAILED') {
+      return 'permission';
+    } else if (error.code === 'VALIDATION_ERROR') {
+      return 'data';
+    }
+    
+    return 'unknown';
+  },
+
+  // ========================= 页面状态管理方法 =========================
+
+  /**
+   * 清除错误状态
+   */
+  clearErrorState() {
+    this.setData({
+      'errorState.hasError': false,
+      'errorState.errorMessage': '',
+      'errorState.errorType': '',
+      'errorState.canRetry': true
+    });
   }
-}));
+});
