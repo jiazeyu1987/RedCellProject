@@ -63,9 +63,9 @@ Page({
     ],
     
     serviceFrequencyOptions: [
-      { value: 'daily', label: '每日服务' },
-      { value: 'weekly', label: '每周服务' },
-      { value: 'monthly', label: '每月服务' }
+      { value: 'daily', label: '每日服务', color: '#007AFF' },
+      { value: 'weekly', label: '每周服务', color: '#5856D6' },
+      { value: 'monthly', label: '每月服务', color: '#AF52DE' }
     ],
     
     // 步骤配置
@@ -83,7 +83,11 @@ Page({
     // 动态输入数组
     medicalHistoryInput: '',
     medicationInput: '',
-    allergyInput: ''
+    allergyInput: '',
+    
+    // 模态选择器显示状态
+    healthStatusPickerVisible: false,
+    serviceFrequencyPickerVisible: false
   },
 
   /**
@@ -560,5 +564,57 @@ Page({
     
     const index = options.findIndex(option => option.value === value);
     return index >= 0 ? index : 0;
+  },
+
+  /**
+   * 显示健康状态选择器
+   */
+  showHealthStatusPicker() {
+    this.setData({ healthStatusPickerVisible: true });
+  },
+
+  /**
+   * 健康状态选择确认
+   */
+  onHealthStatusConfirm(e) {
+    const { value } = e.detail;
+    this.setData({
+      'formData.healthStatus': value,
+      'errors.healthStatus': null,
+      healthStatusPickerVisible: false
+    });
+  },
+
+  /**
+   * 健康状态选择取消
+   */
+  onHealthStatusCancel() {
+    this.setData({ healthStatusPickerVisible: false });
+  },
+
+  /**
+   * 显示服务频率选择器
+   */
+  showServiceFrequencyPicker() {
+    this.setData({ serviceFrequencyPickerVisible: true });
+  },
+
+  /**
+   * 服务频率选择确认
+   */
+  onServiceFrequencyConfirm(e) {
+    const { value } = e.detail;
+    this.setData({
+      'formData.serviceFrequency': value,
+      'errors.serviceFrequency': null,
+      serviceFrequencyPickerVisible: false
+    });
+  },
+
+  /**
+   * 服务频率选择取消
+   */
+  onServiceFrequencyCancel() {
+    this.setData({ serviceFrequencyPickerVisible: false });
   }
 });

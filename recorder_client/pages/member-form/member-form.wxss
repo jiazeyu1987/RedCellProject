@@ -142,39 +142,66 @@
 .input-with-button {
   display: flex;
   align-items: center;
-  margin-bottom: 20rpx;
-  gap: 15rpx;
+  margin-bottom: 30rpx;
+  gap: 24rpx;
 }
 
 .dynamic-input {
   flex: 1;
-  height: 80rpx;
-  padding: 0 20rpx;
-  border: 2rpx solid #e5e5e7;
-  border-radius: 12rpx;
-  font-size: 28rpx;
-  background: #fff;
+  height: 96rpx;
+  padding: 0 24rpx;
+  border: 2rpx solid #e0e6ed;
+  border-radius: 16rpx;
+  font-size: 32rpx;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  color: #1a1a1a;
 }
 
 .dynamic-input:focus {
   border-color: #007aff;
+  box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.15);
+  outline: none;
 }
 
 .add-btn {
-  width: 80rpx;
-  height: 80rpx;
-  background: #007aff !important;
-  border-radius: 12rpx;
+  width: 96rpx;
+  height: 96rpx;
+  background: linear-gradient(135deg, #007aff 0%, #0056d6 100%) !important;
+  border-radius: 16rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   color: #ffffff !important;
+  flex-direction: column;
+  padding: 10rpx 8rpx;
+  box-sizing: border-box;
+  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.add-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2rpx 8rpx rgba(0, 122, 255, 0.4);
 }
 
 .add-btn .iconfont {
-  font-size: 32rpx;
+  font-size: 28rpx;
   color: #ffffff !important;
+  margin-bottom: 6rpx;
+  line-height: 1;
+}
+
+.add-btn .btn-text {
+  font-size: 26rpx;
+  color: #ffffff !important;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  font-weight: 600;
 }
 
 /* 标签列表 */
@@ -560,4 +587,144 @@
 .member-form-page .bottom-actions button.action-btn.reset-btn > .iconfont {
   color: #ffffff !important;
   background-color: #ff9500 !important;
+}
+
+/* 健康状态选择器样式 */
+.health-status-wrapper {
+  margin-bottom: 40rpx;
+}
+
+.health-status-picker {
+  width: 100%;
+  height: 96rpx;
+  padding: 0 32rpx;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 2rpx solid #e0e6ed;
+  border-radius: 16rpx;
+  box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.health-status-picker:active {
+  border-color: #007AFF;
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.15);
+}
+
+.health-status-indicator {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
+}
+
+.health-status-text {
+  flex: 1;
+  font-size: 34rpx;
+  color: #1a1a1a;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.health-status-picker .picker-arrow {
+  color: #6b7280;
+  font-size: 32rpx;
+  font-weight: bold;
+  transition: transform 0.3s ease;
+}
+
+.health-status-picker:active .picker-arrow {
+  transform: rotate(90deg);
+  color: #007AFF;
+}
+
+/* 改进表单标签样式 */
+.health-status-wrapper .form-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+  position: relative;
+}
+
+.health-status-wrapper .label-text {
+  font-size: 32rpx;
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+/* 服务频率选择器样式 */
+.service-frequency-wrapper {
+  margin-bottom: 40rpx;
+}
+
+.service-frequency-picker {
+  width: 100%;
+  height: 96rpx;
+  padding: 0 32rpx;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 2rpx solid #e0e6ed;
+  border-radius: 16rpx;
+  box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.service-frequency-picker:active {
+  border-color: #007AFF;
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.15);
+}
+
+.service-frequency-indicator {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
+}
+
+.service-frequency-text {
+  flex: 1;
+  font-size: 34rpx;
+  color: #1a1a1a;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.service-frequency-picker .picker-arrow {
+  color: #6b7280;
+  font-size: 32rpx;
+  font-weight: bold;
+  transition: transform 0.3s ease;
+}
+
+.service-frequency-picker:active .picker-arrow {
+  transform: rotate(90deg);
+  color: #007AFF;
+}
+
+/* 改进表单标签样式 */
+.service-frequency-wrapper .form-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+  position: relative;
+}
+
+.service-frequency-wrapper .label-text {
+  font-size: 32rpx;
+  color: #1a1a1a;
+  font-weight: 500;
 }

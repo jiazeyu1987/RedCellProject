@@ -1,0 +1,47 @@
+<!-- 模态选择器组件 -->
+<view class="modal-picker" wx:if="{{visible}}">
+  <!-- 遮罩层 -->
+  <view class="modal-overlay" bindtap="onOverlayClick"></view>
+  
+  <!-- 弹框内容 -->
+  <view class="modal-content">
+    <!-- 头部 -->
+    <view class="modal-header">
+      <text class="modal-title">{{title}}</text>
+      <view class="close-btn" bindtap="onCancel">
+        <text class="close-icon">×</text>
+      </view>
+    </view>
+    
+    <!-- 选择器内容 -->
+    <view class="picker-content">
+      <picker-view 
+        class="picker-view" 
+        value="{{selectedIndex}}" 
+        bindchange="onPickerChange">
+        <picker-view-column>
+          <view 
+            wx:for="{{options}}" 
+            wx:key="{{item.value}}" 
+            class="picker-item">
+            <view class="picker-item-content">
+              <!-- 颜色指示器 -->
+              <view 
+                wx:if="{{item.color}}" 
+                class="picker-color-indicator" 
+                style="background-color: {{item.color}}">
+              </view>
+              <text class="picker-item-text">{{item.label}}</text>
+            </view>
+          </view>
+        </picker-view-column>
+      </picker-view>
+    </view>
+    
+    <!-- 底部按钮 -->
+    <view class="modal-footer">
+      <button class="footer-btn cancel-btn" bindtap="onCancel">取消</button>
+      <button class="footer-btn confirm-btn" bindtap="onConfirm">确定</button>
+    </view>
+  </view>
+</view>

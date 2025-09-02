@@ -60,8 +60,8 @@
       bindcancel="onPickerCancel"
     >
       <view class="form-picker {{disabled ? 'form-picker-disabled' : ''}}">
-        <text class="picker-text {{!displayValue ? 'picker-placeholder' : ''}}">
-          {{displayValue || placeholder || '请选择'}}
+        <text class="picker-text {{!value && !displayValue ? 'picker-placeholder' : ''}}">
+          {{displayValue || value || placeholder || '请选择'}}
         </text>
         <text class="picker-arrow">></text>
       </view>

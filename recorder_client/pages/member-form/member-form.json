@@ -7,6 +7,7 @@
     "loading-skeleton": "/components/loading-skeleton/loading-skeleton",
     "button": "/components/button/button",
     "form-item": "/components/form-item/form-item",
-    "status-tag": "/components/status-tag/status-tag"
+    "status-tag": "/components/status-tag/status-tag",
+    "modal-picker": "/components/modal-picker/modal-picker"
   }
 }

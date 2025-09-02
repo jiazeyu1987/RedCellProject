@@ -1,0 +1,97 @@
+/* 字体图标样式 */
+.iconfont {
+  font-family: "iconfont";
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 由于没有字体文件，我们使用文字符号来替代图标 */
+.icon-plus::before {
+  content: "+";
+  font-weight: bold;
+}
+
+.icon-medical::before {
+  content: "🏥";
+}
+
+.icon-pill::before {
+  content: "💊";
+}
+
+.icon-warning::before {
+  content: "⚠️";
+}
+
+.icon-close::before {
+  content: "×";
+  font-weight: bold;
+}
+
+.icon-eye::before {
+  content: "👁";
+}
+
+.icon-edit::before {
+  content: "✏️";
+}
+
+.icon-user::before {
+  content: "👤";
+}
+
+.icon-phone::before {
+  content: "📞";
+}
+
+.icon-heart::before {
+  content: "❤️";
+}
+
+.icon-note::before {
+  content: "📝";
+}
+
+.icon-arrow-left::before {
+  content: "←";
+}
+
+.icon-arrow-right::before {
+  content: "→";
+}
+
+.icon-more::before {
+  content: "⋯";
+}
+
+.icon-message::before {
+  content: "💬";
+}
+
+.icon-filter::before {
+  content: "🔽";
+}
+
+.icon-search::before {
+  content: "🔍";
+}
+
+.icon-list::before {
+  content: "☰";
+}
+
+.icon-grid::before {
+  content: "⊞";
+}
+
+.icon-check::before {
+  content: "✓";
+}
+
+/* 确保图标正确显示 */
+.iconfont::before {
+  display: inline-block;
+  vertical-align: middle;
+}

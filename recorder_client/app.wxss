@@ -3,6 +3,7 @@
 /* 导入全局样式 */
 @import "styles/variables.wxss";
 @import "styles/global.wxss";
+@import "styles/iconfont.wxss";
 
 /* app.wxss 应用级样式 */
 .app {

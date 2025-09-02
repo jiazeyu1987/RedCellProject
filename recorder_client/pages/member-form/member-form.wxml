@@ -129,23 +129,29 @@
         </view>
         
         <view class="form-section">
-          <form-item 
-            label="健康状态"
-            type="picker"
-            value="{{healthStatusOptions[getPickerIndex('healthStatus', formData.healthStatus)].label}}"
-            range="{{healthStatusOptions}}"
-            rangeKey="label"
-            data-field="healthStatus"
-            bind:change="onPickerChange" />
+          <!-- 健康状态选择器 -->
+          <view class="health-status-wrapper">
+            <view class="form-label">
+              <text class="label-text">健康状态</text>
+            </view>
+            <view class="health-status-picker" bindtap="showHealthStatusPicker">
+              <view class="health-status-indicator" style="background-color: {{healthStatusOptions[getPickerIndex('healthStatus', formData.healthStatus)].color}}"></view>
+              <text class="health-status-text">{{healthStatusOptions[getPickerIndex('healthStatus', formData.healthStatus)].label}}</text>
+              <text class="picker-arrow">></text>
+            </view>
+          </view>
           
-          <form-item 
-            label="服务频率"
-            type="picker"
-            value="{{serviceFrequencyOptions[getPickerIndex('serviceFrequency', formData.serviceFrequency)].label}}"
-            range="{{serviceFrequencyOptions}}"
-            rangeKey="label"
-            data-field="serviceFrequency"
-            bind:change="onPickerChange" />
+          <!-- 服务频率选择器 -->
+          <view class="service-frequency-wrapper">
+            <view class="form-label">
+              <text class="label-text">服务频率</text>
+            </view>
+            <view class="service-frequency-picker" bindtap="showServiceFrequencyPicker">
+              <view class="service-frequency-indicator" style="background-color: {{serviceFrequencyOptions[getPickerIndex('serviceFrequency', formData.serviceFrequency)].color}}"></view>
+              <text class="service-frequency-text">{{serviceFrequencyOptions[getPickerIndex('serviceFrequency', formData.serviceFrequency)].label}}</text>
+              <text class="picker-arrow">></text>
+            </view>
+          </view>
         </view>
         
         <!-- 医疗历史 -->
@@ -164,6 +170,7 @@
               bind:input="onDynamicInputChange" />
             <button class="add-btn" bind:tap="onAddMedicalHistory">
               <text class="iconfont icon-plus"></text>
+              <text class="btn-text">添加</text>
             </button>
           </view>
           
@@ -197,6 +204,7 @@
               bind:input="onDynamicInputChange" />
             <button class="add-btn" bind:tap="onAddMedication">
               <text class="iconfont icon-plus"></text>
+              <text class="btn-text">添加</text>
             </button>
           </view>
           
@@ -230,6 +238,7 @@
               bind:input="onDynamicInputChange" />
             <button class="add-btn" bind:tap="onAddAllergy">
               <text class="iconfont icon-plus"></text>
+              <text class="btn-text">添加</text>
             </button>
           </view>
           
@@ -351,3 +360,23 @@
     </view>
   </view>
 </view>
+
+<!-- 健康状态选择器 -->
+<modal-picker
+  visible="{{healthStatusPickerVisible}}"
+  title="选择健康状态"
+  options="{{healthStatusOptions}}"
+  value="{{formData.healthStatus}}"
+  bind:confirm="onHealthStatusConfirm"
+  bind:cancel="onHealthStatusCancel"
+/>
+
+<!-- 服务频率选择器 -->
+<modal-picker
+  visible="{{serviceFrequencyPickerVisible}}"
+  title="选择服务频率"
+  options="{{serviceFrequencyOptions}}"
+  value="{{formData.serviceFrequency}}"
+  bind:confirm="onServiceFrequencyConfirm"
+  bind:cancel="onServiceFrequencyCancel"
+/>
