@@ -3,21 +3,205 @@
  * 提供模板的增删改查、版本管理、审核等功能
  */
 
-import {
+const {
   NOTIFICATION_TYPES,
   NOTIFICATION_CHANNELS,
   NOTIFICATION_TEMPLATES
-} from '../constants/notification-config.js';
+} = require('../constants/notification-config.js');
 
-import {
+const {
   TEMPLATE_TYPES,
   MESSAGE_FORMATS,
   getTemplateTypeConfig,
   getFormatConfig,
   validateTypeFormatCompatibility
-} from '../constants/template-types.js';
+} = require('../constants/template-types.js');
 
-import TemplateTypeFactory from './template-type-factory.js';
+const templateTypeFactory = require('./template-type-factory.js');
+
+/**
+ * 文本消息渲染器
+ */
+class TextMessageRenderer {
+  render(template, data) {
+    try {
+      let content = template.content || '';
+      let title = template.title || '';
+      
+      // 替换变量
+      Object.keys(data).forEach(key => {
+        const regex = new RegExp(`\\{${key}\\}`, 'g');
+        content = content.replace(regex, data[key] || '');
+        title = title.replace(regex, data[key] || '');
+      });
+      
+      return {
+        type: 'text',
+        title: title.trim(),
+        content: content.trim(),
+        length: content.trim().length,
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error('[文本渲染器] 渲染失败:', error);
+      throw error;
+    }
+  }
+}
+
+/**
+ * 卡片消息渲染器
+ */
+class CardMessageRenderer {
+  render(template, data) {
+    try {
+      let content = template.content || '';
+      let title = template.title || '';
+      let description = template.description || '';
+      let imageUrl = template.imageUrl || '';
+      let linkUrl = template.linkUrl || '';
+      
+      // 替换变量
+      Object.keys(data).forEach(key => {
+        const regex = new RegExp(`\\{${key}\\}`, 'g');
+        content = content.replace(regex, data[key] || '');
+        title = title.replace(regex, data[key] || '');
+        description = description.replace(regex, data[key] || '');
+        imageUrl = imageUrl.replace(regex, data[key] || '');
+        linkUrl = linkUrl.replace(regex, data[key] || '');
+      });
+      
+      return {
+        type: 'card',
+        title: title.trim(),
+        content: content.trim(),
+        description: description.trim(),
+        imageUrl: imageUrl.trim(),
+        linkUrl: linkUrl.trim(),
+        actions: template.actions || [],
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error('[卡片渲染器] 渲染失败:', error);
+      throw error;
+    }
+  }
+}
+
+/**
+ * 图文消息渲染器
+ */
+class ImageTextMessageRenderer {
+  render(template, data) {
+    try {
+      let content = template.content || '';
+      let title = template.title || '';
+      let imageUrl = template.imageUrl || '';
+      let linkUrl = template.linkUrl || '';
+      
+      // 替换变量
+      Object.keys(data).forEach(key => {
+        const regex = new RegExp(`\\{${key}\\}`, 'g');
+        content = content.replace(regex, data[key] || '');
+        title = title.replace(regex, data[key] || '');
+        imageUrl = imageUrl.replace(regex, data[key] || '');
+        linkUrl = linkUrl.replace(regex, data[key] || '');
+      });
+      
+      return {
+        type: 'image_text',
+        title: title.trim(),
+        content: content.trim(),
+        imageUrl: imageUrl.trim(),
+        linkUrl: linkUrl.trim(),
+        layout: template.layout || 'vertical',
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error('[图文渲染器] 渲染失败:', error);
+      throw error;
+    }
+  }
+}
+
+/**
+ * 富文本消息渲染器
+ */
+class RichTextMessageRenderer {
+  render(template, data) {
+    try {
+      let content = template.content || '';
+      let title = template.title || '';
+      
+      // 替换变量
+      Object.keys(data).forEach(key => {
+        const regex = new RegExp(`\\{${key}\\}`, 'g');
+        content = content.replace(regex, data[key] || '');
+        title = title.replace(regex, data[key] || '');
+      });
+      
+      // 处理 Markdown 格式
+      const processedContent = this.processMarkdown(content);
+      
+      return {
+        type: 'rich_text',
+        title: title.trim(),
+        content: processedContent,
+        rawContent: content.trim(),
+        styles: template.styles || {},
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error('[富文本渲染器] 渲染失败:', error);
+      throw error;
+    }
+  }
+  
+  processMarkdown(content) {
+    // 简单的 Markdown 处理
+    return content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br/>');
+  }
+}
+
+/**
+ * 自定义消息渲染器
+ */
+class CustomMessageRenderer {
+  render(template, data) {
+    try {
+      // 自定义渲染逻辑
+      const customRender = template.customRenderer;
+      
+      if (customRender && typeof customRender === 'function') {
+        return customRender(template, data);
+      }
+      
+      // 默认处理
+      let content = template.content || '';
+      let title = template.title || '';
+      
+      Object.keys(data).forEach(key => {
+        const regex = new RegExp(`\\{${key}\\}`, 'g');
+        content = content.replace(regex, data[key] || '');
+        title = title.replace(regex, data[key] || '');
+      });
+      
+      return {
+        type: 'custom',
+        title: title.trim(),
+        content: content.trim(),
+        customData: template.customData || {},
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error('[自定义渲染器] 渲染失败:', error);
+      throw error;
+    }
+  }
+}
 
 /**
  * 通知模板管理服务
@@ -32,13 +216,34 @@ class TemplateManager {
     this.lastUpdateTime = 0;
     
     // 模板类型工厂
-    this.typeFactory = new TemplateTypeFactory();
+    this.typeFactory = templateTypeFactory;
     
     // 模板类型渲染器
     this.renderers = new Map();
     
     // 初始化渲染器
     this.initializeRenderers();
+  }
+
+  /**
+   * 初始化模板管理器
+   */
+  async init() {
+    try {
+      console.log('[TemplateManager] 初始化模板管理器...');
+      
+      // 初始化渲染器
+      this.initializeRenderers();
+      
+      // 加载默认模板
+      await this.loadDefaultTemplates();
+      
+      console.log('[TemplateManager] 模板管理器初始化完成');
+      return true;
+    } catch (error) {
+      console.error('[TemplateManager] 初始化失败:', error);
+      return false;
+    }
   }
 
   /**
@@ -62,6 +267,32 @@ class TemplateManager {
   }
 
   /**
+   * 加载默认模板
+   */
+  async loadDefaultTemplates() {
+    try {
+      // 为每种通知类型创建默认模板
+      const notificationTypes = Object.values(TEMPLATE_TYPES);
+      
+      for (const type of notificationTypes) {
+        try {
+          const defaultTemplate = this.getDefaultTemplateByType(type);
+          if (defaultTemplate) {
+            this.templates.set(defaultTemplate.id, defaultTemplate);
+          }
+        } catch (error) {
+          console.warn(`[TemplateManager] 加载默认模板失败 ${type}:`, error);
+        }
+      }
+      
+      console.log(`[TemplateManager] 已加载 ${this.templates.size} 个默认模板`);
+    } catch (error) {
+      console.error('[TemplateManager] 加载默认模板失败:', error);
+      throw error;
+    }
+  }
+
+  /**
    * 创建模板实例
    */
   async createTemplateInstance(type, format, options = {}) {
@@ -78,6 +309,29 @@ class TemplateManager {
     } catch (error) {
       console.error('[模板管理器] 创建模板实例失败:', error);
       throw error;
+    }
+  }
+
+  /**
+   * 渲染模板
+   * @param {Object} template 模板对象
+   * @param {Object} data 渲染数据
+   * @returns {Object} 渲染结果
+   */
+  renderTemplate(template, data = {}) {
+    try {
+      if (!template) {
+        throw new Error('模板不能为空');
+      }
+
+      // 获取模板格式，默认为文本格式
+      const format = template.format || MESSAGE_FORMATS.TEXT;
+      
+      // 调用渲染模板内容方法
+      return this.renderTemplateContent(template, data, format);
+    } catch (error) {
+      console.error('[TemplateManager] 渲染模板失败:', error);
+      return null;
     }
   }
 
@@ -903,189 +1157,5 @@ class TemplateManager {
 
 // 创建单例实例
 const templateManager = new TemplateManager();
-
-/**
- * 文本消息渲染器
- */
-class TextMessageRenderer {
-  render(template, data) {
-    try {
-      let content = template.content || '';
-      let title = template.title || '';
-      
-      // 替换变量
-      Object.keys(data).forEach(key => {
-        const regex = new RegExp(`\\{${key}\\}`, 'g');
-        content = content.replace(regex, data[key] || '');
-        title = title.replace(regex, data[key] || '');
-      });
-      
-      return {
-        type: 'text',
-        title: title.trim(),
-        content: content.trim(),
-        length: content.trim().length,
-        timestamp: new Date().toISOString()
-      };
-    } catch (error) {
-      console.error('[文本渲染器] 渲染失败:', error);
-      throw error;
-    }
-  }
-}
-
-/**
- * 卡片消息渲染器
- */
-class CardMessageRenderer {
-  render(template, data) {
-    try {
-      let content = template.content || '';
-      let title = template.title || '';
-      let description = template.description || '';
-      let imageUrl = template.imageUrl || '';
-      let linkUrl = template.linkUrl || '';
-      
-      // 替换变量
-      Object.keys(data).forEach(key => {
-        const regex = new RegExp(`\\{${key}\\}`, 'g');
-        content = content.replace(regex, data[key] || '');
-        title = title.replace(regex, data[key] || '');
-        description = description.replace(regex, data[key] || '');
-        imageUrl = imageUrl.replace(regex, data[key] || '');
-        linkUrl = linkUrl.replace(regex, data[key] || '');
-      });
-      
-      return {
-        type: 'card',
-        title: title.trim(),
-        content: content.trim(),
-        description: description.trim(),
-        imageUrl: imageUrl.trim(),
-        linkUrl: linkUrl.trim(),
-        actions: template.actions || [],
-        timestamp: new Date().toISOString()
-      };
-    } catch (error) {
-      console.error('[卡片渲染器] 渲染失败:', error);
-      throw error;
-    }
-  }
-}
-
-/**
- * 图文消息渲染器
- */
-class ImageTextMessageRenderer {
-  render(template, data) {
-    try {
-      let content = template.content || '';
-      let title = template.title || '';
-      let imageUrl = template.imageUrl || '';
-      let linkUrl = template.linkUrl || '';
-      
-      // 替换变量
-      Object.keys(data).forEach(key => {
-        const regex = new RegExp(`\\{${key}\\}`, 'g');
-        content = content.replace(regex, data[key] || '');
-        title = title.replace(regex, data[key] || '');
-        imageUrl = imageUrl.replace(regex, data[key] || '');
-        linkUrl = linkUrl.replace(regex, data[key] || '');
-      });
-      
-      return {
-        type: 'image_text',
-        title: title.trim(),
-        content: content.trim(),
-        imageUrl: imageUrl.trim(),
-        linkUrl: linkUrl.trim(),
-        layout: template.layout || 'vertical',
-        timestamp: new Date().toISOString()
-      };
-    } catch (error) {
-      console.error('[图文渲染器] 渲染失败:', error);
-      throw error;
-    }
-  }
-}
-
-/**
- * 富文本消息渲染器
- */
-class RichTextMessageRenderer {
-  render(template, data) {
-    try {
-      let content = template.content || '';
-      let title = template.title || '';
-      
-      // 替换变量
-      Object.keys(data).forEach(key => {
-        const regex = new RegExp(`\\{${key}\\}`, 'g');
-        content = content.replace(regex, data[key] || '');
-        title = title.replace(regex, data[key] || '');
-      });
-      
-      // 处理 Markdown 格式
-      const processedContent = this.processMarkdown(content);
-      
-      return {
-        type: 'rich_text',
-        title: title.trim(),
-        content: processedContent,
-        rawContent: content.trim(),
-        styles: template.styles || {},
-        timestamp: new Date().toISOString()
-      };
-    } catch (error) {
-      console.error('[富文本渲染器] 渲染失败:', error);
-      throw error;
-    }
-  }
-  
-  processMarkdown(content) {
-    // 简单的 Markdown 处理
-    return content
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/\n/g, '<br/>');
-  }
-}
-
-/**
- * 自定义消息渲染器
- */
-class CustomMessageRenderer {
-  render(template, data) {
-    try {
-      // 自定义渲染逻辑
-      const customRender = template.customRenderer;
-      
-      if (customRender && typeof customRender === 'function') {
-        return customRender(template, data);
-      }
-      
-      // 默认处理
-      let content = template.content || '';
-      let title = template.title || '';
-      
-      Object.keys(data).forEach(key => {
-        const regex = new RegExp(`\\{${key}\\}`, 'g');
-        content = content.replace(regex, data[key] || '');
-        title = title.replace(regex, data[key] || '');
-      });
-      
-      return {
-        type: 'custom',
-        title: title.trim(),
-        content: content.trim(),
-        customData: template.customData || {},
-        timestamp: new Date().toISOString()
-      };
-    } catch (error) {
-      console.error('[自定义渲染器] 渲染失败:', error);
-      throw error;
-    }
-  }
-}
 
 module.exports = templateManager;

@@ -388,6 +388,182 @@ class AdjustmentApprovalService {
     // 过滤和排序...
     return approvals;
   }
+
+  /**
+   * 获取用户的审批任务列表
+   * @param {string} userId 用户ID
+   * @param {Object} options 查询选项
+   * @returns {Promise<Array>} 审批任务列表
+   */
+  static async getApprovalTasks(userId, options = {}) {
+    try {
+      const {
+        status = null,
+        sortBy = 'priority'
+      } = options;
+      
+      // 获取用户信息
+      const userInfo = wx.getStorageSync('userInfo') || { id: userId };
+      
+      // 调用现有的 getUserApprovalList 方法
+      const approvals = await this.getUserApprovalList(userInfo, {
+        status,
+        role: 'approver'
+      });
+      
+      // 按照指定方式排序
+      return this.sortApprovalTasks(approvals, sortBy);
+      
+    } catch (error) {
+      console.error('获取审批任务列表失败:', error);
+      return [];
+    }
+  }
+
+  /**
+   * 获取审批状态
+   * @param {string} requestId 申请ID
+   * @returns {Promise<Object>} 审批状态
+   */
+  static async getApprovalStatus(requestId) {
+    try {
+      const approvalRecord = await this.getApprovalRecord(requestId);
+      if (!approvalRecord) {
+        return null;
+      }
+      
+      return {
+        requestId: approvalRecord.id,
+        status: approvalRecord.status,
+        currentStep: approvalRecord.currentStep,
+        workflow: approvalRecord.workflow,
+        steps: approvalRecord.steps,
+        adjustmentRequest: approvalRecord.adjustmentRequest,
+        applicant: approvalRecord.applicant,
+        createdAt: approvalRecord.createdAt,
+        updatedAt: approvalRecord.updatedAt
+      };
+      
+    } catch (error) {
+      console.error('获取审批状态失败:', error);
+      return null;
+    }
+  }
+
+  /**
+   * 处理审批
+   * @param {string} requestId 申请ID
+   * @param {Object} approvalData 审批数据
+   * @returns {Promise<Object>} 处理结果
+   */
+  static async processApproval(requestId, approvalData) {
+    try {
+      const {
+        approverId,
+        decision,
+        comment
+      } = approvalData;
+      
+      // 获取审批人信息
+      const approverInfo = {
+        id: approverId,
+        name: '审批人',
+        role: 'approver'
+      };
+      
+      // 构建审批决策
+      const decisionData = {
+        action: decision,
+        comments: comment,
+        timestamp: new Date()
+      };
+      
+      // 调用现有的 processApprovalDecision 方法
+      return await this.processApprovalDecision(requestId, approverInfo, decisionData);
+      
+    } catch (error) {
+      console.error('处理审批失败:', error);
+      return {
+        success: false,
+        error: error.message || '审批处理失败'
+      };
+    }
+  }
+
+  /**
+   * 创建调整申请
+   * @param {Object} requestData 申请数据
+   * @returns {Promise<Object>} 创建结果
+   */
+  static async createAdjustmentRequest(requestData) {
+    try {
+      // 获取用户信息
+      const userInfo = {
+        id: requestData.applicantId,
+        name: '申请人',
+        role: 'recorder'
+      };
+      
+      // 构建调整数据
+      const adjustData = {
+        appointmentId: requestData.appointmentId,
+        originalTime: requestData.originalTime,
+        newTime: requestData.newTime,
+        reason: requestData.reason,
+        reasonCategory: requestData.reasonCategory,
+        urgentLevel: requestData.urgentLevel,
+        batchAdjust: requestData.batchAdjust,
+        affectedAppointments: requestData.affectedAppointments
+      };
+      
+      // 调用现有的 createAdjustmentApproval 方法
+      const result = await this.createAdjustmentApproval(userInfo, adjustData);
+      
+      return {
+        success: result.success,
+        requireApproval: result.success && result.status === 'pending',
+        approvalId: result.approvalId,
+        error: result.message
+      };
+      
+    } catch (error) {
+      console.error('创建调整申请失败:', error);
+      return {
+        success: false,
+        error: error.message || '申请创建失败'
+      };
+    }
+  }
+
+  /**
+   * 排序审批任务
+   * @param {Array} tasks 任务列表
+   * @param {string} sortBy 排序方式
+   * @returns {Array} 排序后的任务列表
+   */
+  static sortApprovalTasks(tasks, sortBy) {
+    const sortedTasks = [...tasks];
+    
+    switch (sortBy) {
+      case 'priority':
+        sortedTasks.sort((a, b) => {
+          const priorityOrder = { urgent: 4, high: 3, medium: 2, normal: 1 };
+          return (priorityOrder[b.metadata?.priority] || 1) - (priorityOrder[a.metadata?.priority] || 1);
+        });
+        break;
+      case 'time':
+        sortedTasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        break;
+      case 'type':
+        sortedTasks.sort((a, b) => (a.adjustmentRequest?.reasonCategory || '').localeCompare(b.adjustmentRequest?.reasonCategory || ''));
+        break;
+      default:
+        // 默认按创建时间排序
+        sortedTasks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+    
+    return sortedTasks;
+  }
 }
 
 module.exports = AdjustmentApprovalService;

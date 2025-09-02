@@ -77,6 +77,31 @@ class TimeAdjustNotificationService {
     }
   }
 
+  /**
+   * 确保通知服务已初始化
+   */
+  async ensureNotificationServiceInitialized() {
+    if (!this.notificationService) {
+      this.notificationService = new NotificationService();
+      await this.notificationService.init();
+    }
+  }
+
+  /**
+   * 安全的创建并发送通知方法
+   * @param {Object} notificationData 通知数据
+   * @returns {Promise<boolean>} 发送结果
+   */
+  async safeCreateAndSend(notificationData) {
+    try {
+      await this.ensureNotificationServiceInitialized();
+      return await this.notificationService.createAndSend(notificationData);
+    } catch (error) {
+      console.error('[TimeAdjustNotificationService] 安全发送通知失败:', error);
+      return false;
+    }
+  }
+
   // ========== 增强的患者通知功能 ==========
   
   /**
@@ -445,7 +470,7 @@ class TimeAdjustNotificationService {
         templateId: TEMPLATE_TYPES.TIME_ADJUST_BATCH
       };
 
-      return await this.notificationService.createAndSend(notificationData);
+      return await this.safeCreateAndSend(notificationData);
     } catch (error) {
       console.error('[TimeAdjustNotificationService] 发送批量调整通知失败:', error);
       return false;

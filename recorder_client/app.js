@@ -70,7 +70,7 @@ App({
     
     // 重定向到首页
     wx.reLaunch({
-      url: '/pages/home/home'
+      url: '/pages/index/index'
     });
   },
 

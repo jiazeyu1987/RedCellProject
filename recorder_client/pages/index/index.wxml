@@ -1,126 +1,136 @@
-<!--index.wxml-->
-<!-- 自定义导航栏 -->
-<navigation-bar title="工作台" back="{{false}}" color="white" background="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></navigation-bar>
-
-<!-- 主内容区域 -->
-<scroll-view class="scrollarea" scroll-y type="list" refresher-enabled="{{true}}" bindrefresherrefresh="onRefresh" refresher-triggered="{{refreshing}}">
-  <view class="home-container">
-    
-    <!-- 顶部信息栏 -->
-    <view class="header-section">
-      <view class="user-info">
-        <image class="user-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="cover"></image>
-        <view class="user-details">
-          <text class="user-name">{{userInfo.nickName || '记录员'}}</text>
-          <view class="user-status" bindtap="onWorkStatusTap">
-            <text class="status-dot status-{{workStatus}}"></text>
-            <text class="status-text">{{statusText}}</text>
-            <text class="status-arrow">▸</text>
-          </view>
-        </view>
+<!--pages/index/index.wxml-->
+<view class="index-container">
+  <!-- 顶部用户信息 -->
+  <view class="user-header">
+    <view class="avatar-container">
+      <image 
+        class="avatar" 
+        src="{{userInfo.avatarUrl || '/assets/images/default-avatar.png'}}"
+        mode="aspectFill"
+      />
+    </view>
+    <view class="user-info">
+      <text class="nickname">{{userInfo.nickName || '记录员'}}</text>
+      <view class="status-container">
+        <text class="status {{workStatus}}">{{statusText}}</text>
+        <view class="status-dot {{workStatus}}"></view>
       </view>
-      <view class="header-actions">
-        <view class="notification-icon" bindtap="onNotificationTap">
-          <text class="icon-bell">🔔</text>
-          <text wx:if="{{unreadCount > 0}}" class="notification-badge">{{unreadCount}}</text>
+    </view>
+    <view class="notification-icon" bind:tap="goToNotifications">
+      <text class="icon">🔔</text>
+      <view class="badge" wx:if="{{unreadCount > 0}}">{{unreadCount > 99 ? '99+' : unreadCount}}</view>
+    </view>
+  </view>
+
+  <!-- 今日任务卡片 -->
+  <view class="task-card">
+    <view class="card-header">
+      <text class="card-title">今日任务</text>
+      <text class="card-subtitle">{{todayTasksSubtitle}}</text>
+    </view>
+    <view class="task-stats">
+      <view class="stat-item">
+        <text class="stat-number">{{todayTasks.total}}</text>
+        <text class="stat-label">总计</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number pending">{{todayTasks.pending}}</text>
+        <text class="stat-label">待完成</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number completed">{{todayTasks.completed}}</text>
+        <text class="stat-label">已完成</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 紧急任务列表 -->
+  <view class="urgent-tasks" wx:if="{{urgentTasks.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">🚨 紧急任务</text>
+    </view>
+    <view class="task-list">
+      <view 
+        class="task-item" 
+        wx:for="{{urgentTasks}}" 
+        wx:key="id"
+        bind:tap="goToTaskDetail"
+        data-id="{{item.id}}"
+      >
+        <view class="task-time">{{item.time}}</view>
+        <view class="task-content">
+          <text class="patient-name">{{item.patientName}}</text>
+          <text class="service-name">{{item.serviceName}}</text>
+        </view>
+        <view class="task-arrow">▶</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 本周统计 -->
+  <view class="week-stats">
+    <view class="card-header">
+      <text class="card-title">本周统计</text>
+      <text class="card-subtitle">{{weekStatsSubtitle}}</text>
+    </view>
+    <view class="stats-grid">
+      <view class="stat-card">
+        <text class="stat-value">{{weekStats.serviceCount}}</text>
+        <text class="stat-label">服务次数</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-value">{{weekStats.totalHours}}</text>
+        <text class="stat-label">服务时长</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-value">￥{{weekStats.income}}</text>
+        <text class="stat-label">收入</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 通知消息 -->
+  <view class="notices" wx:if="{{notices.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">📢 消息通知</text>
+      <text class="see-all" bind:tap="goToNotifications">查看全部</text>
+    </view>
+    <view class="notice-list">
+      <view 
+        class="notice-item" 
+        wx:for="{{notices}}" 
+        wx:key="id"
+        bind:tap="goToNoticeDetail"
+        data-id="{{item.id}}"
+      >
+        <view class="notice-icon">{{item.icon}}</view>
+        <view class="notice-content">
+          <text class="notice-title">{{item.title}}</text>
+          <text class="notice-desc">{{item.description}}</text>
+          <text class="notice-time">{{item.time}}</text>
         </view>
       </view>
     </view>
-
-    <!-- 今日任务概览 -->
-    <card title="今日任务" subtitle="{{todayTasksSubtitle}}" extra="{{true}}" clickable="{{true}}" bind:cardclick="onTodayTasksTap">
-      <view slot="extra" class="card-extra-text" bindtap="onTodayTasksTap">查看全部</view>
-      <view class="tasks-overview">
-        <view class="task-stat">
-          <text class="stat-number">{{todayTasks.total}}</text>
-          <text class="stat-label">总任务</text>
-        </view>
-        <view class="task-stat">
-          <text class="stat-number">{{todayTasks.pending}}</text>
-          <text class="stat-label">待完成</text>
-        </view>
-        <view class="task-stat">
-          <text class="stat-number">{{todayTasks.completed}}</text>
-          <text class="stat-label">已完成</text>
-        </view>
-      </view>
-      
-      <!-- 紧急任务列表 -->
-      <view wx:if="{{urgentTasks.length > 0}}" class="urgent-tasks">
-        <text class="urgent-title">紧急任务</text>
-        <view wx:for="{{urgentTasks}}" wx:key="id" class="urgent-task-item" bindtap="onTaskItemTap" data-task="{{item}}">
-          <text class="urgent-time">{{item.time}}</text>
-          <text class="urgent-patient">{{item.patientName}}</text>
-          <text class="urgent-service">{{item.serviceName}}</text>
-        </view>
-      </view>
-    </card>
-
-    <!-- 本周统计 -->
-    <card title="本周统计" subtitle="{{weekStatsSubtitle}}" type="bordered">
-      <view class="week-stats">
-        <view class="stat-item">
-          <text class="stat-icon">📊</text>
-          <view class="stat-content">
-            <text class="stat-value">{{weekStats.serviceCount}}</text>
-            <text class="stat-desc">服务次数</text>
-          </view>
-        </view>
-        <view class="stat-item">
-          <text class="stat-icon">⏱️</text>
-          <view class="stat-content">
-            <text class="stat-value">{{weekStats.totalHours}}</text>
-            <text class="stat-desc">服务时长</text>
-          </view>
-        </view>
-        <view class="stat-item">
-          <text class="stat-icon">💰</text>
-          <view class="stat-content">
-            <text class="stat-value">¥{{weekStats.income}}</text>
-            <text class="stat-desc">本周收入</text>
-          </view>
-        </view>
-      </view>
-    </card>
-
-    <!-- 快捷操作区域 -->
-    <card title="快捷操作" showFooter="{{false}}">
-      <view class="quick-actions">
-        <view class="action-item" bindtap="onQuickAction" data-action="startService">
-          <text class="action-icon">🏥</text>
-          <text class="action-label">开始服务</text>
-        </view>
-        <view class="action-item" bindtap="onQuickAction" data-action="patientFiles">
-          <text class="action-icon">👥</text>
-          <text class="action-label">患者档案</text>
-        </view>
-        <view class="action-item" bindtap="onQuickAction" data-action="schedule">
-          <text class="action-icon">📅</text>
-          <text class="action-label">日程管理</text>
-        </view>
-        <view class="action-item" bindtap="onQuickAction" data-action="payment">
-          <text class="action-icon">💳</text>
-          <text class="action-label">付款管理</text>
-        </view>
-      </view>
-    </card>
-
-    <!-- 紧急通知区域 -->
-    <card wx:if="{{notices.length > 0}}" title="紧急通知" type="shadow-none" extraClass="notice-card">
-      <view class="notices-list">
-        <view wx:for="{{notices}}" wx:key="id" class="notice-item notice-{{item.type}}" bindtap="onNoticeTap" data-notice="{{item}}">
-          <text class="notice-icon">{{item.icon}}</text>
-          <view class="notice-content">
-            <text class="notice-title">{{item.title}}</text>
-            <text class="notice-desc">{{item.description}}</text>
-            <text class="notice-time">{{item.time}}</text>
-          </view>
-          <text class="notice-arrow">></text>
-        </view>
-      </view>
-    </card>
-
-    <!-- 底部安全区域 -->
-    <view class="bottom-safe-area"></view>
   </view>
-</scroll-view>
+
+  <!-- 快捷操作按钮 -->
+  <view class="quick-actions">
+    <view class="action-button" bind:tap="goToSchedule">
+      <text class="action-icon">📅</text>
+      <text class="action-text">日程管理</text>
+    </view>
+    <view class="action-button" bind:tap="goToPatients">
+      <text class="action-icon">👥</text>
+      <text class="action-text">患者管理</text>
+    </view>
+    <view class="action-button" bind:tap="goToSettings">
+      <text class="action-icon">⚙️</text>
+      <text class="action-text">设置</text>
+    </view>
+  </view>
+</view>
+
+<!-- 下拉刷新提示 -->
+<view class="refresh-tip" wx:if="{{refreshing}}">
+  正在刷新...
+</view>

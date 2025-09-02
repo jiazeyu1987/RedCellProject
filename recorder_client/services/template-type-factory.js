@@ -3,7 +3,7 @@
  * 负责根据不同类型创建和配置通知模板
  */
 
-import {
+const {
   TEMPLATE_TYPES,
   MESSAGE_FORMATS,
   NOTIFICATION_CHANNELS,
@@ -13,7 +13,7 @@ import {
   validateTypeFormatCompatibility,
   validateTypeChannelCompatibility,
   getDefaultTemplate
-} from '../constants/template-types.js';
+} = require('../constants/template-types.js');
 
 class TemplateTypeFactory {
   constructor() {
@@ -670,4 +670,4 @@ class SmsRenderer extends DefaultTemplateRenderer {
 // 创建单例实例
 const templateTypeFactory = new TemplateTypeFactory();
 
-export default templateTypeFactory;
+module.exports = templateTypeFactory;

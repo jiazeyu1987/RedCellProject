@@ -142,6 +142,31 @@ const ScheduleAPI = {
     });
   },
   
+  // 记录不在家原因
+  recordNoShow: (noShowData) => {
+    return http.post('/schedule/no-show/record', noShowData);
+  },
+  
+  // 记录不在家处理详情
+  recordNoShowHandling: (handlingData) => {
+    return http.post('/schedule/no-show/handling', handlingData);
+  },
+  
+  // 记录联系尝试
+  recordContactAttempt: (attemptData) => {
+    return http.post('/schedule/contact-attempt', attemptData);
+  },
+  
+  // 记录等待结果
+  recordWaitingResult: (waitingData) => {
+    return http.post('/schedule/waiting-result', waitingData);
+  },
+  
+  // 发送短信
+  sendSms: (smsData) => {
+    return http.post('/notification/sms/send', smsData);
+  },
+  
   // 开始服务
   startService: (scheduleId, location) => {
     return http.post(`/schedule/start/${scheduleId}`, {
@@ -205,8 +230,172 @@ const PatientAPI = {
   },
   
   // 获取家庭成员列表
-  getFamilyMembers: (patientId) => {
-    return http.get(`/patient/family/${patientId}`);
+  getFamilyMembers: (params) => {
+    return http.get('/patient/family/members', params);
+  },
+  
+  // 获取家庭成员详情
+  getFamilyMemberDetail: (memberId) => {
+    return http.get(`/patient/family/member/${memberId}`);
+  },
+  
+  // 添加家庭成员
+  addFamilyMember: (memberData) => {
+    return http.post('/patient/family/member/add', memberData);
+  },
+  
+  // 更新家庭成员信息
+  updateFamilyMember: (memberId, updateData) => {
+    return http.put(`/patient/family/member/${memberId}`, updateData);
+  },
+  
+  // 删除家庭成员
+  deleteFamilyMember: (memberId) => {
+    return http.delete(`/patient/family/member/${memberId}`);
+  },
+  
+  // 批量操作家庭成员
+  batchOperateMembers: (operation, memberIds, operationData) => {
+    return http.post('/patient/family/member/batch', {
+      operation,
+      memberIds,
+      operationData
+    });
+  },
+  
+  // 获取家庭统计信息
+  getFamilyStatistics: () => {
+    return http.get('/patient/family/statistics');
+  },
+  
+  // 搜索家庭成员
+  searchFamilyMembers: (keyword, filters) => {
+    return http.get('/patient/family/search', { keyword, ...filters });
+  },
+  
+  // 导出家庭档案
+  exportFamilyArchive: (format = 'json') => {
+    return http.get('/patient/family/export', { format });
+  },
+  
+  // 上传成员头像
+  uploadMemberAvatar: (memberId, filePath) => {
+    return http.upload(`/patient/family/member/${memberId}/avatar`, filePath);
+  },
+  
+  // 获取成员健康档案
+  getMemberHealthRecord: (memberId) => {
+    return http.get(`/patient/family/member/${memberId}/health-record`);
+  },
+  
+  // 更新成员健康档案
+  updateMemberHealthRecord: (memberId, healthData) => {
+    return http.put(`/patient/family/member/${memberId}/health-record`, healthData);
+  },
+  
+  // 获取成员服务历史
+  getMemberServiceHistory: (memberId, params) => {
+    return http.get(`/patient/family/member/${memberId}/service-history`, params);
+  },
+  
+  // 设置成员关系
+  setMemberRelationship: (memberId, relationshipData) => {
+    return http.put(`/patient/family/member/${memberId}/relationship`, relationshipData);
+  },
+  
+  // 获取关系类型列表
+  getRelationshipTypes: () => {
+    return http.get('/patient/family/relationship-types');
+  },
+  
+  // 同步家庭数据
+  syncFamilyData: (lastSyncTime) => {
+    return http.post('/patient/family/sync', { lastSyncTime });
+  },
+
+  // ==================== 多人家庭档案管理API ====================
+  
+  // 创建家庭档案
+  createFamilyArchive: (familyData) => {
+    return http.post('/patient/family/archive/create', familyData);
+  },
+
+  // 获取单个家庭档案
+  getFamilyArchive: (familyId) => {
+    return http.get(`/patient/family/archive/${familyId}`);
+  },
+
+  // 获取用户关联的所有家庭
+  getUserFamilies: () => {
+    return http.get('/patient/family/user-families');
+  },
+
+  // 批量获取多个家庭档案
+  getMultipleFamilyArchives: (familyIds) => {
+    return http.post('/patient/family/archive/batch', { familyIds });
+  },
+
+  // 更新家庭关系
+  updateFamilyRelationships: (familyId, relationships) => {
+    return http.put(`/patient/family/archive/${familyId}/relationships`, {
+      relationships
+    });
+  },
+
+  // 获取家庭关系图谱
+  getFamilyRelationshipMap: (familyId) => {
+    return http.get(`/patient/family/archive/${familyId}/relationship-map`);
+  },
+
+  // 智能推荐家庭关系
+  recommendFamilyRelationships: (familyId, memberData) => {
+    return http.post(`/patient/family/archive/${familyId}/recommend-relationships`, {
+      memberData
+    });
+  },
+
+  // 合并家庭档案
+  mergeFamilyArchives: (mergeData) => {
+    return http.post('/patient/family/archive/merge', mergeData);
+  },
+
+  // 分离家庭成员（创建新家庭）
+  separateFamilyMembers: (separateData) => {
+    return http.post('/patient/family/archive/separate', separateData);
+  },
+
+  // 转移成员到其他家庭
+  transferFamilyMember: (memberId, targetFamilyId) => {
+    return http.put(`/patient/family/member/${memberId}/transfer`, {
+      targetFamilyId
+    });
+  },
+
+  // 复制家庭成员到其他家庭
+  copyFamilyMember: (memberId, targetFamilyId) => {
+    return http.post(`/patient/family/member/${memberId}/copy`, {
+      targetFamilyId
+    });
+  },
+
+  // 获取家庭档案操作历史
+  getFamilyOperationHistory: (familyId, params = {}) => {
+    return http.get(`/patient/family/archive/${familyId}/operation-history`, params);
+  },
+
+  // 恢复已删除的家庭成员
+  restoreDeletedMember: (memberId) => {
+    return http.post(`/patient/family/member/${memberId}/restore`);
+  },
+
+  // 获取已删除的家庭成员列表
+  getDeletedMembers: (familyId) => {
+    return http.get(`/patient/family/archive/${familyId}/deleted-members`);
+  },
+
+  // 永久删除家庭成员
+  permanentDeleteMember: (memberId) => {
+    return http.delete(`/patient/family/member/${memberId}/permanent`);
   },
   
   // 更新患者信息

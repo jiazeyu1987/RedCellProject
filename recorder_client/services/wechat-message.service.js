@@ -3,12 +3,12 @@
  * 实现微信模板消息、订阅消息、服务号消息等功能
  */
 
-import { 
+const { 
   NOTIFICATION_TYPES,
   NOTIFICATION_CHANNELS 
-} from '../constants/notification-config.js';
+} = require('../constants/notification-config.js');
 
-import notificationAPI from '../api/notification-api.js';
+const notificationAPI = require('../api/notification-api.js');
 
 class WechatMessageService {
   constructor() {
@@ -646,4 +646,4 @@ class WechatMessageService {
   }
 }
 
-export default WechatMessageService;
+module.exports = WechatMessageService;

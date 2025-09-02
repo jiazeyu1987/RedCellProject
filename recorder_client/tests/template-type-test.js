@@ -3,13 +3,13 @@
  * 测试不同模板格式的创建、渲染和验证功能
  */
 
-import TemplateManager from '../services/template-manager.js';
-import {
+const TemplateManager = require('../services/template-manager.js');
+const {
   MESSAGE_FORMATS,
   TEMPLATE_TYPES,
   getTemplateTypeConfig,
   validateTypeFormatCompatibility
-} from '../constants/template-types.js';
+} = require('../constants/template-types.js');
 
 class TemplateTypeTest {
   constructor() {
