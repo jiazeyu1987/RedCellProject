@@ -53,7 +53,7 @@
         <view class="quick-filters-list">
           <view wx:for="{{quickFilters}}" wx:key="key"
                 class="filter-tag {{currentFilters.time === item.key || currentFilters.status === item.key ? 'active' : ''}}"
-                data-type="{{item.key}}"
+                data-key="{{item.key}}"
                 bindtap="onQuickFilter">
             <text class="filter-icon">{{item.icon}}</text>
             <text class="filter-label">{{item.label}}</text>

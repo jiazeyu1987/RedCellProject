@@ -10,6 +10,20 @@ const { scheduleDebugHelper } = require('../../utils/schedule-debug-helper');
  * 功能：显示日程列表、筛选排序、批量操作等
  */
 Page({
+  // 防止重复调用统计加载
+  isLoadingStatistics: false,
+  // 防止重复加载日程数据
+  isLoadingSchedules: false,
+  // 上次加载时间戳
+  lastLoadTime: 0,
+  // 调试计数器
+  debugCounters: {
+    onShowCalls: 0,
+    onLoadCalls: 0,
+    loadScheduleListCalls: 0,
+    checkAndFixCalls: 0
+  },
+    
   data: {
     // 页面状态
     loading: false,
@@ -244,54 +258,179 @@ Page({
    * 页面加载
    */
   onLoad(options) {
-    console.log('日程页面开始加载...');
+    const timestamp = new Date().toISOString();
+    const pageStack = getCurrentPages();
     
+    console.log(`[生命周期] ================== onLoad 开始 - ${timestamp} ==================`);
+    console.log(`[生命周期] onLoad 页面栈深度: ${pageStack.length}`);
+    console.log(`[生命周期] onLoad 接收参数:`, options);
+    
+    // 初始化计数器和监控
+    this._onLoadCount = (this._onLoadCount || 0) + 1;
+    this._onShowCount = 0;
+    this._refreshCount = 0;
+    this._loadScheduleCount = 0;
+    
+    console.log(`[生命周期] onLoad 调用次数: ${this._onLoadCount}`);
+    
+    // 如果onLoad被多次调用，记录异常
+    if (this._onLoadCount > 1) {
+      console.error(`[异常] onLoad被重复调用! 次数: ${this._onLoadCount}`);
+    }
+    
+    // 设置页面初始化标志
+    this.pageInitialized = true;
+    this.isLoadingSchedules = false;
+    this.lastLoadTime = 0;
+    
+    console.log(`[生命周期] onLoad 调用 initPage`);
     this.initPage();
-    this.initApprovalPermissions(); // 初始化审批权限
     
-    // 先加载模拟统计数据，保证页面显示
+    console.log(`[生命周期] onLoad 调用 initApprovalPermissions`);
+    this.initApprovalPermissions();
+    
+    console.log(`[生命周期] onLoad 调用 setMockStatistics`);
     this.setMockStatistics();
     
-    // 延迟加载真实数据，避免与onShow冲突
-    setTimeout(() => {
-      console.log('开始加载真实数据...');
-      this.loadScheduleList(true);
-    }, 100);
-    
-    this.loadFilterHistory(); // 加载筛选历史
+    console.log(`[生命周期] onLoad 调用 loadFilterHistory`);
+    this.loadFilterHistory();
     
     // 初始化排序缓存
     this.sortCache = new Map();
     this.distanceCache = {};
     
-    console.log('日程页面加载完成');
+    // 启动监控系统（禁用定时器）
+    this.startRefreshMonitoring();
     
-    // 初始化批量冲突检测服务 - 延迟加载
-    // this.batchConflictService = new BatchConflictDetectionService();
+    // 直接调用 loadScheduleList
+    console.log(`[生命周期] onLoad 调用 loadScheduleList(true)`);
+    this.loadScheduleList(true);
+    
+    console.log(`[生命周期] ================== onLoad 结束 ==================`);
   },
 
   /**
    * 页面显示
    */
   onShow() {
-    // 检查并修复加载状态
-    this.checkAndFixLoadingState();
+    const timestamp = new Date().toISOString();
+    const pageStack = getCurrentPages();
     
-    // 只有当页面数据为空时才刷新，避免重复加载
-    if (this.data.scheduleList.length === 0 && !this.data.loading) {
-      console.log('页面显示：数据为空，开始加载');
-      this.refreshData();
-    } else {
-      console.log('页面显示：数据已存在，跳过加载');
+    console.log(`[生命周期] ================== onShow 开始 - ${timestamp} ==================`);
+    console.log(`[生命周期] onShow 页面栈深度: ${pageStack.length}`);
+    
+    // 检测TabBar切换
+    this.detectTabBarSwitch();
+    
+    // 更新监控计数
+    this._onShowCount = (this._onShowCount || 0) + 1;
+    if (this.lifecycleMonitor) {
+      this.lifecycleMonitor.onShowCalls++;
+      this.lifecycleMonitor.lastOnShow = Date.now();
     }
+    
+    console.log(`[生命周期] onShow 调用次数: ${this._onShowCount}`);
+    
+    // 检查异常频繁调用
+    if (this._onShowCount > 5) {
+      console.error(`[异常] onShow调用异常频繁! 次数: ${this._onShowCount}`);
+      console.error(`[异常] 当前状态:`, {
+        loading: this.data.loading,
+        refreshing: this.data.refreshing,
+        scheduleListLength: this.data.scheduleList.length,
+        pageInitialized: this.pageInitialized
+      });
+    }
+    
+    console.log(`[生命周期] onShow 当前状态:`, {
+      scheduleListLength: this.data.scheduleList.length,
+      loading: this.data.loading,
+      refreshing: this.data.refreshing,
+      isLoadingSchedules: this.isLoadingSchedules,
+      pageInitialized: this.pageInitialized,
+      lastLoadTime: this.lastLoadTime
+    });
+    
+    // 如果页面刚初始化，跳过这次onShow的加载
+    if (this.pageInitialized) {
+      console.log(`[生命周期] onShow 页面刚初始化，跳过加载`);
+      this.pageInitialized = false;
+      console.log(`[生命周期] ================== onShow 结束 - 初始化跳过 ==================`);
+      return;
+    }
+    
+    // 简化加载状态检查，只在必要时调用
+    // this.checkAndFixLoadingState();
+    
+    // 防止频繁刷新：至少间隔5秒
+    const currentTime = Date.now();
+    const timeSinceLastLoad = currentTime - this.lastLoadTime;
+    
+    console.log(`[生命周期] onShow 加载条件检查:`, {
+      dataEmpty: this.data.scheduleList.length === 0,
+      notLoading: !this.data.loading,
+      notRefreshing: !this.data.refreshing,
+      notLoadingSchedules: !this.isLoadingSchedules,
+      timeInterval: timeSinceLastLoad > 3000,
+      timeSinceLastLoad
+    });
+    
+    // 只有当数据为空且不在加载且时间间隔足够时才刷新
+    if (this.data.scheduleList.length === 0 && 
+        !this.data.loading && 
+        !this.data.refreshing && 
+        !this.isLoadingSchedules &&
+        timeSinceLastLoad > 5000) { // 增加时间间隔从3秒到5秒
+      console.log(`[生命周期] onShow 满足条件，开始加载数据`);
+      this.loadScheduleList(true);
+    } else {
+      console.log(`[生命周期] onShow 跳过加载 - 条件不满足`);
+      console.log(`[生命周期] onShow 跳过原因:`, {
+        hasData: this.data.scheduleList.length > 0,
+        loading: this.data.loading,
+        refreshing: this.data.refreshing,
+        isLoadingSchedules: this.isLoadingSchedules,
+        timeNotEnough: timeSinceLastLoad <= 5000,
+        timeSinceLastLoad
+      });
+    }
+    
+    console.log(`[生命周期] ================== onShow 结束 ==================`);
   },
 
   /**
    * 下拉刷新
    */
   onPullDownRefresh() {
+    const timestamp = new Date().toISOString();
+    const callStack = new Error().stack;
+    
+    console.log(`[事件] ================== onPullDownRefresh 开始 - ${timestamp} ==================`);
+    console.log(`[事件] onPullDownRefresh 调用栈:`, callStack);
+    
+    this._pullDownRefreshCount = (this._pullDownRefreshCount || 0) + 1;
+    this._refreshCount = (this._refreshCount || 0) + 1;
+    
+    console.log(`[事件] onPullDownRefresh 调用次数: ${this._pullDownRefreshCount}`);
+    
+    // 检查是否频繁触发
+    if (this._pullDownRefreshCount > 3) {
+      console.error(`[异常] 下拉刷新触发过于频繁! 次数: ${this._pullDownRefreshCount}`);
+    }
+    
+    console.log(`[事件] onPullDownRefresh 当前状态:`, {
+      refreshing: this.data.refreshing,
+      loading: this.data.loading,
+      isLoadingSchedules: this.isLoadingSchedules
+    });
+    
+    // 调用监控报告 (简化监控)
+    // this.debugMonitorRefreshTriggers();
+    
     this.refreshData().finally(() => {
+      console.log(`[事件] onPullDownRefresh 停止下拉刷新`);
       wx.stopPullDownRefresh();
+      console.log(`[事件] ================== onPullDownRefresh 结束 ==================`);
     });
   },
 
@@ -299,8 +438,18 @@ Page({
    * 触底加载更多
    */
   onReachBottom() {
+    console.log(`[DEBUG] onReachBottom 触发`);
+    console.log(`[DEBUG] onReachBottom 状态检查:`, {
+      loadingMore: this.data.loadingMore,
+      hasMore: this.data.hasMore,
+      isLoadingSchedules: this.isLoadingSchedules
+    });
+    
     if (!this.data.loadingMore && this.data.hasMore) {
+      console.log(`[DEBUG] onReachBottom 满足条件，开始加载更多`);
       this.loadMoreSchedules();
+    } else {
+      console.log(`[DEBUG] onReachBottom 不满足条件，跳过加载`);
     }
   },
 
@@ -308,12 +457,16 @@ Page({
    * 初始化页面
    */
   initPage() {
+    console.log(`[DEBUG] initPage 开始`);
+    
     // 设置页面标题
+    console.log(`[DEBUG] initPage 设置导航标题`);
     wx.setNavigationBarTitle({
       title: '日程管理'
     });
     
     // 初始化筛选条件
+    console.log(`[DEBUG] initPage 初始化筛选条件`);
     this.setData({
       currentFilters: {
         time: CONSTANTS.FILTER_TYPES.ALL,
@@ -325,42 +478,62 @@ Page({
         keyword: ''
       },
       loading: false,  // 确保初始加载状态为 false
+      refreshing: false, // 确保初始刷新状态为 false
       'errorState.hasError': false  // 清除错误状态
     });
     
-    // 初始化时加载模拟数据作为默认显示，但不设置加载状态
-    console.log('初始化页面，加载基础数据');
-    this.loadMockScheduleData();
+    // 初始化加载标志
+    this.isLoadingSchedules = false;
+    this.pageInitialized = false;
+    
+    console.log(`[DEBUG] initPage 完成`);
   },
 
   /**
    * 刷新数据
    */
   async refreshData() {
+    const timestamp = new Date().toISOString();
+    const callStack = new Error().stack;
+    const caller = callStack.split('\n')[2]?.trim() || 'unknown';
+    
+    console.log(`[DEBUG] ================== refreshData 开始 - ${timestamp} ==================`);
+    console.log(`[DEBUG] refreshData 调用者: ${caller}`);
+    
+    this._refreshDataCount = (this._refreshDataCount || 0) + 1;
+    console.log(`[DEBUG] refreshData 调用次数: ${this._refreshDataCount}`);
+    
     // 防止重复刷新
-    if (this.data.refreshing || this.data.loading) {
-      console.log('正在刷新或加载中，跳过此次刷新');
+    if (this.data.refreshing || this.data.loading || this.isLoadingSchedules) {
+      console.log(`[DEBUG] refreshData 正在刷新或加载中，跳过此次刷新`);
+      console.log(`[DEBUG] refreshData 当前状态: refreshing=${this.data.refreshing}, loading=${this.data.loading}, isLoadingSchedules=${this.isLoadingSchedules}`);
       return;
     }
     
+    console.log(`[DEBUG] refreshData 设置刷新状态`);
     this.setData({
       refreshing: true,
       'pagination.page': 1
     });
     
     try {
+      console.log(`[DEBUG] refreshData 开始加载日程数据`);
       await this.loadScheduleList(true);
+      console.log(`[DEBUG] refreshData 开始加载统计数据`);
       await this.loadStatistics();
+      console.log(`[DEBUG] refreshData 数据加载完成`);
     } catch (error) {
-      console.error('刷新数据失败:', error);
+      console.error(`[DEBUG] refreshData 刷新数据失败:`, error);
       wx.showToast({
         title: '刷新失败',
         icon: 'none'
       });
     } finally {
+      console.log(`[DEBUG] refreshData 清除刷新状态`);
       this.setData({
         refreshing: false
       });
+      console.log(`[DEBUG] ================== refreshData 结束 - ${new Date().toISOString()} ==================`);
     }
   },
 
@@ -368,14 +541,41 @@ Page({
    * 加载日程列表
    */
   async loadScheduleList(reset = false) {
-    if (this.data.loading) {
+    const timestamp = new Date().toISOString();
+    const callStack = new Error().stack;
+    console.log(`[DEBUG] loadScheduleList 调用 - ${timestamp}`);
+    console.log(`[DEBUG] loadScheduleList 参数 reset: ${reset}`);
+    console.log(`[DEBUG] loadScheduleList 调用栈:`, callStack);
+    
+    // 增强的防重复机制
+    console.log(`[DEBUG] loadScheduleList 防重复检查:`, {
+      'this.data.loading': this.data.loading,
+      'this.isLoadingSchedules': this.isLoadingSchedules
+    });
+    
+    if (this.data.loading || this.isLoadingSchedules) {
       scheduleDebugHelper.logLoadingState('blocked', '重复调用被阻止');
-      return;
+      console.log(`[DEBUG] loadScheduleList 被阻止: loading=${this.data.loading}, isLoadingSchedules=${this.isLoadingSchedules}`);
+      console.log(`[DEBUG] loadScheduleList 阻止原因详情:`);
+      console.log(`  - data.loading: ${this.data.loading}`);
+      console.log(`  - isLoadingSchedules: ${this.isLoadingSchedules}`);
+      console.log(`  - 调用时间: ${timestamp}`);
+      return Promise.resolve(); // 返回一个已解决的Promise避免未捕获异常
     }
+    
+    // 设置加载标志
+    console.log(`[DEBUG] loadScheduleList 设置加载标志`);
+    this.isLoadingSchedules = true;
+    this.lastLoadTime = Date.now();
+    console.log(`[DEBUG] loadScheduleList 标志设置完成:`, {
+      isLoadingSchedules: this.isLoadingSchedules,
+      lastLoadTime: this.lastLoadTime
+    });
     
     scheduleDebugHelper.logLoadingState(true, `开始加载 - reset: ${reset}`);
     
     // 确保显示加载状态
+    console.log(`[DEBUG] loadScheduleList 设置UI加载状态`);
     this.setData({
       loading: true  // 统一设置为true，确保显示加载状态
     });
@@ -390,25 +590,36 @@ Page({
         ...this.buildApiFilters()
       };
       
+      console.log(`[DEBUG] loadScheduleList API调用参数:`, params);
       scheduleDebugHelper.logApiCall('/schedule/list', 'GET', params);
       
+      console.log(`[DEBUG] loadScheduleList 开始API调用`);
       const result = await ScheduleAPI.getScheduleList(params);
+      console.log(`[DEBUG] loadScheduleList API调用成功:`, {
+        dataLength: result.data?.list?.length || 0,
+        total: result.data?.total || 0
+      });
       
       scheduleDebugHelper.logApiCall('/schedule/list', 'GET', params, result);
       
       let scheduleList = [];
       if (reset) {
         scheduleList = result.data.list || [];
+        console.log(`[DEBUG] loadScheduleList reset模式，新数据长度: ${scheduleList.length}`);
       } else {
         scheduleList = [...this.data.scheduleList, ...(result.data.list || [])];
+        console.log(`[DEBUG] loadScheduleList 追加模式，总数据长度: ${scheduleList.length}`);
       }
       
       // 处理日程数据
+      console.log(`[DEBUG] loadScheduleList 开始处理数据`);
       const processedList = scheduleList.map(schedule => this.processScheduleItem(schedule));
+      console.log(`[DEBUG] loadScheduleList 数据处理完成，处理后长度: ${processedList.length}`);
       
       // 记录数据变化
       scheduleDebugHelper.logDataChange('scheduleList', this.data.scheduleList, processedList, '加载完成');
       
+      console.log(`[DEBUG] loadScheduleList 开始更新页面数据`);
       this.setData({
         scheduleList: processedList,
         originalScheduleList: processedList,
@@ -418,19 +629,23 @@ Page({
         loading: false,  // 确保加载状态被清除
         'errorState.hasError': false  // 清除错误状态
       });
+      console.log(`[DEBUG] loadScheduleList 页面数据更新完成`);
       
       scheduleDebugHelper.logLoadingState(false, '加载成功完成');
       
       // 应用本地筛选
+      console.log(`[DEBUG] loadScheduleList 开始应用本地筛选`);
       this.applyLocalFilters();
+      console.log(`[DEBUG] loadScheduleList 本地筛选完成`);
       
     } catch (error) {
-      console.error('加载日程列表失败:', error);
+      console.error(`[DEBUG] loadScheduleList 发生错误:`, error);
       
       scheduleDebugHelper.logError(error, '加载日程列表失败');
       scheduleDebugHelper.logApiCall('/schedule/list', 'GET', {}, null, error);
       
       // 确保加载状态被清除
+      console.log(`[DEBUG] loadScheduleList 错误处理 - 清除加载状态`);
       this.setData({
         loading: false
       });
@@ -439,11 +654,23 @@ Page({
       
       // 如果是重置加载且当前列表为空，使用模拟数据
       if (reset && this.data.scheduleList.length === 0) {
-        console.log('使用模拟日程数据');
+        console.log(`[DEBUG] loadScheduleList 使用模拟数据作为备用`);
         this.loadMockScheduleData();
       } else {
+        console.log(`[DEBUG] loadScheduleList 调用错误处理`);
         this.handleError(error, '加载日程列表失败');
       }
+      throw error; // 重新抛出异常以便上层函数处理
+    } finally {
+      // 确保清除加载标志
+      console.log(`[DEBUG] loadScheduleList finally块 - 清除加载标志`);
+      this.isLoadingSchedules = false;
+      console.log(`[DEBUG] loadScheduleList 最终状态:`, {
+        isLoadingSchedules: this.isLoadingSchedules,
+        'data.loading': this.data.loading,
+        'data.scheduleList.length': this.data.scheduleList.length
+      });
+      console.log(`[DEBUG] loadScheduleList 结束 - ${new Date().toISOString()}`);
     }
   },
 
@@ -451,6 +678,12 @@ Page({
    * 加载更多日程
    */
   async loadMoreSchedules() {
+    // 防止重复加载
+    if (this.data.loadingMore || this.isLoadingSchedules) {
+      console.log('正在加载更多数据，跳过此次请求');
+      return;
+    }
+    
     this.setData({
       loadingMore: true
     });
@@ -468,6 +701,22 @@ Page({
    * 加载统计信息
    */
   async loadStatistics() {
+    // 防止重复调用
+    if (this.isLoadingStatistics) {
+      console.log('统计数据加载中，跳过此次调用');
+      return;
+    }
+    
+    // 如果是模拟数据模式，且已经有统计数据，则跳过
+    if (this.data.scheduleList.length > 0 && 
+        this.data.scheduleList.every(item => item.id.startsWith('mock_')) &&
+        this.data.statistics.total > 0) {
+      console.log('模拟数据模式且统计数据已存在，跳过API调用');
+      return;
+    }
+    
+    this.isLoadingStatistics = true;
+    
     try {
       // 同时获取基本统计和详细统计
       const [basicStats, detailedStats] = await Promise.all([
@@ -486,10 +735,9 @@ Page({
         statistics.completionRate = Math.round((statistics.completed / statistics.total) * 100);
       }
       
-      // 更新快捷筛选计数
+      // 更新快捷筛选计数（减少频繁更新）
       const quickFilters = this.data.quickFilters.map(filter => {
         let newCount = 0;
-        let countChanged = false;
         
         switch (filter.key) {
           case CONSTANTS.FILTER_TYPES.TODAY:
@@ -508,25 +756,28 @@ Page({
             newCount = filter.count || 0;
         }
         
-        // 检查数量是否发生变化
-        if (filter.count !== newCount && newCount > 0) {
-          countChanged = true;
-          // 延迟重置动画状态
-          setTimeout(() => {
-            const updatedFilters = this.data.quickFilters.map(f => 
-              f.key === filter.key ? { ...f, countChanged: false } : f
-            );
-            this.setData({ quickFilters: updatedFilters });
-          }, 500);
+        // 只有计数变化时才更新
+        if (filter.count !== newCount) {
+          return { ...filter, count: newCount };
         }
-        
-        return { ...filter, count: newCount, countChanged };
+        return filter;
       });
       
-      this.setData({
-        statistics,
-        quickFilters
-      });
+      // 检查是否需要更新quickFilters
+      const hasQuickFilterChanges = quickFilters.some((filter, index) => 
+        filter.count !== this.data.quickFilters[index].count
+      );
+      
+      const updateData = {
+        statistics
+      };
+      
+      // 只有变化时才更新quickFilters
+      if (hasQuickFilterChanges) {
+        updateData.quickFilters = quickFilters;
+      }
+      
+      this.setData(updateData);
       
       // 加载趋势数据（异步）
       this.loadStatisticsTrend();
@@ -535,6 +786,8 @@ Page({
       console.error('加载统计信息失败:', error);
       // 使用模拟数据作为备用
       this.setMockStatistics();
+    } finally {
+      this.isLoadingStatistics = false;
     }
   },
   
@@ -581,26 +834,47 @@ Page({
       }
     };
     
-    // 更新快捷筛选计数
+    // 更新快捷筛选计数（减少频繁更新）
     const quickFilters = this.data.quickFilters.map(filter => {
       switch (filter.key) {
         case CONSTANTS.FILTER_TYPES.TODAY:
-          return { ...filter, count: mockStatistics.today };
+          if (filter.count !== mockStatistics.today) {
+            return { ...filter, count: mockStatistics.today };
+          }
+          break;
         case 'pending':
-          return { ...filter, count: mockStatistics.pending };
+          if (filter.count !== mockStatistics.pending) {
+            return { ...filter, count: mockStatistics.pending };
+          }
+          break;
         case 'urgent':
-          return { ...filter, count: mockStatistics.urgent };
+          if (filter.count !== mockStatistics.urgent) {
+            return { ...filter, count: mockStatistics.urgent };
+          }
+          break;
         case CONSTANTS.FILTER_TYPES.OVERDUE:
-          return { ...filter, count: mockStatistics.overdue };
-        default:
-          return filter;
+          if (filter.count !== mockStatistics.overdue) {
+            return { ...filter, count: mockStatistics.overdue };
+          }
+          break;
       }
+      return filter;
     });
     
-    this.setData({
-      statistics: mockStatistics,
-      quickFilters
-    });
+    // 检查是否需要更新
+    const hasChanges = quickFilters.some((filter, index) => 
+      filter.count !== this.data.quickFilters[index].count
+    );
+    
+    const updateData = {
+      statistics: mockStatistics
+    };
+    
+    if (hasChanges) {
+      updateData.quickFilters = quickFilters;
+    }
+    
+    this.setData(updateData);
   },
   
   /**
@@ -963,15 +1237,29 @@ Page({
       
       console.log('排序后数据长度:', filteredList.length);
       
-      this.setData({
-        filteredScheduleList: filteredList,
-        loading: false  // 确保清除加载状态
-      });
+      // 检查是否需要更新，减少不必要的重渲染
+      const currentFilteredList = this.data.filteredScheduleList || [];
+      const needsUpdate = currentFilteredList.length !== filteredList.length ||
+        JSON.stringify(currentFilteredList.map(item => item.id)) !== 
+        JSON.stringify(filteredList.map(item => item.id));
       
-      console.log('数据设置成功，filteredScheduleList长度:', filteredList.length);
-      
-      // 更新筛选条件标签 - 使用安全的方式调用
-      this.safeUpdateFilterTags();
+      if (needsUpdate) {
+        this.setData({
+          filteredScheduleList: filteredList,
+          loading: false  // 确保清除加载状态
+        });
+        
+        console.log('数据设置成功，filteredScheduleList长度:', filteredList.length);
+        
+        // 减少频繁的标签更新
+        // this.safeUpdateFilterTags();
+      } else {
+        console.log('数据未变化，跳过更新');
+        // 仍然需要清除加载状态
+        if (this.data.loading) {
+          this.setData({ loading: false });
+        }
+      }
       
     } catch (error) {
       console.error('筛选排序失败:', error);
@@ -1154,8 +1442,14 @@ Page({
       'pagination.page': 1
     });
     
-    // 重新加载数据
-    this.loadScheduleList(true);
+    // 防止重复加载：检查当前是否在加载
+    if (!this.data.loading && !this.isLoadingSchedules) {
+      this.loadScheduleList(true);
+    } else {
+      console.log('正在加载中，跳过筛选器变更后的重新加载');
+      // 直接应用本地筛选
+      this.applyLocalFilters();
+    }
     
     // 保存筛选历史
     this.saveFilterHistory();
@@ -1245,7 +1539,14 @@ Page({
       'pagination.page': 1
     });
     
-    this.loadScheduleList(true);
+    // 防止重复加载：检查当前是否在加载
+    if (!this.data.loading && !this.isLoadingSchedules) {
+      this.loadScheduleList(true);
+    } else {
+      console.log('正在加载中，跳过快捷筛选后的重新加载');
+      // 直接应用本地筛选
+      this.applyLocalFilters();
+    }
   },
   
   /**
@@ -1319,7 +1620,14 @@ Page({
       'pagination.page': 1
     });
     
-    this.loadScheduleList(true);
+    // 防止重复加载：检查当前是否在加载
+    if (!this.data.loading && !this.isLoadingSchedules) {
+      this.loadScheduleList(true);
+    } else {
+      console.log('正在加载中，跳过统计项点击后的重新加载');
+      // 直接应用本地筛选
+      this.applyLocalFilters();
+    }
     
     // 显示反馈
     wx.showToast({
@@ -1348,7 +1656,14 @@ Page({
       'pagination.page': 1
     });
     
-    this.loadScheduleList(true);
+    // 防止重复加载：检查当前是否在加载
+    if (!this.data.loading && !this.isLoadingSchedules) {
+      this.loadScheduleList(true);
+    } else {
+      console.log('正在加载中，跳过清除筛选后的重新加载');
+      // 直接应用本地筛选
+      this.applyLocalFilters();
+    }
     
     wx.showToast({
       title: '已清除筛选',
@@ -1368,25 +1683,331 @@ Page({
       loadingMore: false,
       'errorState.hasError': false
     });
+    
+    // 清除内部加载标志
+    this.isLoadingSchedules = false;
+    this.isLoadingStatistics = false;
+    this.loadingStartTime = null;
+    
+    scheduleDebugHelper.logLoadingState('force_stopped', '强制停止所有加载状态');
+  },
+
+  /**
+   * 启动刷新监控
+   */
+  startRefreshMonitoring() {
+    console.log('[MONITOR] 启动刷新监控系统');
+    
+    // 监控页面生命周期
+    this.lifecycleMonitor = {
+      onLoadCalls: 0,
+      onShowCalls: 0,
+      loadScheduleCalls: 0,
+      refreshCalls: 0,
+      lastOnShow: null,
+      lastOnLoad: null,
+      lastRefresh: null
+    };
+    
+    // 禁用频繁的监控定时器，改为按需检查
+    // this.monitorTimer = setInterval(() => {
+    //   this.checkRefreshAbnormality();
+    // }, 5000);
+    
+    // 页面卸载时清理监控
+    const originalOnUnload = this.onUnload;
+    this.onUnload = function() {
+      console.log('[MONITOR] 清理刷新监控');
+      if (this.monitorTimer) {
+        clearInterval(this.monitorTimer);
+        this.monitorTimer = null;
+      }
+      if (originalOnUnload) {
+        originalOnUnload.call(this);
+      }
+    };
+  },
+  
+  /**
+   * 检查刷新异常
+   */
+  checkRefreshAbnormality() {
+    const now = Date.now();
+    const monitor = this.lifecycleMonitor;
+    
+    // 检查onShow调用频率
+    if (monitor.lastOnShow && now - monitor.lastOnShow < 1000) {
+      console.warn('[MONITOR] 警告: onShow调用过于频繁!');
+      console.warn('[MONITOR] onShow详情:', {
+        调用次数: monitor.onShowCalls,
+        距离上次: now - monitor.lastOnShow,
+        当前状态: {
+          loading: this.data.loading,
+          refreshing: this.data.refreshing,
+          isLoadingSchedules: this.isLoadingSchedules
+        }
+      });
+    }
+    
+    // 检查loading状态异常
+    if (this.data.loading && this.loadingStartTime && now - this.loadingStartTime > 15000) {
+      console.error('[MONITOR] 严重警告: loading状态超过15秒!');
+      this.forceStopLoading();
+    }
+    
+    // 检查数据状态
+    if (this.data.scheduleList.length !== this.data.filteredScheduleList.length && 
+        this.data.currentFilters.time === 'all' && 
+        this.data.currentFilters.status === 'all') {
+      console.warn('[MONITOR] 数据不一致:', {
+        原始数据: this.data.scheduleList.length,
+        筛选数据: this.data.filteredScheduleList.length,
+        筛选条件: this.data.currentFilters
+      });
+    }
   },
   
   /**
    * 检查并修复加载状态
    */
   checkAndFixLoadingState() {
-    // 如果加载状态持续时间过长，自动修复
-    if (this.data.loading) {
+    const timestamp = new Date().toISOString();
+    const { loading, refreshing, loadingMore } = this.data;
+    const callStack = new Error().stack;
+    const caller = callStack.split('\n')[2]?.trim() || 'unknown';
+    
+    console.log(`[DEBUG] ================== checkAndFixLoadingState 开始 - ${timestamp} ==================`);
+    console.log(`[DEBUG] checkAndFixLoadingState 调用者: ${caller}`);
+    
+    this._checkAndFixCount = (this._checkAndFixCount || 0) + 1;
+    console.log(`[DEBUG] checkAndFixLoadingState 调用次数: ${this._checkAndFixCount}`);
+    
+    console.log(`[DEBUG] checkAndFixLoadingState 当前状态:`, {
+      loading: loading,
+      refreshing: refreshing,
+      loadingMore: loadingMore,
+      isLoadingSchedules: this.isLoadingSchedules,
+      loadingStartTime: this.loadingStartTime,
+      lastLoadTime: this.lastLoadTime,
+      currentLoadId: this._currentLoadId
+    });
+    
+    // 如果加载状态异常（超过10秒），强制清除
+    if (loading || refreshing || loadingMore) {
       const currentTime = Date.now();
+      console.log(`[DEBUG] checkAndFixLoadingState 检测到加载状态，当前时间: ${currentTime}`);
+      
       if (!this.loadingStartTime) {
+        console.log(`[DEBUG] checkAndFixLoadingState 设置loadingStartTime: ${currentTime}`);
         this.loadingStartTime = currentTime;
-      } else if (currentTime - this.loadingStartTime > 10000) { // 10秒超时
-        console.warn('检测到加载状态异常，自动修复');
-        this.forceStopLoading();
-        this.loadingStartTime = null;
+      } else {
+        const duration = currentTime - this.loadingStartTime;
+        console.log(`[DEBUG] checkAndFixLoadingState 加载持续时间: ${duration}ms`);
+        
+        if (duration > 10000) { // 10秒超时
+          console.warn(`[DEBUG] checkAndFixLoadingState 检测到加载状态异常，持续${duration}ms，自动修复`);
+          console.log(`[DEBUG] checkAndFixLoadingState 异常加载ID: ${this._currentLoadId}`);
+          scheduleDebugHelper.logLoadingState('auto_fixed', '超时自动修复');
+          this.forceStopLoading();
+          this.loadingStartTime = null;
+          this.isLoadingSchedules = false;
+          console.log(`[DEBUG] checkAndFixLoadingState 自动修复完成`);
+        }
       }
     } else {
+      if (this.loadingStartTime) {
+        console.log(`[DEBUG] checkAndFixLoadingState 清除loadingStartTime`);
+      }
       this.loadingStartTime = null;
     }
+    
+    console.log(`[DEBUG] ================== checkAndFixLoadingState 结束 ==================`);
+  },
+  
+  /**
+   * 调试监控方法 - 监控所有可能导致刷新的事件
+   */
+  debugMonitorRefreshTriggers() {
+    const timestamp = new Date().toISOString();
+    console.log(`[监控] ================== 刷新监控报告 - ${timestamp} ==================`);
+    
+    console.log(`[监控] 页面基本信息:`, {
+      页面路径: getCurrentPages()[getCurrentPages().length - 1]?.route || 'unknown',
+      页面实例ID: this.__wxExparserNodeId__ || 'unknown',
+      页面栈深度: getCurrentPages().length
+    });
+    
+    console.log(`[监控] 生命周期调用统计:`, {
+      onLoad调用次数: this._onLoadCount || 0,
+      onShow调用次数: this._onShowCount || 0,
+      refreshData调用次数: this._refreshDataCount || 0,
+      loadScheduleList调用次数: this._loadScheduleCount || 0,
+      pullDownRefresh调用次数: this._pullDownRefreshCount || 0,
+      TabBar切换次数: this._tabBarSwitchCount || 0
+    });
+    
+    console.log(`[监控] 当前状态快照:`, {
+      data_loading: this.data.loading,
+      data_refreshing: this.data.refreshing,
+      data_loadingMore: this.data.loadingMore,
+      isLoadingSchedules: this.isLoadingSchedules,
+      scheduleList长度: this.data.scheduleList?.length || 0,
+      最后加载时间: this.lastLoadTime,
+      距离上次加载: this.lastLoadTime ? Date.now() - this.lastLoadTime : 'N/A'
+    });
+    
+    console.log(`[监控] 页面标志位:`, {
+      pageInitialized: this.pageInitialized || false,
+      _hasInitialized: this._hasInitialized || false,
+      _currentLoadId: this._currentLoadId || 'none'
+    });
+    
+    // 检测异常频繁调用
+    const totalCalls = (this._onShowCount || 0) + (this._refreshDataCount || 0) + (this._loadScheduleCount || 0);
+    if (totalCalls > 20) {
+      console.error(`[监控] 警告: 检测到异常频繁刷新! 总调用次数: ${totalCalls}`);
+      console.error(`[监控] 详细统计:`, {
+        onShow: this._onShowCount,
+        refreshData: this._refreshDataCount,
+        loadSchedule: this._loadScheduleCount
+      });
+      
+      // 生成详细调试报告
+      this.generateDebugReport();
+    }
+    
+    console.log(`[监控] ================== 监控报告结束 ==================`);
+  },
+  
+  /**
+   * 检测TabBar切换
+   */
+  detectTabBarSwitch() {
+    // 监听页面栈变化
+    const currentPageStack = getCurrentPages();
+    const currentPageIndex = currentPageStack.length - 1;
+    const currentPage = currentPageStack[currentPageIndex];
+    
+    console.log(`[TabBar] 当前页面信息:`, {
+      route: currentPage?.route,
+      index: currentPageIndex,
+      total: currentPageStack.length,
+      options: currentPage?.options
+    });
+    
+    // 如果是从其他tabbar页面切换过来，记录日志
+    if (this._lastPageRoute && this._lastPageRoute !== currentPage?.route) {
+      console.log(`[TabBar] 检测到页面切换:`, {
+        from: this._lastPageRoute,
+        to: currentPage?.route,
+        timestamp: new Date().toISOString()
+      });
+      
+      // 如果是从非日程页切换到日程页，这可能是导致刷新的原因
+      if (currentPage?.route === 'pages/schedule/schedule') {
+        console.log(`[TabBar] 检测到切换到日程页面 - 这可能触发刷新`);
+        
+        // 记录TabBar切换导致的onShow
+        this._tabBarSwitchCount = (this._tabBarSwitchCount || 0) + 1;
+        console.log(`[TabBar] TabBar切换计数: ${this._tabBarSwitchCount}`);
+      }
+    }
+    
+    this._lastPageRoute = currentPage?.route;
+  },
+  
+  /**
+   * 生成全面调试报告
+   */
+  generateDebugReport() {
+    const timestamp = new Date().toISOString();
+    const report = {
+      报告生成时间: timestamp,
+      页面状态: {
+        路径: getCurrentPages()[getCurrentPages().length - 1]?.route,
+        栈深度: getCurrentPages().length,
+        实例ID: this.__wxExparserNodeId__
+      },
+      调用统计: {
+        onLoad: this._onLoadCount || 0,
+        onShow: this._onShowCount || 0,
+        refreshData: this._refreshDataCount || 0,
+        loadScheduleList: this._loadScheduleCount || 0,
+        pullDownRefresh: this._pullDownRefreshCount || 0,
+        tabBarSwitch: this._tabBarSwitchCount || 0
+      },
+      数据状态: {
+        scheduleList长度: this.data?.scheduleList?.length || 0,
+        filteredList长度: this.data?.filteredScheduleList?.length || 0,
+        originalList长度: this.data?.originalScheduleList?.length || 0
+      },
+      加载状态: {
+        loading: this.data?.loading || false,
+        refreshing: this.data?.refreshing || false,
+        loadingMore: this.data?.loadingMore || false,
+        isLoadingSchedules: this.isLoadingSchedules || false
+      },
+      时间信息: {
+        最后加载时间: this.lastLoadTime,
+        距离上次加载: this.lastLoadTime ? Date.now() - this.lastLoadTime : 'N/A',
+        加载开始时间: this.loadingStartTime
+      },
+      可能原因分析: []
+    };
+    
+    // 分析可能的问题原因
+    if (report.调用统计.onShow > 5) {
+      report.可能原因分析.push('onShow调用过于频繁 - 可能是TabBar切换导致');
+    }
+    
+    if (report.调用统计.tabBarSwitch > 3) {
+      report.可能原因分析.push('TabBar切换过于频繁 - 检查用户操作习惯');
+    }
+    
+    if (report.加载状态.loading && report.时间信息.加载开始时间) {
+      const loadingDuration = Date.now() - report.时间信息.加载开始时间;
+      if (loadingDuration > 10000) {
+        report.可能原因分析.push(`加载状态超时(${loadingDuration}ms) - 可能死循环`);
+      }
+    }
+    
+    if (report.数据状态.scheduleList长度 !== report.数据状态.filteredList长度) {
+      report.可能原因分析.push('数据不一致 - 筛选逻辑可能有问题');
+    }
+    
+    console.log('[调试报告] ==============================================');
+    console.log('[调试报告] 全面调试报告:', report);
+    console.log('[调试报告] ==============================================');
+    
+    return report;
+  },
+  
+  /**
+   * TabBar切换检测
+   */
+  detectTabBarSwitch() {
+    // 监听页面栈变化
+    const currentPageStack = getCurrentPages();
+    const currentPageIndex = currentPageStack.length - 1;
+    const currentPage = currentPageStack[currentPageIndex];
+    
+    console.log(`[TabBar] 当前页面信息:`, {
+      route: currentPage?.route,
+      index: currentPageIndex,
+      total: currentPageStack.length,
+      options: currentPage?.options
+    });
+    
+    // 如果是从其他tabbar页面切换过来，记录日志
+    if (this._lastPageRoute && this._lastPageRoute !== currentPage?.route) {
+      console.log(`[TabBar] 检测到页面切换:`, {
+        from: this._lastPageRoute,
+        to: currentPage?.route,
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    this._lastPageRoute = currentPage?.route;
   },
   
   /**
@@ -8271,6 +8892,9 @@ Page({
       this.waitTimer = null;
     }
     
+    // 重置统计加载状态
+    this.isLoadingStatistics = false;
+    
     // 清理排序缓存
     this.clearSortCache();
   },
@@ -10010,6 +10634,614 @@ Page({
       title: '调试信息已清理',
       icon: 'success',
       duration: 1000
+    });
+  },
+
+  // ========================= 页面导航方法 =========================
+  
+  /**
+   * 添加日程 - 显示添加选项菜单
+   */
+  addSchedule() {
+    console.log('[事件] 点击添加日程');
+    
+    try {
+      wx.showActionSheet({
+        itemList: [
+          '🏥 添加健康记录',
+          '👥 添加家庭成员',
+          '📊 健康监测记录',
+          '💊 用药记录',
+          '🩺 就诊记录',
+          '🏃 运动记录',
+          '😴 睡眠记录'
+        ],
+        success: (res) => {
+          console.log('[事件] 用户选择:', res.tapIndex);
+          this.handleAddScheduleSelection(res.tapIndex);
+        },
+        fail: (error) => {
+          console.log('[事件] 用户取消选择或操作失败:', error);
+        }
+      });
+    } catch (error) {
+      console.error('[错误] addSchedule 方法执行失败:', error);
+      wx.showToast({
+        title: '操作失败',
+        icon: 'none',
+        duration: 2000
+      });
+    }
+  },
+
+  /**
+   * 处理添加日程选择
+   */
+  handleAddScheduleSelection(index) {
+    console.log('[事件] 处理选择项:', index);
+    
+    const actions = [
+      () => this.navigateToHealthRecord('vital'),    // 健康记录
+      () => this.navigateToMemberForm(),             // 家庭成员
+      () => this.navigateToHealthRecord('monitoring'), // 健康监测
+      () => this.navigateToHealthRecord('medicationRecord'), // 用药记录
+      () => this.navigateToHealthRecord('consultation'),     // 就诊记录
+      () => this.navigateToHealthRecord('exercise'),         // 运动记录
+      () => this.navigateToHealthRecord('sleep')             // 睡眠记录
+    ];
+    
+    if (actions[index]) {
+      actions[index]();
+    }
+  },
+
+  /**
+   * 导航到健康记录表单
+   */
+  navigateToHealthRecord(type) {
+    console.log(`[导航] 跳转到健康记录表单，类型: ${type}`);
+    
+    wx.navigateTo({
+      url: `/pages/health-record-form/health-record-form?type=${type}&mode=add`,
+      success: () => {
+        console.log(`[导航] 成功跳转到健康记录表单 - ${type}`);
+      },
+      fail: (error) => {
+        console.error(`[导航] 跳转到健康记录表单失败:`, error);
+        wx.showToast({
+          title: '页面跳转失败',
+          icon: 'none',
+          duration: 2000
+        });
+      }
+    });
+  },
+
+  /**
+   * 导航到家庭成员表单
+   */
+  navigateToMemberForm() {
+    console.log('[导航] 跳转到家庭成员表单');
+    
+    wx.navigateTo({
+      url: '/pages/member-form/member-form?mode=add',
+      success: () => {
+        console.log('[导航] 成功跳转到家庭成员表单');
+      },
+      fail: (error) => {
+        console.error('[导航] 跳转到家庭成员表单失败:', error);
+        wx.showToast({
+          title: '页面跳转失败',
+          icon: 'none',
+          duration: 2000
+        });
+      }
+    });
+  },
+
+  // ========================= 其他缺失的事件处理方法 =========================
+
+  /**
+   * 清除筛选条件
+   */
+  clearFilters() {
+    console.log('[事件] 清除筛选条件');
+    
+    this.setData({
+      currentFilters: {
+        time: 'all',
+        status: 'all',
+        type: 'all',
+        priority: 'all',
+        patient: 'all',
+        sort: 'time_asc',
+        keyword: ''
+      }
+    });
+    
+    // 重新加载数据
+    this.loadScheduleList(true);
+    
+    wx.showToast({
+      title: '已清除筛选',
+      icon: 'success',
+      duration: 1500
+    });
+  },
+
+  /**
+   * 重试上次操作
+   */
+  retryLastOperation() {
+    console.log('[事件] 重试上次操作');
+    
+    // 增加重试计数
+    const retryCount = this.data.errorState.retryCount + 1;
+    
+    this.setData({
+      'errorState.retryCount': retryCount,
+      'errorState.hasError': false
+    });
+    
+    // 重新加载数据
+    this.loadScheduleList(true);
+  },
+
+  /**
+   * 手动重新加载
+   */
+  manualReload() {
+    console.log('[事件] 手动重新加载');
+    
+    // 清除错误状态
+    this.setData({
+      'errorState.hasError': false,
+      'errorState.retryCount': 0
+    });
+    
+    // 重新加载数据
+    this.refreshData();
+  },
+
+  /**
+   * 日程项点击事件
+   */
+  onScheduleItemTap(e) {
+    const scheduleId = e.currentTarget.dataset.id;
+    console.log('[事件] 点击日程项:', scheduleId);
+    
+    if (!scheduleId) {
+      console.error('[错误] 无效的日程 ID');
+      return;
+    }
+    
+    // 导航到日程详情页面（假设存在）
+    // 这里可以根据实际需要修改导航目标
+    wx.showModal({
+      title: '日程详情',
+      content: `您点击了日程 ID: ${scheduleId}\n\n该功能正在开发中...`,
+      showCancel: true,
+      cancelText: '取消',
+      confirmText: '知道了'
+    });
+  },
+
+  /**
+   * 日程项长按事件
+   */
+  onScheduleItemLongPress(e) {
+    const scheduleId = e.currentTarget.dataset.id;
+    console.log('[事件] 长按日程项:', scheduleId);
+    
+    // 进入批量选择模式或显示快捷操作菜单
+    wx.showActionSheet({
+      itemList: ['编辑日程', '删除日程', '复制日程', '进入批量模式'],
+      success: (res) => {
+        switch (res.tapIndex) {
+          case 0:
+            console.log('编辑日程:', scheduleId);
+            break;
+          case 1:
+            this.confirmDeleteSchedule(scheduleId);
+            break;
+          case 2:
+            console.log('复制日程:', scheduleId);
+            break;
+          case 3:
+            this.enterBatchMode();
+            break;
+        }
+      }
+    });
+  },
+
+  /**
+   * 确认删除日程
+   */
+  confirmDeleteSchedule(scheduleId) {
+    wx.showModal({
+      title: '删除确认',
+      content: '确定要删除这个日程吗？此操作不可恢复。',
+      confirmText: '删除',
+      confirmColor: '#ff4444',
+      success: (res) => {
+        if (res.confirm) {
+          this.deleteSchedule(scheduleId);
+        }
+      }
+    });
+  },
+
+  /**
+   * 删除日程
+   */
+  async deleteSchedule(scheduleId) {
+    try {
+      wx.showLoading({ title: '删除中...' });
+      
+      // 这里应该调用 API 删除日程
+      // await ScheduleAPI.deleteSchedule(scheduleId);
+      
+      // 从本地数据中移除
+      const scheduleList = this.data.scheduleList.filter(item => item.id !== scheduleId);
+      
+      this.setData({
+        scheduleList,
+        originalScheduleList: scheduleList
+      });
+      
+      this.applyLocalFilters();
+      
+      wx.hideLoading();
+      wx.showToast({
+        title: '删除成功',
+        icon: 'success'
+      });
+    } catch (error) {
+      wx.hideLoading();
+      console.error('删除日程失败:', error);
+      wx.showToast({
+        title: '删除失败',
+        icon: 'error'
+      });
+    }
+  },
+
+  /**
+   * 进入批量模式
+   */
+  enterBatchMode() {
+    console.log('[事件] 进入批量模式');
+    
+    this.setData({
+      batchMode: true,
+      selectedSchedules: []
+    });
+    
+    wx.showToast({
+      title: '已进入批量模式',
+      icon: 'none'
+    });
+  },
+
+  /**
+   * 排序按钮点击
+   */
+  onSortTap() {
+    console.log('[事件] 排序按钮点击');
+    
+    const sortOptions = [
+      '按时间排序 (早→晚)',
+      '按时间排序 (晚→早)',
+      '按优先级排序',
+      '按状态排序',
+      '按患者姓名排序'
+    ];
+    
+    wx.showActionSheet({
+      itemList: sortOptions,
+      success: (res) => {
+        this.handleSortSelection(res.tapIndex);
+      }
+    });
+  },
+
+  /**
+   * 处理排序选择
+   */
+  handleSortSelection(index) {
+    const sortTypes = ['time_asc', 'time_desc', 'priority', 'status', 'patient'];
+    const sortType = sortTypes[index];
+    
+    console.log('[事件] 切换排序方式:', sortType);
+    
+    this.setData({
+      'currentFilters.sort': sortType
+    });
+    
+    // 应用本地排序
+    this.applyLocalFilters();
+    
+    wx.showToast({
+      title: '排序已更新',
+      icon: 'success',
+      duration: 1500
+    });
+  },
+
+  // ========================= 批量操作相关方法 =========================
+
+  /**
+   * 切换选中状态
+   */
+  onToggleSelection(e) {
+    const scheduleId = e.currentTarget.dataset.id;
+    console.log('[事件] 切换选中状态:', scheduleId);
+    
+    const selectedSchedules = [...this.data.selectedSchedules];
+    const index = selectedSchedules.indexOf(scheduleId);
+    
+    if (index > -1) {
+      // 已选中，移除
+      selectedSchedules.splice(index, 1);
+    } else {
+      // 未选中，添加
+      selectedSchedules.push(scheduleId);
+    }
+    
+    this.setData({
+      selectedSchedules
+    });
+    
+    console.log('[事件] 当前选中:', selectedSchedules.length, '项');
+  },
+
+  /**
+   * 批量操作
+   */
+  onBatchAction(e) {
+    const action = e.currentTarget.dataset.action;
+    const selectedSchedules = this.data.selectedSchedules;
+    
+    console.log('[事件] 批量操作:', action, '选中数量:', selectedSchedules.length);
+    
+    if (selectedSchedules.length === 0) {
+      wx.showToast({
+        title: '请先选择日程',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    switch (action) {
+      case 'reschedule':
+        this.batchReschedule(selectedSchedules);
+        break;
+      case 'cancel':
+        this.batchCancel(selectedSchedules);
+        break;
+      case 'confirm':
+        this.batchConfirm(selectedSchedules);
+        break;
+      default:
+        console.error('[错误] 未知的批量操作:', action);
+    }
+  },
+
+  /**
+   * 批量重新安排
+   */
+  batchReschedule(scheduleIds) {
+    console.log('[批量操作] 重新安排:', scheduleIds);
+    
+    wx.showModal({
+      title: '批量重新安排',
+      content: `确定要重新安排这 ${scheduleIds.length} 个日程吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          // 这里应该调用批量重新安排的 API
+          wx.showToast({
+            title: '批量重新安排成功',
+            icon: 'success'
+          });
+          this.exitBatchMode();
+        }
+      }
+    });
+  },
+
+  /**
+   * 批量取消
+   */
+  batchCancel(scheduleIds) {
+    console.log('[批量操作] 取消:', scheduleIds);
+    
+    wx.showModal({
+      title: '批量取消',
+      content: `确定要取消这 ${scheduleIds.length} 个日程吗？`,
+      confirmText: '取消日程',
+      confirmColor: '#ff4444',
+      success: (res) => {
+        if (res.confirm) {
+          this.updateBatchScheduleStatus(scheduleIds, 'cancelled');
+          this.exitBatchMode();
+        }
+      }
+    });
+  },
+
+  /**
+   * 批量确认
+   */
+  batchConfirm(scheduleIds) {
+    console.log('[批量操作] 确认:', scheduleIds);
+    
+    wx.showModal({
+      title: '批量确认',
+      content: `确定要确认这 ${scheduleIds.length} 个日程吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          this.updateBatchScheduleStatus(scheduleIds, 'confirmed');
+          this.exitBatchMode();
+        }
+      }
+    });
+  },
+
+  /**
+   * 批量更新日程状态
+   */
+  updateBatchScheduleStatus(scheduleIds, newStatus) {
+    const scheduleList = this.data.scheduleList.map(item => {
+      if (scheduleIds.includes(item.id)) {
+        return {
+          ...item,
+          status: newStatus,
+          statusText: this.getStatusText(newStatus)
+        };
+      }
+      return item;
+    });
+    
+    this.setData({
+      scheduleList,
+      originalScheduleList: scheduleList
+    });
+    
+    this.applyLocalFilters();
+    
+    wx.showToast({
+      title: `批量操作成功`,
+      icon: 'success'
+    });
+  },
+
+  /**
+   * 退出批量模式
+   */
+  exitBatchMode() {
+    console.log('[事件] 退出批量模式');
+    
+    this.setData({
+      batchMode: false,
+      selectedSchedules: []
+    });
+  },
+
+  /**
+   * 获取状态文本
+   */
+  getStatusText(status) {
+    const statusMap = {
+      'pending': '待服务',
+      'in-progress': '服务中',
+      'completed': '已完成',
+      'cancelled': '已取消',
+      'confirmed': '已确认',
+      'overdue': '已过期'
+    };
+    return statusMap[status] || status;
+  },
+
+  // ========================= 操作弹窗相关方法 =========================
+
+  /**
+   * 日程操作
+   */
+  onScheduleAction(e) {
+    const action = e.currentTarget.dataset.action;
+    console.log('[事件] 日程操作:', action);
+    
+    // 关闭操作弹窗
+    this.setData({
+      showActionModal: false
+    });
+    
+    // 执行对应操作
+    switch (action) {
+      case 'edit':
+        this.editSchedule();
+        break;
+      case 'delete':
+        this.confirmDeleteSchedule(this.data.selectedSchedule?.id);
+        break;
+      case 'reschedule':
+        this.rescheduleSchedule();
+        break;
+      case 'complete':
+        this.completeSchedule();
+        break;
+      default:
+        console.error('[错误] 未知的操作:', action);
+    }
+  },
+
+  /**
+   * 关闭操作弹窗
+   */
+  onActionModalClose() {
+    console.log('[事件] 关闭操作弹窗');
+    
+    this.setData({
+      showActionModal: false,
+      selectedSchedule: null,
+      actionModalActions: []
+    });
+  },
+
+  /**
+   * 编辑日程
+   */
+  editSchedule() {
+    const schedule = this.data.selectedSchedule;
+    if (!schedule) return;
+    
+    console.log('[操作] 编辑日程:', schedule.id);
+    
+    // 这里应该导航到编辑页面
+    wx.showToast({
+      title: '编辑功能开发中',
+      icon: 'none'
+    });
+  },
+
+  /**
+   * 重新安排日程
+   */
+  rescheduleSchedule() {
+    const schedule = this.data.selectedSchedule;
+    if (!schedule) return;
+    
+    console.log('[操作] 重新安排日程:', schedule.id);
+    
+    // 这里应该打开时间选择器
+    wx.showToast({
+      title: '重新安排功能开发中',
+      icon: 'none'
+    });
+  },
+
+  /**
+   * 完成日程
+   */
+  completeSchedule() {
+    const schedule = this.data.selectedSchedule;
+    if (!schedule) return;
+    
+    console.log('[操作] 完成日程:', schedule.id);
+    
+    wx.showModal({
+      title: '完成确认',
+      content: `确定要标记为完成吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          this.updateScheduleStatus(schedule.id, 'completed');
+          wx.showToast({
+            title: '已标记为完成',
+            icon: 'success'
+          });
+        }
+      }
     });
   }
 });
