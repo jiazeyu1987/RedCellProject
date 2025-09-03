@@ -1,0 +1,313 @@
+/* 日程表单页面样式 */
+
+.schedule-form-container {
+  height: 100vh;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 加载状态 */
+.loading-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-text {
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 表单内容 */
+.form-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-scroll {
+  flex: 1;
+  padding: 20rpx;
+}
+
+/* 表单分组 */
+.form-section {
+  margin-bottom: 40rpx;
+  background-color: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.section-title {
+  padding: 24rpx 32rpx 16rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* 表单输入框 */
+.form-input {
+  width: 100%;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: #333;
+  background-color: transparent;
+}
+
+.form-input::placeholder {
+  color: #999;
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 120rpx;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: #333;
+  background-color: transparent;
+  line-height: 1.6;
+}
+
+.form-textarea::placeholder {
+  color: #999;
+}
+
+/* 选择器样式 */
+.picker-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: #333;
+  min-height: 48rpx;
+}
+
+.picker-arrow {
+  color: #999;
+  font-size: 24rpx;
+  transform: rotate(90deg);
+  transition: transform 0.3s ease;
+}
+
+/* 优先级显示 */
+.priority-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.priority-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* 日期时间选择器 */
+.form-item .datetime-picker {
+  width: 100%;
+}
+
+.datetime-text {
+  color: #333;
+}
+
+/* 操作按钮 */
+.form-actions {
+  display: flex;
+  gap: 24rpx;
+  padding: 32rpx;
+  background-color: #fff;
+  border-top: 1px solid #f0f0f0;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+
+.btn-cancel {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #6c757d;
+  border: 2rpx solid #dee2e6;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.btn-cancel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-cancel:active::before {
+  left: 100%;
+}
+
+.btn-cancel-hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+  transform: translateY(-2rpx);
+  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.12);
+}
+
+.btn-submit {
+  flex: 2;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  background: linear-gradient(135deg, #007aff 0%, #0056cc 100%);
+  color: #fff;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 6rpx 20rpx rgba(0, 122, 255, 0.3);
+  border: none;
+}
+
+.btn-submit::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-submit:active::before {
+  left: 100%;
+}
+
+.btn-submit-hover {
+  background: linear-gradient(135deg, #0056cc 0%, #003d99 100%);
+  transform: translateY(-2rpx);
+  box-shadow: 0 8rpx 24rpx rgba(0, 122, 255, 0.4);
+}
+
+.btn-submit.submitting {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: #adb5bd;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+  transform: none;
+}
+
+.btn-submit.submitting::before {
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.btn-icon {
+  font-size: 32rpx;
+  line-height: 1;
+}
+
+.btn-text {
+  font-size: 28rpx;
+  line-height: 1;
+}
+
+/* 表单验证错误提示 */
+.form-item[data-has-error="true"] .form-input,
+.form-item[data-has-error="true"] .form-textarea,
+.form-item[data-has-error="true"] .picker-display {
+  border-color: #ff3b30;
+}
+
+/* 响应式布局 */
+@media (max-width: 750rpx) {
+  .form-scroll {
+    padding: 16rpx;
+  }
+  
+  .form-actions {
+    padding: 24rpx 16rpx;
+  }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .schedule-form-container {
+    background-color: #1c1c1e;
+  }
+  
+  .form-section {
+    background-color: #2c2c2e;
+  }
+  
+  .section-title {
+    color: #fff;
+    border-bottom-color: #3a3a3c;
+  }
+  
+  .form-input,
+  .form-textarea,
+  .picker-display,
+  .datetime-picker {
+    color: #fff;
+  }
+  
+  .form-input::placeholder,
+  .form-textarea::placeholder {
+    color: #8e8e93;
+  }
+  
+  .picker-arrow {
+    color: #8e8e93;
+  }
+  
+  .form-actions {
+    background-color: #2c2c2e;
+    border-top-color: #3a3a3c;
+    box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.3);
+  }
+  
+  .btn-cancel {
+    background: linear-gradient(135deg, #3a3a3c 0%, #2c2c2e 100%);
+    color: #8e8e93;
+    border-color: #48484a;
+    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.3);
+  }
+  
+  .btn-cancel-hover {
+    background: linear-gradient(135deg, #48484a 0%, #3a3a3c 100%);
+    color: #fff;
+  }
+  
+  .btn-submit {
+    background: linear-gradient(135deg, #0a84ff 0%, #0056cc 100%);
+    box-shadow: 0 6rpx 20rpx rgba(10, 132, 255, 0.4);
+  }
+  
+  .btn-submit-hover {
+    background: linear-gradient(135deg, #0056cc 0%, #003d99 100%);
+    box-shadow: 0 8rpx 24rpx rgba(10, 132, 255, 0.5);
+  }
+}

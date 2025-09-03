@@ -240,6 +240,8 @@ const PagePermissions = {
   // 日程管理
   SCHEDULE_LIST: PermissionMiddleware.createPageConfig(PERMISSIONS.VIEW_SCHEDULE),
   SCHEDULE_DETAIL: PermissionMiddleware.createPageConfig(PERMISSIONS.VIEW_SCHEDULE),
+  SCHEDULE_CREATE: PermissionMiddleware.createPageConfig(PERMISSIONS.CREATE_SCHEDULE),
+  SCHEDULE_EDIT: PermissionMiddleware.createPageConfig(PERMISSIONS.UPDATE_SCHEDULE),
   
   // 患者管理
   PATIENT_LIST: PermissionMiddleware.createPageConfig(PERMISSIONS.VIEW_PATIENT),

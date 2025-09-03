@@ -1,0 +1,186 @@
+<!--日程表单页面-->
+<view class="schedule-form-container">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-text">加载中...</view>
+  </view>
+
+  <!-- 表单内容 -->
+  <view wx:else class="form-content">
+    <scroll-view scroll-y class="form-scroll">
+      
+      <!-- 基本信息 -->
+      <view class="form-section">
+        <view class="section-title">基本信息</view>
+        
+        <!-- 服务名称 -->
+        <form-item 
+          label="服务名称" 
+          required="{{false}}"
+          error="{{formErrors.serviceName}}">
+          <input 
+            class="form-input"
+            data-field="serviceName"
+            value="{{formData.serviceName}}"
+            placeholder="请输入服务名称"
+            bindinput="onInputChange" />
+        </form-item>
+
+        <!-- 患者选择 -->
+        <form-item 
+          label="服务对象" 
+          required="{{false}}"
+          error="{{formErrors.patientId}}">
+          <picker 
+            data-field="patientId"
+            range="{{patientList}}"
+            range-key="name"
+            value="{{formData.patientName}}"
+            bindchange="onPatientChange">
+            <view class="picker-display">
+              {{formData.patientName || '请选择患者'}}
+              <text class="picker-arrow">></text>
+            </view>
+          </picker>
+        </form-item>
+
+        <!-- 服务类型 -->
+        <form-item 
+          label="服务类型" 
+          required="{{false}}"
+          error="{{formErrors.serviceType}}">
+          <picker 
+            data-field="serviceType"
+            range="{{serviceTypes}}"
+            range-key="label"
+            bindchange="onServiceTypeChange">
+            <view class="picker-display">
+              {{selectedServiceTypeLabel || '请选择服务类型'}}
+              <text class="picker-arrow">&gt;</text>
+            </view>
+          </picker>
+        </form-item>
+
+        <!-- 优先级 -->
+        <form-item 
+          label="优先级" 
+          required="{{false}}"
+          error="{{formErrors.priority}}">
+          <picker 
+            data-field="priority"
+            range="{{priorities}}"
+            range-key="label"
+            bindchange="onPriorityChange">
+            <view class="picker-display">
+              <view class="priority-item">
+                <text 
+                  class="priority-dot" 
+                  style="background-color: {{selectedPriorityColor}}">
+                </text>
+                {{selectedPriorityLabel || '请选择优先级'}}
+              </view>
+              <text class="picker-arrow">&gt;</text>
+            </view>
+          </picker>
+        </form-item>
+      </view>
+
+      <!-- 时间安排 -->
+      <view class="form-section">
+        <view class="section-title">时间安排</view>
+        
+        <!-- 开始时间 -->
+        <form-item 
+          label="开始时间" 
+          required="{{true}}"
+          error="{{formErrors.startTime}}">
+          <picker 
+            mode="multiSelector"
+            range="{{dateTimePickerRange}}"
+            range-key="{{dateTimePickerRangeKey}}"
+            value="{{startTimePickerValue}}"
+            data-field="startTime"
+            bindchange="onDateTimePickerChange">
+            <view class="picker-display">
+              <text class="datetime-text">{{formData.startTime || '请选择开始时间'}}</text>
+              <text class="picker-arrow">&gt;</text>
+            </view>
+          </picker>
+        </form-item>
+
+        <!-- 结束时间 -->
+        <form-item 
+          label="结束时间" 
+          required="{{true}}"
+          error="{{formErrors.endTime}}">
+          <picker 
+            mode="multiSelector"
+            range="{{dateTimePickerRange}}"
+            range-key="{{dateTimePickerRangeKey}}"
+            value="{{endTimePickerValue}}"
+            data-field="endTime"
+            bindchange="onDateTimePickerChange">
+            <view class="picker-display">
+              <text class="datetime-text">{{formData.endTime || '请选择结束时间'}}</text>
+              <text class="picker-arrow">&gt;</text>
+            </view>
+          </picker>
+        </form-item>
+      </view>
+
+      <!-- 详细信息 -->
+      <view class="form-section">
+        <view class="section-title">详细信息</view>
+        
+        <!-- 服务地点 -->
+        <form-item 
+          label="服务地点" 
+          required="{{false}}"
+          error="{{formErrors.location}}">
+          <input 
+            class="form-input"
+            data-field="location"
+            value="{{formData.location}}"
+            placeholder="请输入服务地点"
+            bindinput="onInputChange" />
+        </form-item>
+
+        <!-- 服务描述 -->
+        <form-item 
+          label="服务描述" 
+          required="{{false}}"
+          error="{{formErrors.description}}">
+          <textarea 
+            class="form-textarea"
+            data-field="description"
+            value="{{formData.description}}"
+            placeholder="请输入服务描述或备注信息"
+            bindinput="onInputChange"
+            maxlength="200"
+            show-count>
+          </textarea>
+        </form-item>
+      </view>
+
+    </scroll-view>
+
+    <!-- 操作按钮 -->
+    <view class="form-actions">
+      <button 
+        class="btn-cancel"
+        hover-class="btn-cancel-hover"
+        bindtap="onCancel">
+        <text class="btn-icon">❌</text>
+        <text class="btn-text">取消</text>
+      </button>
+      <button 
+        class="btn-submit {{submitting ? 'submitting' : ''}}"
+        hover-class="btn-submit-hover"
+        bindtap="onSubmit"
+        disabled="{{submitting}}">
+        <text class="btn-icon">{{submitting ? '⏳' : (mode === 'create' ? '➕' : '💾')}}</text>
+        <text class="btn-text">{{submitting ? '提交中...' : (mode === 'create' ? '创建' : '保存')}}</text>
+      </button>
+    </view>
+  </view>
+</view>

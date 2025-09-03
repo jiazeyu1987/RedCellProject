@@ -14,6 +14,7 @@
     "pages/health-monitoring/health-monitoring",
     "pages/relationship-map/relationship-map",
     "pages/schedule/schedule",
+    "pages/schedule-form/schedule-form",
     "pages/user-settings/user-settings",
     "pages/logs/logs"
   ],

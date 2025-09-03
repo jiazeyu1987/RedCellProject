@@ -98,6 +98,7 @@ Page({
     // 权限相关
     permissions: {
       canView: false,
+      canCreate: false,
       canEdit: false,
       canDelete: false,
       canBatchEdit: false
@@ -266,6 +267,7 @@ Page({
     
     const permissions = {
       canView: RolePermissionManager.hasPermission(userRole, PERMISSIONS.VIEW_SCHEDULE),
+      canCreate: RolePermissionManager.hasPermission(userRole, PERMISSIONS.CREATE_SCHEDULE),
       canEdit: RolePermissionManager.hasPermission(userRole, PERMISSIONS.UPDATE_SCHEDULE),
       canDelete: RolePermissionManager.hasPermission(userRole, PERMISSIONS.DELETE_SCHEDULE),
       canBatchEdit: RolePermissionManager.hasPermission(userRole, PERMISSIONS.BATCH_ADJUST_TIME)
@@ -966,7 +968,7 @@ Page({
   createSchedule() {
     console.log('创建日程');
     
-    if (!this.data.permissions.canEdit) {
+    if (!this.data.permissions.canCreate) {
       wx.showToast({
         title: '没有创建权限',
         icon: 'none'
@@ -974,18 +976,17 @@ Page({
       return;
     }
     
-    // TODO: 创建日程表单页面开发中
-    wx.showModal({
-      title: '功能开发中',
-      content: '日程创建表单页面正在开发中，请稍后再试。',
-      showCancel: false,
-      confirmText: '知道了'
+    // 跳转到日程创建表单页面
+    wx.navigateTo({
+      url: '/pages/schedule-form/schedule-form?mode=create',
+      fail: (err) => {
+        console.error('跳转到日程表单失败:', err);
+        wx.showToast({
+          title: '页面跳转失败',
+          icon: 'none'
+        });
+      }
     });
-    
-    // 待日程表单页面开发完成后，可以启用下面的代码
-    // wx.navigateTo({
-    //   url: '/pages/schedule-form/schedule-form?mode=create'
-    // });
   },
 
   /**

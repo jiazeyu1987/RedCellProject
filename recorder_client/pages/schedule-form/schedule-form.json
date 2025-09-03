@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "日程表单",
+  "navigationBarBackgroundColor": "#007AFF",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#f8f9fa",
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "button": "/components/button/button",
+    "form-item": "/components/form-item/form-item",
+    "modal-picker": "/components/modal-picker/modal-picker"
+  }
+}
